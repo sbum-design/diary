@@ -1579,7 +1579,7 @@ button.tci:hover{background:var(--page)}
     else if(v==='tasks'){if(S.tl==='cal:w')S.cur=addD(S.cur,7*dir);else if(S.tl==='cal:d')S.cur=addD(S.cur,dir);else S.cur=addM(S.cur,dir);if(!S.qa.pick)S.qa.due=S.cur}
   }
   const ACT={
-    tab:b=>{flushAll();S.view=b.dataset.v;S.confirm=null;S.tsel=null;S.dp=null;S.mm=false;S.tp=null;try{localStorage.setItem(LSV,S.view)}catch(e){}render();window.scrollTo(0,0)},
+    tab:b=>{flushAll();S.view=b.dataset.v;S.confirm=null;S.tsel=null;S.dp=null;S.mm=false;S.tp=null;if(S.view==='tasks'){S.cur=TODAY;S.side=false;S.qa.pick=false;S.qa.due=qaCtx().due}try{localStorage.setItem(LSV,S.view)}catch(e){}render();window.scrollTo(0,0)},
     prev:()=>{flushAll();S.tp=null;shift(-1);render()},
     next:()=>{flushAll();S.tp=null;shift(1);render()},
     today:()=>{flushAll();S.cur=TODAY;if(S.view==='tasks'&&!S.qa.pick)S.qa.due=qaCtx().due;render()},
