@@ -6,8 +6,8 @@
 <title>하루 기록장</title>
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" href="icon.png">
-<meta name="theme-color" content="#f2f4f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#121418" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f2f4f7">
+<meta name="color-scheme" content="light only">
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Gothic+A1:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -21,18 +21,9 @@
   --f-body:"Gothic A1","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --desk:#121418; --page:#1b1e23; --ink:#e7e9ed; --ink-2:#a6adb8; --ink-3:#6e7581; --rule:#343944; --hair:#272b32; --fill:#242830;
-  --ac:#6f8fff; --ac-soft:#232c4a; --on-ac:#ffffff;
-  --p1:#6f8fff; --p2:#f5b13a; --p3:#f06a6e;
-  --on:#1b1e23; --gutter:rgba(0,0,0,.4); --l1:#243055; --l2:#344c9a; --l3:#4e6fe0; --l4:#7d9aff; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --desk:#121418; --page:#1b1e23; --ink:#e7e9ed; --ink-2:#a6adb8; --ink-3:#6e7581; --rule:#343944; --hair:#272b32; --fill:#242830;
-  --ac:#6f8fff; --ac-soft:#232c4a; --on-ac:#ffffff;
-  --p1:#6f8fff; --p2:#f5b13a; --p3:#f06a6e;
-  --on:#1b1e23; --gutter:rgba(0,0,0,.4); --l1:#243055; --l2:#344c9a; --l3:#4e6fe0; --l4:#7d9aff; color-scheme:dark}
 
 *{box-sizing:border-box}
+:root{color-scheme:light only}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{-webkit-text-size-adjust:100%;touch-action:pan-x pan-y}
 body{touch-action:pan-x pan-y}
@@ -1388,14 +1379,14 @@ button.tci:hover{background:var(--page)}
       const inner=pic?(ph.length>1?`<span class="cnt">${ph.length}</span>`:''):items.slice(0,3).map(x=>`<span class="ev ${x.g?'g':''} ${x.k||''}">${x.g?'●':x.k==='k'?'□':x.k==='kd'?'■':'○'} ${esc(x.t)}</span>`).join('')+(items.length>3?`<span class="ev more">+${items.length-3}</span>`:'');
       return `<td class="${id===TODAY?'today':''} ${dt.getDay()===0?'sun':''} ${pic?'pic':''}"><button class="cell" data-act="goday" data-d="${id}" aria-label="${m+1}월 ${dt.getDate()}일"${bg}><span class="dn">${dt.getDate()}</span>${inner}</button></td>`;
     };
-    const wk=s=>`<td class="wk"><span>W${pad(isoWeek(s).w)}</span></td>`;
+    const wk=()=>'';
     const memo=`<div class="memo"><h4 class="lab">Monthly goal</h4>${checklist(mid,'goals','목표 추가')}<h4 class="lab" style="margin-top:6px">Memo</h4><textarea class="ta" rows="2" data-b="${mid}|memo" placeholder="이 달의 메모">${esc(mdoc.memo||'')}</textarea></div>`;
     let left,right;
     if(wide.matches){
-      left=`<table class="cal"><thead><tr><th class="wk"></th>${WD.slice(0,4).map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${wk(s)}${[0,1,2,3].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
+      left=`<table class="cal"><thead><tr>${WD.slice(0,4).map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${wk(s)}${[0,1,2,3].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
       right=`<table class="cal"><thead><tr>${WD.slice(4).map(w=>`<th>${w}</th>`).join('')}<th class="memo-h">MEMO</th></tr></thead><tbody>${weeks.map((s,r)=>`<tr>${[4,5,6].map(i=>cell(addD(s,i))).join('')}${r===0?`<td class="memo-td" rowspan="${weeks.length}">${memo}</td>`:''}</tr>`).join('')}</tbody></table>`;
     }else{
-      left=`<table class="cal"><thead><tr><th class="wk"></th>${WD.map(w=>`<th>${w.slice(0,2)}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${wk(s)}${[0,1,2,3,4,5,6].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
+      left=`<table class="cal"><thead><tr>${WD.map(w=>`<th>${w.slice(0,2)}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${wk(s)}${[0,1,2,3,4,5,6].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
       right=memo;
     }
     const tools=`<div class="tools"><div class="seg" role="group" aria-label="보기 방식"><button data-act="mode" data-m="0" aria-pressed="${!photo}">TEXT</button><button data-act="mode" data-m="1" aria-pressed="${photo}">PHOTO</button></div></div>`;
