@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>하루 기록장</title>
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" href="icon.png">
@@ -28,7 +28,8 @@
 
 *{box-sizing:border-box}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;touch-action:pan-x pan-y}
+body{touch-action:pan-x pan-y}
 body{margin:0}
 img{max-width:100%}
 [hidden]{display:none!important}
@@ -249,10 +250,14 @@ td.today.pic .dn{background:#fff;color:#111;text-shadow:none}
 
 /* goal */
 .word{font-family:var(--f-disp);font-weight:700;font-size:1.6rem;border:0;border-bottom:1px solid var(--hair);background:transparent;width:100%;padding:2px 0}
-.gr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 0;border-bottom:1px solid var(--hair)}
-.gr .tx{flex:1 1 160px}
-.gr input[type=range]{accent-color:var(--ink);width:110px}
-.gr .pv{font-family:var(--f-mono);font-size:.74rem;width:3.2em;text-align:right;color:var(--ink-2)}
+.gr{display:grid;gap:6px;padding:8px 0 10px;border-bottom:1px solid var(--hair)}
+.gr1{display:flex;align-items:center;gap:8px;min-width:0}
+.gr2{display:flex;align-items:center;gap:10px;padding-left:23px}
+.gcells{flex:1;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:3px}
+.gc{height:26px;border-radius:4px;background:var(--fill);border:1px solid var(--hair)}
+.gc:hover{border-color:var(--ink-3)}
+.gc.on{background:var(--ink);border-color:var(--ink)}
+.gr .pv{font-family:var(--f-mono);font-size:.78rem;width:3.2em;text-align:right;color:var(--ink-2);flex:none}
 .bar{height:4px;background:var(--fill);border-radius:2px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--ink)}
 .big{display:flex;align-items:baseline;gap:10px}
@@ -762,8 +767,8 @@ td.today.pic .dn{background:#fff;color:#111;text-shadow:none}
     const y=parse(S.cur).getFullYear(),yid=`y-${y}`,yd=D(yid),gs=yd.goals||[];
     const avg=gs.length?Math.round(gs.reduce((a,g)=>a+(g.done?100:(+g.pct||0)),0)/gs.length):0;
     const left=`<section class="sec"><h4 class="lab">올해의 한 단어</h4><input class="word" data-b="${yid}|word" value="${esc(yd.word||'')}" placeholder="예: 꾸준함"></section>
-      <section class="sec"><div class="big"><b>${avg}%</b><span class="lab">${y} 목표 진행률</span></div><div class="bar"><i style="width:${avg}%"></i></div></section>
-      <section class="sec"><h4 class="lab">${y} Goals</h4><div class="cl">${gs.map((g,i)=>`<div class="gr"><input type="checkbox" data-b="${yid}|goals.${i}.done" ${g.done?'checked':''} aria-label="달성"><input class="tx ${g.done?'done':''}" data-b="${yid}|goals.${i}.text" value="${esc(g.text||'')}" placeholder="목표"><input type="range" min="0" max="100" step="10" data-b="${yid}|goals.${i}.pct" data-rr="1" value="${+g.pct||0}" aria-label="진행률"><span class="pv">${+g.pct||0}%</span><button class="del" data-act="del" data-b="${yid}|goals.${i}" aria-label="삭제">×</button></div>`).join('')}<button class="add" data-act="add" data-b="${yid}|goals" data-tpl="goal">+ 목표 추가</button></div></section>
+      <section class="sec"><div class="big"><b>${avg}%</b><span class="lab">${y} 목표 진행률</span></div><div class="bar"><i style="width:${avg}%"></i></div><span class="gnote">아래 목표들의 진행률 평균입니다. 달성 체크한 목표는 100%로 계산됩니다.</span></section>
+      <section class="sec"><h4 class="lab">${y} Goals</h4>${gs.length?'':'<p class="empty">아직 목표가 없습니다. 아래 \'+ 목표 추가\'를 눌러 올해 목표를 적고, 칸을 눌러 진행률을 채우세요.</p>'}<div class="cl">${gs.map((g,i)=>{const p=g.done?100:(+g.pct||0);return `<div class="gr"><div class="gr1"><input type="checkbox" data-b="${yid}|goals.${i}.done" ${g.done?'checked':''} aria-label="달성"><input class="tx ${g.done?'done':''}" data-b="${yid}|goals.${i}.text" value="${esc(g.text||'')}" placeholder="목표를 적으세요"><button class="del" data-act="del" data-b="${yid}|goals.${i}" aria-label="삭제">×</button></div><div class="gr2"><div class="gcells" role="group" aria-label="진행률">${[10,20,30,40,50,60,70,80,90,100].map(v=>`<button class="gc ${v<=p?'on':''}" data-act="gpct" data-b="${yid}|goals.${i}" data-p="${v}" aria-label="${v}%"></button>`).join('')}</div><span class="pv">${p}%</span></div></div>`}).join('')}<button class="add" data-act="add" data-b="${yid}|goals" data-tpl="goal">+ 목표 추가</button></div>${gs.length?'<span class="gnote">칸을 누르면 그만큼 채워지고, 마지막 채운 칸을 다시 누르면 한 칸 줄어듭니다. 10칸을 다 채우면 달성으로 체크됩니다.</span>':''}</section>
       ${area(yid,'review','Year review','한 해를 돌아보며')}`;
     const cm=y===TY?+TODAY.slice(5,7)-1:(+S.cur.slice(0,4)===y?+S.cur.slice(5,7)-1:0);
     const rows=MON.map((n,i)=>{const g=D(`m-${y}-${pad(i+1)}`).goals||[];const t=g.filter(x=>x.text).length,d=g.filter(x=>x.text&&x.done).length;
@@ -846,6 +851,8 @@ td.today.pic .dn{background:#fff;color:#111;text-shadow:none}
     confirm:b=>{S.confirm=b.dataset.k;render()},
     cancel:()=>{S.confirm=null;render()},
     'note-del':()=>{remove(S.noteSel);S.noteSel=null;S.confirm=null;render()},
+    gpct:b=>{const[id,p]=b.dataset.b.split('|');const i=+p.split('.')[1],v=+b.dataset.p;
+      update(id,d=>{const g=(d.goals||[])[i];if(!g)return;const cur=g.done?100:(+g.pct||0);g.pct=cur===v?v-10:v;g.done=g.pct>=100},true);render()},
     'g-send':async b=>{const id=b.dataset.d,i=+b.dataset.i,it=(D(id).events||[])[i];if(!it)return;
       b.disabled=true;b.textContent='보내는 중…';
       const ok=await gInsert(id,it.text,it.t||'','',defaultCal(it.text));
@@ -909,6 +916,9 @@ td.today.pic .dn{background:#fff;color:#111;text-shadow:none}
     render();
   }
 
+  ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+  document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
+  let lastTap=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<300&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTap=n},{passive:false});
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){saveLocal();flushAll()}else if(authed()){sync();syncWatches()}else render()});
   window.addEventListener('pagehide',()=>{saveLocal();flushAll()});
   window.addEventListener('online',()=>{if(authed())sync()});
