@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>하루 기록장</title>
 <link rel="apple-touch-icon" href="icon.png?v=3">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Diary Book">
 <link rel="icon" href="icon.png?v=3">
 <meta name="theme-color" content="#f2f4f7">
 <meta name="color-scheme" content="light only">
@@ -1585,6 +1588,7 @@ button.tci:hover{background:var(--page)}
       <div class="set-row"><span class="lab">시간 알림</span><label class="li"><input type="checkbox" data-b="cfg|autoAlarm" ${c.autoAlarm?'checked':''}><span>시간을 넣은 할 일은 자동으로 알림 켜기</span></label>
         <div class="li"><span>알림 시점</span><select class="sel" data-b="cfg|alarmMin">${[0,5,10,15,30,60].map(m=>`<option value="${m}" ${c.alarmMin===m?'selected':''}>${m?m+'분 전':'정시'}</option>`).join('')}</select></div>
         <span class="gnote">알림은 구글 캘린더 일정의 알림으로 옵니다. 폰의 구글 캘린더 앱 알림이 켜져 있어야 합니다.</span></div>
+      <div class="set-row"><span class="lab">앱 아이콘 뱃지</span>${badgeRow()}</div>
       <div class="set-row"><span class="lab">기록 현황</span><div class="kv"><span>기록한 날</span><span class="mono">${dayKeys.filter(dayHas).length}일</span><span>노트</span><span class="mono">${keys.filter(k=>k.startsWith('note-')).length}편</span><span>습관</span><span class="mono">${c.habits.length}개</span><span>사진</span><span class="mono">${photos}장</span></div></div></div>`;
     const right=`<ul class="tips">
       <li><b>TASKS</b> 입력칸에 한 줄로 적으면 날짜·시간·우선순위·목록을 알아서 나눕니다.<br>날짜: 오늘 · 내일 · 모레 · 금요일 · 다음주 화요일 · 11월 3일 · 11/3 · 3일 후<br>시간: 3시 · 오전 9시 · 오후 2시 반 · 14:30<br>우선순위: !높음 · !중간 · !낮음 (또는 !1 · !2 · !3)<br>목록·태그: #업무 (목록 이름이면 목록, 아니면 태그)</li>
@@ -1600,6 +1604,29 @@ button.tci:hover{background:var(--page)}
 
   const VIEW_FN={tasks:vTasks,year:vYear,month:vMonth,week:vWeek,day:vDay,notes:vNotes,habit:vHabit,goal:vGoal,setting:vSetting};
 
+  /* ---------------- app icon badge ---------------- */
+  const badgeOK=()=>'setAppBadge' in navigator;
+  const notifPerm=()=>{try{return window.Notification?Notification.permission:'unsupported'}catch(e){return'unsupported'}};
+  const badgeCount=()=>tasks().filter(t=>!t.done&&t.due&&t.due<=TODAY).length;
+  let lastBadge=-1;
+  function updateBadge(force){
+    if(!badgeOK())return;
+    const on=D('cfg').badge!==false&&notifPerm()==='granted',n=on?badgeCount():0;
+    if(!force&&n===lastBadge)return;lastBadge=n;
+    try{(n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{})}catch(e){}
+  }
+  async function badgeOn(){
+    try{if(window.Notification&&Notification.permission==='default')await Notification.requestPermission()}catch(e){}
+    update('cfg',d=>{d.badge=true},true);updateBadge(true);render();
+  }
+  function badgeRow(){
+    if(!badgeOK())return `<span class="gnote">이 화면에서는 뱃지를 쓸 수 없습니다. 아이폰은 사파리에서 '홈 화면에 추가'한 아이콘으로 열었을 때만 됩니다.</span>`;
+    const perm=notifPerm(),on=D('cfg').badge!==false;
+    if(perm==='denied')return `<span>알림 권한이 꺼져 있습니다.</span><span class="gnote">아이폰 설정 → 알림 → Diary Book에서 '알림 허용'과 '배지'를 켜주세요.</span>`;
+    if(perm!=='granted'||!on)return `<button class="btn dark" data-act="badge-on" style="justify-self:start">뱃지 켜기</button><span class="gnote">처음 한 번 알림 허용을 물어봅니다. 허용해야 아이콘에 숫자가 뜹니다.</span>`;
+    return `<span>켜짐 · 지금 ${badgeCount()}개 표시</span><span class="gnote">오늘 할 일과 기한 지난 할 일 중 완료하지 않은 개수입니다. 앱을 열었다 닫을 때마다 새로 맞춰집니다.</span><button class="btn" data-act="badge-off" style="justify-self:start">뱃지 끄기</button>`;
+  }
+
   /* ---------------- render ---------------- */
   let pending=false;
   const typing=()=>{const a=document.activeElement;return a&&app.contains(a)&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&!['checkbox','radio','range','file'].includes(a.type)))};
@@ -1612,6 +1639,7 @@ button.tci:hover{background:var(--page)}
     const sheet=S.tsel&&S.docs[S.tsel]&&!(S.view==='tasks'&&wideDetail.matches)?`<div class="sheet-bg" data-act="tclose"></div><div class="sheet" role="dialog" aria-label="할 일 상세">${taskDetail(S.tsel)}</div>`:'';
     const top=`<div class="top"><span class="brand">${esc(cfg().title)}</span><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>`;
     const toast=S.undo?`<div class="toast" role="status"><span>할 일을 삭제했습니다</span><button data-act="undo">되돌리기</button></div>`:'';
+    updateBadge();
     if(r.tasks){app.innerHTML=top+tasksLayout(r)+sheet+toast;app.querySelectorAll('textarea.ta').forEach(autosize);return}
     app.innerHTML=`
       <div class="top"><span class="brand">${esc(cfg().title)}</span><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>
@@ -1676,6 +1704,8 @@ button.tci:hover{background:var(--page)}
     side:()=>{S.side=!S.side;render()},
     tdayview:b=>{S.cur=b.dataset.d;S.tl='cal:d';try{localStorage.setItem('diarybook-tl',S.tl)}catch(e){}if(!S.qa.pick)S.qa.due=S.cur;render()},
     tday:b=>{flushAll();S.cur=b.dataset.d;S.qa.due=b.dataset.d;S.qa.pick=false;render()},
+    'badge-on':()=>badgeOn(),
+    'badge-off':()=>{update('cfg',d=>{d.badge=false},true);updateBadge(true);render()},
     'tp-open':b=>{const id=b.dataset.id,k=b.dataset.k,v=D(id)[k]||b.dataset.def;const[h,m]=v.split(':').map(Number);S.tp={id,key:k,label:b.dataset.label,h,m};render()},
     'tp-close':()=>{S.tp=null;render()},
     'tp-ap':b=>{const pm=b.dataset.v==='1';if(pm&&S.tp.h<12)S.tp.h+=12;if(!pm&&S.tp.h>=12)S.tp.h-=12;render()},
@@ -1818,7 +1848,7 @@ button.tci:hover{background:var(--page)}
   ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
   document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
   let lastTap=0,lastEl=null;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<300&&e.target===lastEl&&!e.target.closest('input,textarea,select,button,label'))e.preventDefault();lastTap=n;lastEl=e.target},{passive:false});
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){saveLocal();flushAll()}else if(authed()){sync();syncWatches()}else render()});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){saveLocal();flushAll();updateBadge(true)}else if(authed()){sync();syncWatches()}else render()});
   window.addEventListener('pagehide',()=>{saveLocal();flushAll()});
   window.addEventListener('online',()=>{if(authed())sync()});
   setInterval(()=>{if(document.visibilityState!=='visible')return;if(authed()){sync();syncWatches()}else if(S.gcals){S.gerr='auth';requestRender()}},60000);
