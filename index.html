@@ -453,6 +453,55 @@ a.tci{text-decoration:none}
 .wki .tci{font-size:.74rem;padding:3px 6px;border-radius:5px;background:var(--fill);border-left-width:3px;white-space:normal;line-height:1.35}
 .wki .tci.g{background:var(--ac-soft);color:var(--ink-2)}
 .wke{color:var(--rule);text-align:center;font-size:.8rem;padding-top:8px}
+/* iPad: 좁은 사이드 + 캘린더 보기 전환 */
+.book.tbook.mini{grid-template-columns:76px minmax(0,1fr) 38px}
+.book.tbook.mini.hasd{grid-template-columns:76px minmax(0,1fr) minmax(320px,380px) 38px}
+.sitop{display:flex;justify-content:flex-end;padding:0 2px 8px}
+.sitog{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--ink-3)}
+.sitog:hover{background:var(--hair);color:var(--ink)}
+.sitog svg{width:19px;height:19px}
+.tside.mini{padding:14px 6px;gap:4px}
+.tside.mini .sitop{justify-content:center}
+.tside.mini .sgrp{gap:4px}
+.tside.mini .si{flex-direction:column;gap:4px;padding:9px 2px 7px;font-size:.64rem;text-align:center;border-radius:12px}
+.tside.mini .si svg{width:22px;height:22px}
+.tside.mini .si span{flex:none;width:100%}
+.tside.mini .si b{display:none}
+.tside.mini .sdiv{margin:6px 10px}
+.th.cth{gap:14px;flex-wrap:nowrap}
+.th h2.mpill{background:var(--fill);border-radius:999px;padding:6px 16px;font-size:1.2rem;white-space:nowrap}
+.cseg{display:flex;gap:2px;margin-inline:auto;background:var(--fill);border-radius:999px;padding:3px}
+.cseg button{padding:6px 14px;border-radius:999px;font-size:.86rem;color:var(--ink-2);white-space:nowrap}
+.cseg button:hover{color:var(--ink)}
+.cseg button[aria-pressed="true"]{background:var(--page);color:var(--ac);font-weight:700;box-shadow:0 1px 4px rgba(30,40,60,.1)}
+.th.cth .nav{margin-left:0}
+.wstrip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:2px 0 12px;border-bottom:1px solid var(--hair)}
+.wsd{display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 0 4px;border-radius:12px;color:var(--ink-3);font-size:.78rem}
+.wsd b{width:40px;height:40px;line-height:40px;border-radius:50%;font-size:1.12rem;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.wsd.sun,.wsd.sun b{color:var(--p3)}
+.wsd.today b{color:var(--ac)}
+.wsd.on b{background:var(--ac);color:var(--on-ac)}
+.wsd i{width:5px;height:5px;border-radius:50%}
+.wsd i.has{background:var(--ac)}
+.wsd i.late{background:var(--p3)}
+.wsd:hover,.wsd.over{background:var(--fill)}
+.agday{display:grid;gap:10px}
+.agday h3{margin:4px 0 0;font-size:1rem;display:flex;gap:8px;align-items:baseline}
+.agday h3 small{color:var(--ac);font-size:.8rem}
+.wkg.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.yg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px 26px}
+.ym h4{margin:0 0 6px}
+.ym h4 button{font-weight:700;font-size:.95rem;color:var(--ink)}
+.ym.cur h4 button{color:var(--ac)}
+.ymg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;text-align:center}
+.ymg span{font-size:.6rem;color:var(--ink-3);padding-bottom:2px}
+.ymg button,.ymg em{height:24px;font-size:.7rem;font-style:normal;position:relative;color:var(--ink-2);font-variant-numeric:tabular-nums;border-radius:50%}
+.ymg button:hover{background:var(--fill)}
+.ymg button.sun{color:var(--p3)}
+.ymg button.has::after,.ymg button.late::after{content:"";position:absolute;bottom:1px;left:50%;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:var(--ac)}
+.ymg button.late::after{background:var(--p3)}
+.ymg button.today{background:var(--ac);color:var(--on-ac);font-weight:700}
+@media (max-width:1100px){.yg{grid-template-columns:repeat(3,minmax(0,1fr))}.cseg button{padding:6px 10px}}
 .drawer{position:fixed;top:0;bottom:0;left:0;z-index:45;width:min(290px,84vw);background:var(--fill);overflow:auto;display:flex;flex-direction:column;gap:2px;
   padding:calc(16px + env(safe-area-inset-top,0px)) 10px calc(16px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));box-shadow:8px 0 30px rgba(0,0,0,.15)}
 @media (max-width:899px){
@@ -460,7 +509,9 @@ a.tci{text-decoration:none}
   .book.tbook.noside{grid-template-columns:minmax(0,1fr)}
   .tside{border-radius:0}
   .tmain{padding-block:16px 20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-  .wkg{grid-template-columns:minmax(0,1fr);border-radius:8px}
+  .wkg,.wkg.n3{grid-template-columns:minmax(0,1fr);border-radius:8px}
+  .yg{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .wsd b{width:34px;height:34px;line-height:34px;font-size:1rem}
   .wkc{border-right:0;border-bottom:1px solid var(--hair);min-height:0;flex-direction:row}
   .wkc:last-child{border-bottom:0}
   .wkh{width:54px;flex:none;border-bottom:0;border-right:1px solid var(--hair);justify-content:center}
@@ -1210,21 +1261,36 @@ button.tci:hover{background:var(--page)}
   /* ---------------- TASKS: sidebar + content (TickTick layout) ---------------- */
   const wideSide=matchMedia('(min-width:700px)'),wideDetail=matchMedia('(min-width:1180px)');
   S.side=false;
-  const isCalK=k=>k==='cal:m'||k==='cal:w'||k==='cal:d';
-  function sideHtml(){
+  const isCalK=k=>typeof k==='string'&&k.startsWith('cal:');
+  const CALV=[['cal:a','목록'],['cal:d','일'],['cal:3','3일'],['cal:w','주'],['cal:m','월'],['cal:y','년']];
+  S.mini=(()=>{try{return localStorage.getItem('diarybook-mini')!=='0'}catch(e){return true}})();
+  S.lastCal=(()=>{try{const v=localStorage.getItem('diarybook-lcal');return CALV.some(c=>c[0]===v)?v:'cal:m'}catch(e){return'cal:m'}})();
+  function sideHtml(mini){
     const L=smart(),by=k=>(L.find(x=>x.k===k)||{}).count||0;
-    const it=(k,ic,n,c)=>`<button class="si ${S.tl===k?'on':''}" data-act="tl" data-k="${esc(k)}">${ic}<span>${esc(n)}</span>${c?`<b>${c}</b>`:''}</button>`;
+    const it=(k,ic,n,c,on)=>`<button class="si ${(on!=null?on:S.tl===k)?'on':''}" data-act="tl" data-k="${esc(k)}" title="${esc(n)}">${ic}<span>${esc(n)}</span>${c?`<b>${c}</b>`:''}</button>`;
+    const calIt=it(isCalK(S.tl)?S.tl:S.lastCal,icon('cal'),'캘린더',0,isCalK(S.tl));
+    const tog=wideSide.matches?`<div class="sitop"><button class="sitog" data-act="mini" aria-label="${mini?'사이드 넓게':'사이드 좁게'}" title="${mini?'넓게':'좁게'}">${icon('menu')}</button></div>`:'';
     const dayIc=txt=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.75" y="5" width="16.5" height="15.25" rx="2.75"/><path d="M8 3v3.5M16 3v3.5"/><text x="12" y="17" text-anchor="middle" font-size="8" font-weight="600" fill="currentColor" stroke="none" font-family="system-ui,sans-serif">${txt}</text></svg>`;
     const tags=L.filter(x=>x.k.startsWith('g:'));
     const lform=S.addingList?`<form class="sform" id="listForm"><input id="listName" placeholder="목록 이름" maxlength="20" autocomplete="off"><button class="btn dark sm" type="submit">추가</button></form>`:'';
-    return `<div class="sgrp">
+    if(mini)return `${tog}<div class="sgrp">
+        ${it('today',dayIc(+TODAY.slice(8)),'오늘',by('today'))}
+        ${it('week',dayIc(WDK[parse(TODAY).getDay()]),'7일',by('week'))}
+        ${calIt}
+        ${it('all',icon('stack'),'전체',by('all'))}
+        ${it('inbox',icon('inbox'),'받은함',by('inbox'))}
+      </div><div class="sdiv"></div>
+      <div class="sgrp">${lists().map(l=>it('l:'+l.id,icon('list'),l.name,0)).join('')}</div>
+      <div class="sdiv"></div>
+      <div class="sgrp">${it('done',icon('donebox'),'완료')}</div>`;
+    return `${tog}<div class="sgrp">
         ${it('all',icon('stack'),'전체',by('all'))}
         ${it('today',dayIc(+TODAY.slice(8)),'오늘',by('today'))}
         ${it('week',dayIc(WDK[parse(TODAY).getDay()]),'다음 7일',by('week'))}
         ${it('inbox',icon('inbox'),'받은함',by('inbox'))}
       </div>
       <div class="sh">캘린더</div>
-      <div class="sgrp">${it('cal:m',icon('cal'),'월')}${it('cal:w',icon('calw'),'주')}${it('cal:d',icon('cald'),'일')}</div>
+      <div class="sgrp">${calIt}</div>
       <div class="sh">리스트<button class="sadd" data-act="list-new" aria-label="목록 추가">${icon('plus')}</button></div>
       <div class="sgrp">${lists().map(l=>it('l:'+l.id,icon('list'),l.name,by('l:'+l.id))).join('')}${lform}</div>
       ${tags.length?`<div class="sh">태그</div><div class="sgrp">${tags.map(x=>it(x.k,icon('hash'),x.n.slice(1),x.count)).join('')}</div>`:''}
@@ -1263,14 +1329,14 @@ button.tci:hover{background:var(--page)}
     const agenda=`<div class="agenda"><div class="agh"><h3>${md(sel)} ${WDK[parse(sel).getDay()]}요일</h3>${rel?`<span class="sub">${rel}</span>`:''}<button class="lnk" data-act="tl" data-k="cal:d">일 보기 →</button></div>${dayTasks(sel,true)}${dayEvents(sel)}</div>`;
     return{title:`${y}년 ${m+1}월`,nav:true,body:`${pushBar()}${grid}${W?'<span class="gnote">할 일을 다른 날짜 칸으로 끌어다 놓으면 날짜가 바뀝니다.</span>':''}${agenda}`};
   }
-  function calWeek(){
-    const s=monday(S.cur),by=byDue();
+  function calWeek(n){
+    n=n||7;const s=n===7?monday(S.cur):S.cur,by=byDue();
     const col=i=>{
       const id=addD(s,i),dt=parse(id),ts=by[id]||[],ev=gDay(id);
       return `<div class="wkc ${id===TODAY?'today':''}" data-drop="${id}"><button class="wkh" data-act="tdayview" data-d="${id}"><span>${WDK[dt.getDay()]}</span><b>${dt.getDate()}</b></button>
         <div class="wki">${ts.map(t=>chipFor(t,true)).join('')}${ev.map(e=>`<a class="tci g" href="${esc(e.link)}" target="_blank" rel="noopener">${e.allDay?'':`<i>${e.time}</i> `}${esc(e.title)}</a>`).join('')}${!ts.length&&!ev.length?'<span class="wke">—</span>':''}</div></div>`;
     };
-    return{title:`${md(s)} – ${md(addD(s,6))}`,nav:true,body:`${pushBar()}<div class="wkg">${[0,1,2,3,4,5,6].map(col).join('')}</div>`};
+    return{title:`${md(s)} – ${md(addD(s,n-1))}`,nav:true,body:`${pushBar()}<div class="wkg ${n===3?'n3':''}">${Array.from({length:n},(_,i)=>i).map(col).join('')}</div>`};
   }
   function calDay(){
     const id=S.cur,dt=parse(id),ts=byDue()[id]||[],diff=Math.round((dt-parse(TODAY))/864e5);
@@ -1281,9 +1347,34 @@ button.tci:hover{background:var(--page)}
     const body=`${sec('기한 지남',late,'late','<button class="lnk" data-act="tpushall">오늘로 연기</button>')}${sec('시간 지정',timed)}${sec('종일',free)}${!open.length&&!late.length?'<p class="empty">이 날 할 일이 없습니다. 위 칸에서 추가하세요.</p>':''}${dayEvents(id)}${sec('완료',done)}`;
     return{title:`${dt.getMonth()+1}월 ${dt.getDate()}일 ${WDK[dt.getDay()]}요일${rel?` <small>${rel}</small>`:''}`,nav:true,body};
   }
+  function weekStrip(){
+    const s=monday(S.cur),by=byDue();
+    return `<div class="wstrip">${[0,1,2,3,4,5,6].map(i=>{const id=addD(s,i),dt=parse(id),ts=(by[id]||[]).filter(t=>!t.done),late=ts.some(t=>overdue(t)),has=ts.length||gDay(id).length;
+      return `<button class="wsd ${id===TODAY?'today':''} ${id===S.cur?'on':''} ${dt.getDay()===0?'sun':''}" data-act="tday" data-d="${id}" data-drop="${id}" aria-label="${dt.getMonth()+1}월 ${dt.getDate()}일"><span>${WDK[dt.getDay()]}</span><b>${dt.getDate()}</b><i class="${late?'late':has?'has':''}"></i></button>`}).join('')}</div>`;
+  }
+  function calAgenda(){
+    const d=calDay(),dt=parse(S.cur);
+    return{title:`${dt.getFullYear()}년 ${dt.getMonth()+1}월`,nav:true,body:`${weekStrip()}<div class="agday"><h3>${d.title}</h3>${d.body}</div>`};
+  }
+  function calYear(){
+    const y=parse(S.cur).getFullYear(),by=byDue(),cm=parse(TODAY).getMonth(),cy=parse(TODAY).getFullYear();
+    const mon=m=>{
+      const first=ymd(new Date(y,m,1)),end=ymd(new Date(y,m+1,0));let cells='';
+      for(let d=monday(first);d<=end;d=addD(d,1)){
+        const dt=parse(d);
+        if(dt.getMonth()!==m){cells+='<em></em>';continue}
+        const ts=(by[d]||[]).filter(t=>!t.done),cls=ts.some(t=>overdue(t))?'late':ts.length?'has':'';
+        cells+=`<button class="${cls} ${d===TODAY?'today':''} ${dt.getDay()===0?'sun':''}" data-act="tdayview" data-d="${d}" aria-label="${m+1}월 ${dt.getDate()}일">${dt.getDate()}</button>`;
+      }
+      return `<div class="ym ${y===cy&&m===cm?'cur':''}"><h4><button data-act="tmonth" data-d="${first}">${m+1}월</button></h4><div class="ymg">${['월','화','수','목','금','토','일'].map(w=>`<span>${w}</span>`).join('')}${cells}</div></div>`;
+    };
+    return{title:`${y}년`,nav:true,body:`<div class="yg">${Array.from({length:12},(_,i)=>mon(i)).join('')}</div>`,noAdd:true};
+  }
+  function calSeg(){return `<div class="cseg" role="group" aria-label="캘린더 보기">${CALV.map(([k,n])=>`<button data-act="tl" data-k="${k}" aria-pressed="${S.tl===k}">${n}</button>`).join('')}</div>`}
   function vTasks(){
     const k=S.tl;let r;
-    if(k==='cal:m')r=calMonth();else if(k==='cal:w')r=calWeek();else if(k==='cal:d')r=calDay();
+    if(k==='cal:m')r=calMonth();else if(k==='cal:w')r=calWeek();else if(k==='cal:3')r=calWeek(3);else if(k==='cal:d')r=calDay();
+    else if(k==='cal:a')r=calAgenda();else if(k==='cal:y')r=calYear();
     else{const L=smart();let sl=L.find(x=>x.k===k);if(!sl){S.tl='today';sl=L.find(x=>x.k==='today')}
       r={title:esc(sl.n),sub:sl.done?'':String(sl.count||''),nav:false,body:listBody(sl,tasks()),noAdd:!!sl.done}}
     if(S.tsel&&!S.docs[S.tsel])S.tsel=null;
@@ -1292,14 +1383,15 @@ button.tci:hover{background:var(--page)}
   S.lastList=(()=>{try{return localStorage.getItem('diarybook-tlist')||'today'}catch(e){return'today'}})();
   function viewSeg(){
     const b=(k,n,on)=>`<button data-act="tl" data-k="${esc(k)}" aria-pressed="${on}">${n}</button>`;
-    return `<div class="vseg" role="group" aria-label="보기 전환">${b(S.lastList,'목록',!isCalK(S.tl))}${b('cal:m','월',S.tl==='cal:m')}${b('cal:w','주',S.tl==='cal:w')}${b('cal:d','일',S.tl==='cal:d')}</div>`;
+    return `<div class="vseg" role="group" aria-label="보기 전환">${b(S.lastList,'목록',!isCalK(S.tl))}${b('cal:m','월',S.tl==='cal:m'||S.tl==='cal:y')}${b('cal:w','주',S.tl==='cal:w'||S.tl==='cal:3')}${b('cal:d','일',S.tl==='cal:d'||S.tl==='cal:a')}</div>`;
   }
   function tasksLayout(r){
-    const showSide=wideSide.matches,inlineD=S.tsel&&wideDetail.matches;
-    return `<div class="book tbook ${inlineD?'hasd':''} ${showSide?'':'noside'}">
-      ${showSide?`<aside class="tside">${sideHtml()}</aside>`:''}
+    const showSide=wideSide.matches,inlineD=S.tsel&&wideDetail.matches,mini=showSide&&S.mini,calH=showSide&&isCalK(S.tl);
+    return `<div class="book tbook ${inlineD?'hasd':''} ${showSide?'':'noside'} ${mini?'mini':''}">
+      ${showSide?`<aside class="tside ${mini?'mini':''}">${sideHtml(mini)}</aside>`:''}
       <section class="tmain">
-        <header class="th">${showSide?'':`<button class="ib" data-act="side" aria-label="메뉴">${icon('menu')}</button>`}<h2>${r.title}</h2>${r.sub?`<span class="sub">${r.sub}</span>`:''}${r.nav?navHtml({},''):''}</header>
+        ${calH?`<header class="th cth"><h2 class="mpill">${r.title}</h2>${calSeg()}${navHtml({},'')}</header>`:
+        `<header class="th">${showSide?'':`<button class="ib" data-act="side" aria-label="메뉴">${icon('menu')}</button>`}<h2>${r.title}</h2>${r.sub?`<span class="sub">${r.sub}</span>`:''}${r.nav?navHtml({},''):''}</header>`}
         ${showSide?'':viewSeg()}
         ${r.noAdd?'':composer()}
         <div class="tlist">${r.body}</div>
@@ -1678,7 +1770,7 @@ button.tci:hover{background:var(--page)}
     else if(v==='month'||v==='habit')S.cur=addM(S.cur,dir);
     else if(v==='week')S.cur=addD(S.cur,7*dir);
     else if(v==='day')S.cur=addD(S.cur,dir);
-    else if(v==='tasks'){if(S.tl==='cal:w')S.cur=addD(S.cur,7*dir);else if(S.tl==='cal:d')S.cur=addD(S.cur,dir);else S.cur=addM(S.cur,dir);if(!S.qa.pick)S.qa.due=S.cur}
+    else if(v==='tasks'){const k=S.tl;if(k==='cal:w'||k==='cal:a')S.cur=addD(S.cur,7*dir);else if(k==='cal:3')S.cur=addD(S.cur,3*dir);else if(k==='cal:d')S.cur=addD(S.cur,dir);else if(k==='cal:y')S.cur=addM(S.cur,12*dir);else S.cur=addM(S.cur,dir);if(!S.qa.pick)S.qa.due=S.cur}
   }
   const ACT={
     tab:b=>{flushAll();S.view=b.dataset.v;S.confirm=null;S.tsel=null;S.dp=null;S.mm=false;S.tp=null;if(S.view==='tasks'){S.cur=TODAY;S.side=false;S.qa.pick=false;S.qa.due=qaCtx().due}try{localStorage.setItem(LSV,S.view)}catch(e){}render();window.scrollTo(0,0)},
@@ -1706,7 +1798,9 @@ button.tci:hover{background:var(--page)}
       const ok=await gInsert(id,it.text,it.t||'','',defaultCal(it.text));
       if(ok)update(id,d=>{const k=(d.events||[]).findIndex(x=>x.text===it.text&&(x.t||'')===(it.t||''));if(k>=0)d.events.splice(k,1)},true);
       render()},
-    tl:b=>{S.tl=b.dataset.k;if(!isCalK(S.tl)){S.lastList=S.tl;try{localStorage.setItem('diarybook-tlist',S.tl)}catch(e){}}S.side=false;S.addingList=false;try{localStorage.setItem('diarybook-tl',S.tl)}catch(e){}S.tsel=null;S.confirm=null;S.dp=null;S.mm=false;if(!S.qa.pick){const c=qaCtx();S.qa.due=c.due;S.qa.list=c.list||defList()}render()},
+    mini:()=>{S.mini=!S.mini;try{localStorage.setItem('diarybook-mini',S.mini?'1':'0')}catch(e){}render()},
+    tmonth:b=>{S.cur=b.dataset.d;S.tl='cal:m';S.lastCal='cal:m';try{localStorage.setItem('diarybook-tl',S.tl);localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}if(!S.qa.pick)S.qa.due=S.cur;render()},
+    tl:b=>{S.tl=b.dataset.k;if(!isCalK(S.tl)){S.lastList=S.tl;try{localStorage.setItem('diarybook-tlist',S.tl)}catch(e){}}else{S.lastCal=S.tl;try{localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}}S.side=false;S.addingList=false;try{localStorage.setItem('diarybook-tl',S.tl)}catch(e){}S.tsel=null;S.confirm=null;S.dp=null;S.mm=false;if(!S.qa.pick){const c=qaCtx();S.qa.due=c.due;S.qa.list=c.list||defList()}render()},
     tsel:b=>{flushAll();S.tsel=b.dataset.t;S.confirm=null;S.dp=null;S.mm=false;render()},
     tclose:()=>{flushAll();S.tsel=null;S.confirm=null;S.dp=null;render()},
     tdone:b=>toggleDone(b.dataset.t),
@@ -1721,7 +1815,7 @@ button.tci:hover{background:var(--page)}
     tcol:b=>{const k=b.dataset.g;S.col.has(k)?S.col.delete(k):S.col.add(k);render()},
     tmode:b=>{S.tmode=b.dataset.m;S.tsel=null;S.qa.due=S.tmode==='cal'?S.cur:(qaCtx().due);try{localStorage.setItem('diarybook-tmode',S.tmode)}catch(e){}render()},
     side:()=>{S.side=!S.side;render()},
-    tdayview:b=>{S.cur=b.dataset.d;S.tl='cal:d';try{localStorage.setItem('diarybook-tl',S.tl)}catch(e){}if(!S.qa.pick)S.qa.due=S.cur;render()},
+    tdayview:b=>{S.cur=b.dataset.d;S.tl='cal:d';S.lastCal='cal:d';try{localStorage.setItem('diarybook-tl',S.tl);localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}if(!S.qa.pick)S.qa.due=S.cur;render()},
     tday:b=>{flushAll();S.cur=b.dataset.d;S.qa.due=b.dataset.d;S.qa.pick=false;render()},
     'badge-on':()=>badgeOn(),
     'badge-off':()=>{update('cfg',d=>{d.badge=false},true);updateBadge(true);render()},
