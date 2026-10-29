@@ -303,6 +303,13 @@ td.today.pic .dn{background:#fff;color:#111;text-shadow:none}
 @media (max-width:520px){.ib.go span{display:none}.ib.go{padding:0 9px}.cchip{max-width:38%}.cmp2 .ib{width:30px}}
 .cmp2{display:flex;align-items:center;gap:2px;border:1px solid var(--rule);border-radius:10px;padding:3px 4px 3px 12px;background:var(--page)}
 .cmp2:focus-within{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac-soft)}
+.cmp2{padding-left:5px}
+.kseg{display:flex;flex:none;background:var(--fill);border-radius:7px;padding:2px;margin-right:8px}
+.kseg button{font-size:.78rem;padding:5px 9px;border-radius:5px;color:var(--ink-3);white-space:nowrap}
+.kseg button[aria-pressed="true"]{background:var(--page);color:var(--ac);font-weight:700;box-shadow:0 1px 3px rgba(30,40,60,.12)}
+.cmp2.ev .kseg button[aria-pressed="true"]{color:#1f8a5b}
+.cmp2.ev:focus-within{border-color:#2fa36b;box-shadow:0 0 0 3px #e3f4ea}
+@media (max-width:520px){.kseg button{padding:5px 7px}.kseg{margin-right:5px}}
 .cmp2 #qa{flex:1;min-width:0;border:0;background:transparent;font-size:16px;padding:8px 0;outline:none}
 .cchip{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;color:var(--ac);white-space:nowrap;padding:4px 6px;border-radius:6px;max-width:45%;overflow:hidden}
 .cchip:empty{display:none}
@@ -849,7 +856,7 @@ button.tci:hover{background:var(--page)}
       if(S.seq===seq)S.localDirty=false;else syncAgain=true;
       S.lastSync=Date.now();saveLocal();
       setSaving('구글 드라이브에 저장됨');
-      migrateTodos();
+      migrateTodos();migrateCalTasks();
       if(changed)requestRender();
     }catch(e){
       saveLocal();
@@ -1071,17 +1078,21 @@ button.tci:hover{background:var(--page)}
     return r;
   }
   const MEET=/(미팅|회의|면담|약속|점심|저녁|회식|방문|출장|교육|행사|세미나|워크숍|워크샵|인터뷰|상담|모임|만남|통화|콜)/;
-  S.qa={due:TODAY,time:'',end:'',pri:0,list:'',cal:false,calSet:false,alarm:false,alarmSet:false,alarmMin:null,pick:false};S.qaText='';S.dp=null;S.mm=false;
+  S.qa={due:TODAY,time:'',end:'',pri:0,list:'',cal:false,calSet:false,alarm:false,alarmSet:false,alarmMin:null,pick:false,evCal:''};
+  S.qkind=(()=>{try{return localStorage.getItem('diarybook-qkind')==='event'?'event':'task'}catch(e){return'task'}})();S.flash='';let flashT=null;
+  function flash(t){S.flash=t;clearTimeout(flashT);flashT=setTimeout(()=>{S.flash='';requestRender()},3500)}S.qaText='';S.dp=null;S.mm=false;
   function eff(){
     const p=parseQuick(S.qaText),q=S.qa;
     let due=q.pick?q.due:(p.due||q.due),time=q.pick?q.time:(p.time||q.time);
     if(time&&!due)due=TODAY;
     const am=q.alarmMin!=null?q.alarmMin:cfg().alarmMin;
+    if(S.qkind==='event'){const d=due||TODAY;return{p,kind:'event',due:d,time:time||'',end:time?q.end:'',evCal:q.evCal||defaultCal(p.title||''),pri:0,list:'',cal:false,alarm:false,alarmMin:am}}
     return{p,due,time:due?time:'',end:due&&time?q.end:'',pri:p.pri||q.pri,list:p.list||q.list||defList(),
       cal:!!due&&(q.calSet?q.cal:false),alarm:!!(due&&time)&&(q.alarmSet?q.alarm:cfg().autoAlarm),alarmMin:am};
   }
   function chipHtml(e){
     const parts=[];
+    if(e.kind==='event'){parts.push(`<span class="cd">${esc(dueLabel({due:e.due,time:e.time}))}${e.end?'–'+esc(e.end):''}</span>`);if(e.evCal&&S.gcals)parts.push(`<span><i class="ldot" style="--cc:${gColor(e.evCal)}"></i>${esc(gName(e.evCal))}</span>`);return parts.join('')}
     if(e.due)parts.push(`<span class="cd ${e.due<TODAY?'late':''}">${esc(dueLabel({due:e.due,time:e.time}))}${e.end?'–'+esc(e.end):''}</span>`);
     if(e.pri)parts.push(flag(e.pri));
     if(e.list&&e.list!=='inbox'&&e.list!==defList())parts.push(`<span>${esc(listName(e.list))}</span>`);
@@ -1091,11 +1102,12 @@ button.tci:hover{background:var(--page)}
   function composer(){
     const e=eff();
     return `<div class="cmpw">
-      <form class="cmp2" id="qaForm">
-        <input id="qa" value="${esc(S.qaText)}" placeholder="할 일 추가" autocomplete="off" enterkeyhint="done" aria-label="할 일">
+      <form class="cmp2 ${S.qkind==='event'?'ev':''}" id="qaForm">
+        <div class="kseg" role="group" aria-label="종류"><button type="button" data-act="qkind" data-v="task" aria-pressed="${S.qkind!=='event'}">할 일</button><button type="button" data-act="qkind" data-v="event" aria-pressed="${S.qkind==='event'}">일정</button></div>
+        <input id="qa" value="${esc(S.qaText)}" placeholder="${S.qkind==='event'?'일정 추가':'할 일 추가'}" autocomplete="off" enterkeyhint="done" aria-label="${S.qkind==='event'?'일정':'할 일'}">
         <button type="button" class="cchip" id="qaChip" data-act="dp-open" data-for="qa">${chipHtml(e)}</button>
         <button type="button" class="ib" data-act="dp-open" data-for="qa" aria-label="날짜·시간">${icon('cal')}</button>
-        <button type="button" class="ib" data-act="mm-open" aria-label="우선순위·목록">${icon('chev')}</button>
+        <button type="button" class="ib" data-act="mm-open" aria-label="${S.qkind==='event'?'캘린더 선택':'우선순위·목록'}">${icon('chev')}</button>
         <button type="submit" class="ib go">${icon('plus')}<span>추가</span></button>
       </form>
       <div class="qprev" id="qprev">${e.p.tags.map(t=>`<span>#${esc(t)}</span>`).join('')}</div>
@@ -1108,10 +1120,19 @@ button.tci:hover{background:var(--page)}
     const c=document.getElementById('qaChip');if(c)c.innerHTML=chipHtml(e);
     const pv=document.getElementById('qprev');if(pv)pv.innerHTML=e.p.tags.map(t=>`<span>#${esc(t)}</span>`).join('');
   }
-  function resetQa(){const c=qaCtx();Object.assign(S.qa,{due:c.due,time:'',end:'',pri:0,list:c.list||defList(),cal:false,calSet:false,alarm:false,alarmSet:false,alarmMin:null,pick:false})}
-  function cmpSubmit(){
+  function resetQa(){const c=qaCtx();Object.assign(S.qa,{due:c.due,time:'',end:'',pri:0,list:c.list||defList(),cal:false,calSet:false,alarm:false,alarmSet:false,alarmMin:null,pick:false,evCal:''})}
+  async function cmpSubmit(){
     const el=document.getElementById('qa');if(!el||!el.value.trim())return;
     S.qaText=el.value;const e=eff();if(!e.p.title)return;
+    if(e.kind==='event'){
+      if(!authed()||!S.gcals){flash('구글에 연결해야 일정을 추가할 수 있습니다');render();return}
+      const cal=e.evCal;if(!cal){flash('일정을 넣을 캘린더가 없습니다');render();return}
+      el.disabled=true;
+      const ok=await gInsert(e.due,e.p.title,e.time,e.end,cal);
+      flash(S.gmsg);S.gmsg='';
+      if(ok){if(isCalK(S.tl))S.cur=e.due;S.qaText='';S.dp=null;S.mm=false;resetQa()}
+      render();const n=document.getElementById('qa');if(n)n.focus();return;
+    }
     let time=e.time,end=e.end;
     if(e.cal&&e.due&&!time&&/점심/.test(e.p.title)){time='12:00';end=end||'13:00'}
     const ctx=qaCtx(),tags=e.p.tags.slice();if(ctx.tag&&!tags.includes(ctx.tag))tags.push(ctx.tag);
@@ -1143,7 +1164,7 @@ button.tci:hover{background:var(--page)}
         <div class="dp-row">${icon('clock')}<span>시작</span><button type="button" class="tbtn ${p.time?'':'empty'}" data-act="dtp-open" data-v="time" ${p.due?'':'disabled'}>${p.time?fmtT(p.time):'시간 없음'}</button>${p.time?'<button type="button" class="dp-x" data-act="dp-notime" aria-label="시간 지우기">×</button>':''}</div>
         <div class="dp-row">${icon('clock')}<span>종료</span><button type="button" class="tbtn ${p.end?'':'empty'}" data-act="dtp-open" data-v="end" ${p.time?'':'disabled'}>${p.end?fmtT(p.end):'—'}</button></div>
         <label class="dp-row">${icon('bell')}<span>알림</span>${alarmSel}</label>
-        <label class="dp-row">${icon('cal')}<span>구글 캘린더에도 등록</span><input type="checkbox" id="dpCal" ${p.cal?'checked':''} ${p.due?'':'disabled'}></label>
+
         ${p.alarm&&p.time&&!p.cal?'<span class="gnote dp-note">알림을 받으려면 구글 캘린더에 알림용 일정이 만들어집니다</span>':''}${p.cal&&p.due?`<span class="gnote dp-note">${esc(gName(alarmCal({list:p.for==='qa'?eff().list:D(p.for).list,title:p.for==='qa'?eff().p.title:D(p.for).title}))||'구글 캘린더')}에 ${p.time?(p.end?p.time+'–'+p.end:'1시간'):'종일'} 일정으로 올라갑니다</span>`:''}
       </div>
       <div class="dp-btns"><button type="button" class="btn" data-act="dp-clear">삭제</button><button type="button" class="btn dark" data-act="dp-ok">확인</button></div>
@@ -1166,6 +1187,8 @@ button.tci:hover{background:var(--page)}
     const f=p.for;S.dp=null;render();if(f==='qa'){const n=document.getElementById('qa');if(n)n.focus()}
   }
   function mmHtml(e){
+    if(e.kind==='event'){const cs=(S.gcals||[]).filter(c=>!c.holiday&&c.write);
+      return `<div class="dp-bg" data-act="mm-close"></div><div class="dp mm" role="dialog" aria-label="캘린더 선택"><span class="lab">캘린더</span><div class="mm-row">${cs.length?cs.map(c=>`<button type="button" class="mmb ${e.evCal===c.id?'on':''}" data-act="mm-cal" data-v="${esc(c.id)}"><i class="ldot" style="--cc:${gColor(c.id)}"></i>${esc(c.name)}</button>`).join(''):'<span class="empty">구글에 연결하면 캘린더를 고를 수 있습니다.</span>'}</div><span class="gnote">고르지 않으면 점심→점심식사, 저녁·회식→저녁식사, 그 외→기본 캘린더</span></div>`}
     return `<div class="dp-bg" data-act="mm-close"></div><div class="dp mm" role="dialog" aria-label="우선순위와 목록">
       <span class="lab">우선순위</span><div class="mm-row">${PRI.slice().reverse().map(p=>`<button type="button" class="mmb ${e.pri===p.v?'on':''}" data-act="mm-pri" data-v="${p.v}">${flag(p.v)}${p.n}</button>`).join('')}</div>
       <span class="lab">목록</span><div class="mm-row">${lists().map(l=>`<button type="button" class="mmb ${e.list===l.id?'on':''}" data-act="mm-list" data-v="${esc(l.id)}">${esc(l.name)}</button>`).join('')}</div>
@@ -1493,6 +1516,12 @@ button.tci:hover{background:var(--page)}
     });
   }
 
+  /* 캘린더에도 올렸던 할 일 → 구글 일정으로만 남기기 (할 일 목록에서 빼고, 캘린더 일정은 그대로 둠) */
+  function migrateCalTasks(){
+    let n=0;
+    tasks().forEach(t=>{if(t.cal&&t.gcal&&t.gcal.kind==='cal'&&t.gcal.id){clearTimeout(alarmT[t.id]);remove(t.id);n++}});
+    if(n){syncWatches(true);requestRender()}
+  }
   /* one-time move of old DAY to-dos into tasks */
   function migrateTodos(){
     Object.keys(S.docs).filter(isDay).forEach(day=>{
@@ -1760,7 +1789,7 @@ button.tci:hover{background:var(--page)}
     const r=VIEW_FN[S.view]();
     const sheet=S.tsel&&S.docs[S.tsel]&&!(S.view==='tasks'&&wideDetail.matches)?`<div class="sheet-bg" data-act="tclose"></div><div class="sheet" role="dialog" aria-label="할 일 상세">${taskDetail(S.tsel)}</div>`:'';
     const top=`<div class="top"><button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>`;
-    const toast=S.undo?`<div class="toast" role="status"><span>할 일을 삭제했습니다</span><button data-act="undo">되돌리기</button></div>`:'';
+    const toast=S.undo?`<div class="toast" role="status"><span>할 일을 삭제했습니다</span><button data-act="undo">되돌리기</button></div>`:S.flash?`<div class="toast" role="status"><span>${esc(S.flash)}</span></div>`:'';
     updateBadge();
     if(r.tasks){app.innerHTML=top+tasksLayout(r)+sheet+toast;app.querySelectorAll('textarea.ta').forEach(autosize);return}
     app.innerHTML=`
@@ -1859,6 +1888,8 @@ button.tci:hover{background:var(--page)}
     'mm-open':()=>{const q=document.getElementById('qa');if(q)S.qaText=q.value;S.dp=null;S.mm=!S.mm;render()},
     'mm-close':()=>{S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
     'mm-pri':b=>{S.qa.pri=+b.dataset.v;S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
+    'mm-cal':b=>{S.qa.evCal=b.dataset.v;S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
+    qkind:b=>{const q=document.getElementById('qa');if(q)S.qaText=q.value;S.qkind=b.dataset.v;try{localStorage.setItem('diarybook-qkind',S.qkind)}catch(e){}S.dp=null;S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
     'mm-list':b=>{S.qa.list=b.dataset.v;S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
     tpush:b=>{pushToday([b.dataset.t]);render()},
     tpushall:()=>{const o=overdueList();pushToday(o.map(t=>t.id));setSaving(`${o.length}개를 오늘로 연기했습니다`);render()},
