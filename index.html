@@ -285,9 +285,9 @@ td.today.pic .dn{background:#fff;color:#111;text-shadow:none}
 .glist{display:grid}
 .gev{display:grid;grid-template-columns:3.4em minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--hair);color:var(--ink);text-decoration:none;font-size:.86rem}
 .gev:hover{background:var(--fill)}
-.gev .t{font-family:var(--f-mono);font-size:.74rem;color:var(--ink-2)}
-.gev .x{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
-.gev small{font-size:.64rem;color:var(--ink-3);white-space:nowrap}
+.gev .t{font-size:.82rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.gev .x{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400;font-size:.92rem;line-height:1.45}
+.gev small{font-size:.76rem;color:var(--ink-3);white-space:nowrap}
 .wk-row.gl{color:var(--ink);text-decoration:none}
 .wk-row.gl .x{font-weight:600}
 .gadd{display:grid;gap:6px;margin-top:4px}
@@ -440,7 +440,7 @@ td.today.pic .dn{background:#fff;color:#111;text-shadow:none}
 .tdetail{border-left:1px solid var(--hair);padding:22px 20px;min-width:0;overflow:auto}
 .agenda{display:grid;gap:10px;margin-top:6px;padding-top:14px;border-top:1px solid var(--hair)}
 .agh .lnk{margin-left:auto}
-.tci i{font-style:normal;color:var(--ink-3);font-family:var(--f-mono);font-size:.92em}
+.tci i{font-style:normal;color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:.92em}
 a.tci{text-decoration:none}
 .wkg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid var(--rule);border-radius:10px;overflow:hidden}
 .wkc{border-right:1px solid var(--hair);min-height:420px;display:flex;flex-direction:column;min-width:0}
@@ -1810,7 +1810,7 @@ button.tci:hover{background:var(--page)}
       const ok=await gInsert(id,it.text,it.t||'','',defaultCal(it.text));
       if(ok)update(id,d=>{const k=(d.events||[]).findIndex(x=>x.text===it.text&&(x.t||'')===(it.t||''));if(k>=0)d.events.splice(k,1)},true);
       render()},
-    home:()=>{flushAll();S.view='tasks';S.cur=TODAY;S.confirm=null;S.tsel=null;S.dp=null;S.mm=false;S.tp=null;S.side=false;S.qa.pick=false;S.qa.due=qaCtx().due;try{localStorage.setItem(LSV,S.view)}catch(e){}render();window.scrollTo(0,0)},
+    home:()=>{flushAll();S.view='tasks';S.cur=TODAY;S.tl=S.lastCal||'cal:m';try{localStorage.setItem('diarybook-tl',S.tl)}catch(e){}S.confirm=null;S.tsel=null;S.dp=null;S.mm=false;S.tp=null;S.side=false;S.qa.pick=false;S.qa.due=qaCtx().due;try{localStorage.setItem(LSV,S.view)}catch(e){}render();window.scrollTo(0,0)},
     mini:()=>{S.mini=!S.mini;try{localStorage.setItem('diarybook-mini',S.mini?'1':'0')}catch(e){}render()},
     tmonth:b=>{S.cur=b.dataset.d;S.tl='cal:m';S.lastCal='cal:m';try{localStorage.setItem('diarybook-tl',S.tl);localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}if(!S.qa.pick)S.qa.due=S.cur;render()},
     tl:b=>{S.tl=b.dataset.k;if(!isCalK(S.tl)){S.lastList=S.tl;try{localStorage.setItem('diarybook-tlist',S.tl)}catch(e){}}else{S.lastCal=S.tl;try{localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}}S.side=false;S.addingList=false;try{localStorage.setItem('diarybook-tl',S.tl)}catch(e){}S.tsel=null;S.confirm=null;S.dp=null;S.mm=false;if(!S.qa.pick){const c=qaCtx();S.qa.due=c.due;S.qa.list=c.list||defList()}render()},
