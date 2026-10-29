@@ -412,7 +412,7 @@ td.today.pic .dn{background:#fff;color:#111;text-shadow:none}
 .trow-w.go .tswdone{background:var(--ac)}
 .trow-w.open .tswdel,.trow-w.swiping .tswdel{visibility:visible}
 .trow-w .trow:hover{background:var(--fill)}
-.trow-w .trow.sel{background:var(--ac-soft)}
+.trow-w .trow.sel{background:var(--ac-soft);justify-self:stretch;max-width:none}
 .tswdel{position:absolute;top:0;right:0;bottom:0;width:84px;z-index:0;background:var(--p3);color:#fff;font-size:.88rem;font-weight:600;display:flex;align-items:center;justify-content:center;transition:width .15s}
 .trow-w.far .tswdel{width:100%;justify-content:flex-end;padding-right:28px}
 .toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:#1f2329;color:#fff;border-radius:12px;padding:11px 16px;display:flex;gap:16px;align-items:center;font-size:.88rem;box-shadow:0 8px 30px rgba(0,0,0,.25);white-space:nowrap}
@@ -484,7 +484,19 @@ a.tci{text-decoration:none}
 .cseg button{padding:6px 14px;border-radius:999px;font-size:.86rem;color:var(--ink-2);white-space:nowrap}
 .cseg button:hover{color:var(--ink)}
 .cseg button[aria-pressed="true"]{background:var(--page);color:var(--ac);font-weight:700;box-shadow:0 1px 4px rgba(30,40,60,.1)}
-.th.cth .nav{margin-left:0}
+.th.cth .nav{margin-left:0;flex:none;white-space:nowrap}
+.tbook.hasd .cseg button{padding:6px 9px}
+.tbook.hasd .th h2.mpill{font-size:1.05rem;padding:6px 12px}
+.tsub .lab b{color:var(--ac);font-weight:600;margin-left:4px}
+.tsub .cl{gap:0}
+.tsub .li{padding:2px 0}
+.tsub .li input[type=checkbox]{width:17px;height:17px;accent-color:var(--ac);flex:none}
+.tsub .tx.done{color:var(--ink-3);text-decoration:line-through}
+.tsub .add{justify-self:start;color:var(--ink-3);font-size:.86rem;padding:6px 0}
+.tsub .add:hover{color:var(--ac)}
+.sbc{display:inline-flex;align-items:center;gap:2px;font-variant-numeric:tabular-nums}
+.sbc svg{width:13px;height:13px}
+.sbc.all{color:var(--ac)}
 .wstrip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:2px 0 12px;border-bottom:1px solid var(--hair)}
 .wsd{display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 0 4px;border-radius:12px;color:var(--ink-3);font-size:.78rem}
 .wsd b{width:40px;height:40px;line-height:40px;border-radius:50%;font-size:1.12rem;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
@@ -1259,6 +1271,7 @@ button.tci:hover{background:var(--page)}
     const late=!t.done&&!!t.due&&(t.due<TODAY||overdue(t)),right=[];
     (t.tags||[]).forEach(g=>right.push(`<span class="tg2">#${esc(g)}</span>`));
     if(t.note)right.push(`<span title="메모">${icon('pen')}</span>`);
+    const sb=(t.sub||[]).filter(x=>x&&(x.text||'').trim());if(sb.length)right.push(`<span class="sbc ${sb.every(x=>x.done)?'all':''}" title="체크리스트">${icon('check')}${sb.filter(x=>x.done).length}/${sb.length}</span>`);
     if(t.gcal)right.push(`<span title="${t.gcal.kind==='cal'?'구글 캘린더 일정':'구글 캘린더 알림'}">${icon(t.gcal.kind==='cal'?'people':'bell')}</span>`);
     if(S.tl!=='l:'+t.list||S.view!=='tasks')right.push(`<span class="tl2"><i class="ldot" style="--cc:${listColor(t.list)}"></i>${esc(listName(t.list))}</span>`);
     const dl=o.day?(t.time||''):shortDue(t);
@@ -1448,6 +1461,7 @@ button.tci:hover{background:var(--page)}
       <div class="td-r"><span class="lab">목록</span><div class="lchips">${ls.map(l=>`<button class="lchip ${t.list===l.id?'on':''}" data-act="tlist" data-t="${id}" data-l="${esc(l.id)}"><i class="ldot" style="--cc:${listColor(l.id)}"></i>${esc(l.name)}</button>`).join('')}<button class="lchip add" data-act="list-new" aria-label="목록 추가">+</button></div></div>
       <div class="td-r"><span class="lab">우선순위</span><div class="seg pri" role="group">${PRI.map(p=>`<button data-act="tpri" data-t="${id}" data-p="${p.v}" aria-pressed="${(t.pri||0)===p.v}">${flag(p.v)}${p.n}</button>`).join('')}</div></div>
       <div class="td-r"><span class="lab">태그</span><input class="tx bl" id="tTags" data-t="${id}" value="${esc((t.tags||[]).map(x=>'#'+x).join(' '))}" placeholder="#보고 #현장" autocomplete="off"></div>
+      <div class="td-r tsub"><span class="lab">체크리스트${(t.sub||[]).length?` <b>${(t.sub||[]).filter(x=>x.done).length}/${t.sub.length}</b>`:''}</span>${checklist(id,'sub','항목 추가')}</div>
       <div class="td-r"><span class="lab">메모</span><textarea class="ta lined" data-b="${id}|note" placeholder="메모">${esc(t.note||'')}</textarea></div>
       <div class="li wrap" style="justify-content:space-between"><span class="gnote">${t.created?new Date(t.created).toLocaleDateString('ko-KR')+' 만듦':''}</span><span class="li">${del}</span></div>
     </div>`;
@@ -1926,6 +1940,8 @@ button.tci:hover{background:var(--page)}
   app.addEventListener('compositionstart',()=>{composing=true});
   app.addEventListener('compositionend',e=>{composing=false;if(e.target.id==='qa'){cmpSync();if(qaPending){qaPending=false;setTimeout(cmpSubmit,0)}}});
   app.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&e.target.matches('.tsub .tx')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();const add=e.target.closest('.cl').querySelector('.add');if(add)add.click();return}
+    if(e.key==='Backspace'&&e.target.matches('.tsub .tx')&&!e.target.value){const li=e.target.closest('.li'),prev=li&&li.previousElementSibling&&li.previousElementSibling.querySelector('.tx');const del=li&&li.querySelector('.del');if(del){e.preventDefault();del.click();if(prev){const b=prev.dataset.b,n=app.querySelector(`.tx[data-b="${b}"]`);if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}}return}
     if(e.target.id==='qa'&&e.key==='Enter'){e.preventDefault();if(e.isComposing||e.keyCode===229||composing){qaPending=true;return}cmpSubmit();return}if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-act]')){e.preventDefault();e.target.click()}});
   const DT='application/x-diary-task';let dragId=null;
   app.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('[data-drag]');if(!c){e.preventDefault();return}dragId=c.dataset.drag;try{e.dataTransfer.clearData()}catch(x){}e.dataTransfer.setData(DT,dragId);e.dataTransfer.effectAllowed='move'});
