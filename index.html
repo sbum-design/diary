@@ -44,7 +44,8 @@ button{cursor:pointer;background:none;border:0;padding:0}
 svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
 .top{max-width:1280px;margin:0 auto 10px;display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:0 2px}
-.brand{font-family:var(--f-disp);font-weight:600;font-size:1rem;letter-spacing:.01em}
+.brand{font-family:var(--f-disp);font-weight:600;font-size:1rem;letter-spacing:.01em;color:var(--ink);background:none;border:0;padding:4px 0;cursor:pointer}
+.brand:hover{color:var(--ac)}
 .saving{font-size:.7rem;color:var(--ink-3);display:flex;align-items:center;gap:6px}
 .saving i{width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
 .saving.ok i{background:var(--ac)}
@@ -1758,12 +1759,12 @@ button.tci:hover{background:var(--page)}
     syncWatches();
     const r=VIEW_FN[S.view]();
     const sheet=S.tsel&&S.docs[S.tsel]&&!(S.view==='tasks'&&wideDetail.matches)?`<div class="sheet-bg" data-act="tclose"></div><div class="sheet" role="dialog" aria-label="할 일 상세">${taskDetail(S.tsel)}</div>`:'';
-    const top=`<div class="top"><span class="brand">${esc(cfg().title)}</span><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>`;
+    const top=`<div class="top"><button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>`;
     const toast=S.undo?`<div class="toast" role="status"><span>할 일을 삭제했습니다</span><button data-act="undo">되돌리기</button></div>`:'';
     updateBadge();
     if(r.tasks){app.innerHTML=top+tasksLayout(r)+sheet+toast;app.querySelectorAll('textarea.ta').forEach(autosize);return}
     app.innerHTML=`
-      <div class="top"><span class="brand">${esc(cfg().title)}</span><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>
+      <div class="top"><button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>
       <div class="book">
         <section class="pg left"><header class="ph"><div class="ttl"><h2>${r.title}</h2><span class="sub">${r.sub||''}</span></div>${navHtml(r,'n-narrow')}</header><div class="pc">${r.left}</div><footer class="pf"><span>${r.footL||''}</span></footer></section>
         <section class="pg right"><header class="ph">${r.tools||''}${navHtml(r,'n-wide')}</header><div class="pc">${r.right}</div><footer class="pf"><span></span><span>${r.footR||''}</span></footer></section>
@@ -1809,6 +1810,7 @@ button.tci:hover{background:var(--page)}
       const ok=await gInsert(id,it.text,it.t||'','',defaultCal(it.text));
       if(ok)update(id,d=>{const k=(d.events||[]).findIndex(x=>x.text===it.text&&(x.t||'')===(it.t||''));if(k>=0)d.events.splice(k,1)},true);
       render()},
+    home:()=>{flushAll();S.view='tasks';S.cur=TODAY;S.confirm=null;S.tsel=null;S.dp=null;S.mm=false;S.tp=null;S.side=false;S.qa.pick=false;S.qa.due=qaCtx().due;try{localStorage.setItem(LSV,S.view)}catch(e){}render();window.scrollTo(0,0)},
     mini:()=>{S.mini=!S.mini;try{localStorage.setItem('diarybook-mini',S.mini?'1':'0')}catch(e){}render()},
     tmonth:b=>{S.cur=b.dataset.d;S.tl='cal:m';S.lastCal='cal:m';try{localStorage.setItem('diarybook-tl',S.tl);localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}if(!S.qa.pick)S.qa.due=S.cur;render()},
     tl:b=>{S.tl=b.dataset.k;if(!isCalK(S.tl)){S.lastList=S.tl;try{localStorage.setItem('diarybook-tlist',S.tl)}catch(e){}}else{S.lastCal=S.tl;try{localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}}S.side=false;S.addingList=false;try{localStorage.setItem('diarybook-tl',S.tl)}catch(e){}S.tsel=null;S.confirm=null;S.dp=null;S.mm=false;if(!S.qa.pick){const c=qaCtx();S.qa.due=c.due;S.qa.list=c.list||defList()}render()},
