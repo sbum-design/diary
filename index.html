@@ -2026,6 +2026,16 @@ button.tci:hover{background:var(--page)}
     if(e.key==='Enter'&&e.target.matches('.tsub .tx')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();const add=e.target.closest('.cl').querySelector('.add');if(add)add.click();return}
     if(e.key==='Backspace'&&e.target.matches('.tsub .tx')&&!e.target.value){const li=e.target.closest('.li'),prev=li&&li.previousElementSibling&&li.previousElementSibling.querySelector('.tx');const del=li&&li.querySelector('.del');if(del){e.preventDefault();del.click();if(prev){const b=prev.dataset.b,n=app.querySelector(`.tx[data-b="${b}"]`);if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}}return}
     if(e.target.id==='qa'&&e.key==='Enter'){e.preventDefault();if(e.isComposing||e.keyCode===229||composing){qaPending=true;return}cmpSubmit();return}if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-act]')){e.preventDefault();e.target.click()}});
+  /* Esc: 열린 팝업 → 할 일 상세 창 순서로 닫기 */
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Escape'||e.isComposing)return;
+    if(S.dp){e.preventDefault();ACT['dp-close']();return}
+    if(S.mm){e.preventDefault();ACT['mm-close']();return}
+    if(S.tp){e.preventDefault();S.tp=null;render();return}
+    if(S.confirm){e.preventDefault();S.confirm=null;render();return}
+    if(S.side){e.preventDefault();S.side=false;render();return}
+    if(S.tsel){e.preventDefault();const a=document.activeElement;if(a&&a.blur)a.blur();ACT.tclose()}
+  });
   const DT='application/x-diary-task';let dragId=null;
   app.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('[data-drag]');if(!c){e.preventDefault();return}dragId=c.dataset.drag;try{e.dataTransfer.clearData()}catch(x){}e.dataTransfer.setData(DT,dragId);e.dataTransfer.effectAllowed='move'});
   app.addEventListener('dragend',()=>{dragId=null;app.querySelectorAll('.over').forEach(x=>x.classList.remove('over'))});
