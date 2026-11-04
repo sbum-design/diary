@@ -110,6 +110,13 @@ svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;str
 input[type=checkbox]{accent-color:var(--ink);width:15px;height:15px;margin:0;flex:none}
 .del{color:var(--ink-3);font-size:1rem;line-height:1;width:22px;height:22px;border-radius:4px;flex:none;opacity:.55}
 .li:hover .del,.del:focus-visible{opacity:1}
+.mvb{display:inline-flex;flex:none;opacity:.55;transition:opacity .15s}
+.li:hover .mvb,.mvb:focus-within{opacity:1}
+.mv{width:22px;height:22px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-3)}
+.mv svg{width:14px;height:14px}
+.mv:hover:not(:disabled){background:var(--fill);color:var(--ink)}
+.mv:disabled{opacity:.25;cursor:default}
+@media (hover:none){.mvb{opacity:.8}.mv{width:30px;height:30px}}
 .del:hover{background:var(--fill);color:var(--ink)}
 .add{font-size:.76rem;color:var(--ink-3);text-align:left;padding:5px 0;justify-self:start}
 .add:hover{color:var(--ink)}
@@ -743,6 +750,9 @@ button.tci:hover{background:var(--page)}
   const MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const MON3=MON.map(m=>m.slice(0,3));
   const WD=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  // 달력은 일요일부터 시작 (주간 다이어리 WEEK는 기존대로 월요일 기준)
+  const WDC=['SUN','MON','TUE','WED','THU','FRI','SAT'],WKC=['일','월','화','수','목','금','토'];
+  const wkStart=s=>addD(s,-parse(s).getDay());
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const isDay=k=>/^\d{4}-\d\d-\d\d$/.test(k);
   const md=s=>{const d=parse(s);return`${d.getMonth()+1}.${pad(d.getDate())}`};
@@ -931,9 +941,10 @@ button.tci:hover{background:var(--page)}
   const habitDone=(id,h)=>!!(D(id).habits||{})[h];
   function dur(bed,wake){if(!bed||!wake)return'';const t=s=>{const[h,m]=s.split(':').map(Number);return h*60+m};const x=(t(wake)-t(bed)+1440)%1440;return`${Math.floor(x/60)}h ${pad(x%60)}m`}
   const area=(id,f,label,ph,cls='')=>`<section class="sec"><h4 class="lab">${label}</h4><textarea class="ta ${cls}" rows="1" data-b="${id}|${f}" placeholder="${esc(ph)}">${esc(D(id)[f]||'')}</textarea></section>`;
-  function checklist(id,field,addLabel){
+  function checklist(id,field,addLabel,movable){
     const arr=D(id)[field]||[];
-    return `<div class="cl">${arr.map((it,i)=>`<div class="li"><input type="checkbox" data-b="${id}|${field}.${i}.done" ${it.done?'checked':''} aria-label="완료"><input class="tx ${it.done?'done':''}" data-b="${id}|${field}.${i}.text" value="${esc(it.text||'')}" placeholder="내용 입력"><button class="del" data-act="del" data-b="${id}|${field}.${i}" aria-label="삭제">×</button></div>`).join('')}<button class="add" data-act="add" data-b="${id}|${field}" data-tpl="item">+ ${addLabel}</button></div>`;
+    const mv=i=>movable?`<span class="mvb"><button class="mv" data-act="mv" data-b="${id}|${field}.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${icon('chev').replace('<svg','<svg style="transform:rotate(180deg)"')}</button><button class="mv" data-act="mv" data-b="${id}|${field}.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===arr.length-1?'disabled':''}>${icon('chev')}</button></span>`:'';
+    return `<div class="cl">${arr.map((it,i)=>`<div class="li"><input type="checkbox" data-b="${id}|${field}.${i}.done" ${it.done?'checked':''} aria-label="완료"><input class="tx ${it.done?'done':''}" data-b="${id}|${field}.${i}.text" value="${esc(it.text||'')}" placeholder="내용 입력">${mv(i)}<button class="del" data-act="del" data-b="${id}|${field}.${i}" aria-label="삭제">×</button></div>`).join('')}<button class="add" data-act="add" data-b="${id}|${field}" data-tpl="item">+ ${addLabel}</button></div>`;
   }
   const TPL={item:()=>({text:'',done:false}),event:()=>({t:'',text:''}),log:()=>({text:''}),goal:()=>({text:'',done:false,pct:0})};
 
@@ -980,8 +991,8 @@ button.tci:hover{background:var(--page)}
     const tcal=S.view==='tasks'&&(isCalK(S.tl)||S.tl==='dash');
     if(!authed()||!S.gcals||!(['month','week','day'].includes(S.view)||tcal))return;
     const d0=parse(S.cur),yr=tcal&&S.tl==='cal:y';
-    const s=monday(ymd(new Date(d0.getFullYear(),yr?0:d0.getMonth(),1)));
-    const e=addD(monday(ymd(new Date(d0.getFullYear(),yr?12:d0.getMonth()+1,0))),7);
+    const s=wkStart(ymd(new Date(d0.getFullYear(),yr?0:d0.getMonth(),1)));
+    const e=addD(wkStart(ymd(new Date(d0.getFullYear(),yr?12:d0.getMonth()+1,0))),7);
     const cals=gShown().map(c=>c.id);
     const key=`${s}|${e}|${cals.join(',')}`;
     if(!force&&key===gw.key&&Date.now()-gw.t<300000)return;
@@ -1411,7 +1422,7 @@ button.tci:hover{background:var(--page)}
   const chipFor=(t,click)=>`<${click?'button':'span'} class="tci lc p${t.pri||0} ${t.done?'done':''} ${overdue(t)?'late':''}" style="--cc:${listColor(t.list)}" ${click?`data-act="tsel" data-t="${t.id}" draggable="true" data-drag="${t.id}"`:''} title="${esc(t.title)}">${t.time?`<i>${t.time}</i> `:''}${esc(t.title)}</${click?'button':'span'}>`;
   function calMonth(){
     const d0=parse(S.cur),y=d0.getFullYear(),m=d0.getMonth(),end=new Date(y,m+1,0),weeks=[];
-    for(let s=monday(ymd(new Date(y,m,1)));parse(s)<=end;s=addD(s,7))weeks.push(s);
+    for(let s=wkStart(ymd(new Date(y,m,1)));parse(s)<=end;s=addD(s,7))weeks.push(s);
     const by=byDue(),W=wideSide.matches,lim=W?3:2;
     const cell=id=>{
       const dt=parse(id),out=dt.getMonth()!==m,ts=by[id]||[];
@@ -1420,13 +1431,13 @@ button.tci:hover{background:var(--page)}
       const more=items.length>lim?`<span class="tci more">+${items.length-lim}</span>`:'';
       return `<td class="${id===TODAY?'today':''} ${id===S.cur?'sel':''} ${out?'dim':''}" data-drop="${id}"><div class="tcell" data-act="tday" data-d="${id}" role="button" tabindex="0" aria-label="${dt.getMonth()+1}월 ${dt.getDate()}일 · 할 일 ${ts.filter(t=>!t.done).length}개"><span class="dn">${dt.getDate()}</span>${items.slice(0,lim).join('')}${more}</div></td>`;
     };
-    const grid=`<table class="cal tcal"><thead><tr>${WD.map(w=>`<th>${W?w:w.slice(0,2)}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${[0,1,2,3,4,5,6].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
+    const grid=`<table class="cal tcal"><thead><tr>${WDC.map(w=>`<th>${W?w:w.slice(0,2)}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${[0,1,2,3,4,5,6].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
     const sel=S.cur,diff=Math.round((parse(sel)-parse(TODAY))/864e5),rel=diff===0?'오늘':diff===1?'내일':diff===-1?'어제':'';
     const agenda=`<div class="agenda"><div class="agh"><h3>${md(sel)} ${WDK[parse(sel).getDay()]}요일</h3>${rel?`<span class="sub">${rel}</span>`:''}<button class="lnk" data-act="tl" data-k="cal:d">일 보기 →</button></div>${dayTasks(sel,true)}${dayEvents(sel)}</div>`;
     return{title:`${y}년 ${m+1}월`,nav:true,body:`${pushBar()}${grid}${W?'<span class="gnote">할 일을 다른 날짜 칸으로 끌어다 놓으면 날짜가 바뀝니다.</span>':''}${agenda}`};
   }
   function calWeek(n){
-    n=n||7;const s=n===7?monday(S.cur):S.cur,by=byDue();
+    n=n||7;const s=n===7?wkStart(S.cur):S.cur,by=byDue();
     const col=i=>{
       const id=addD(s,i),dt=parse(id),ts=by[id]||[],ev=gDay(id);
       return `<div class="wkc ${id===TODAY?'today':''}" data-drop="${id}"><button class="wkh" data-act="tdayview" data-d="${id}"><span>${WDK[dt.getDay()]}</span><b>${dt.getDate()}</b></button>
@@ -1444,7 +1455,7 @@ button.tci:hover{background:var(--page)}
     return{title:`${dt.getMonth()+1}월 ${dt.getDate()}일 ${WDK[dt.getDay()]}요일${rel?` <small>${rel}</small>`:''}`,nav:true,body};
   }
   function weekStrip(){
-    const s=monday(S.cur),by=byDue();
+    const s=wkStart(S.cur),by=byDue();
     return `<div class="wstrip">${[0,1,2,3,4,5,6].map(i=>{const id=addD(s,i),dt=parse(id),ts=(by[id]||[]).filter(t=>!t.done),late=ts.some(t=>overdue(t)),has=ts.length||gDay(id).length;
       return `<button class="wsd ${id===TODAY?'today':''} ${id===S.cur?'on':''} ${dt.getDay()===0?'sun':''}" data-act="tday" data-d="${id}" data-drop="${id}" aria-label="${dt.getMonth()+1}월 ${dt.getDate()}일"><span>${WDK[dt.getDay()]}</span><b>${dt.getDate()}</b><i class="${late?'late':has?'has':''}"></i></button>`}).join('')}</div>`;
   }
@@ -1456,13 +1467,13 @@ button.tci:hover{background:var(--page)}
     const y=parse(S.cur).getFullYear(),by=byDue(),cm=parse(TODAY).getMonth(),cy=parse(TODAY).getFullYear();
     const mon=m=>{
       const first=ymd(new Date(y,m,1)),end=ymd(new Date(y,m+1,0));let cells='';
-      for(let d=monday(first);d<=end;d=addD(d,1)){
+      for(let d=wkStart(first);d<=end;d=addD(d,1)){
         const dt=parse(d);
         if(dt.getMonth()!==m){cells+='<em></em>';continue}
         const ts=(by[d]||[]).filter(t=>!t.done),cls=ts.some(t=>overdue(t))?'late':ts.length||gDay(d).length?'has':'';
         cells+=`<button class="${cls} ${d===TODAY?'today':''} ${dt.getDay()===0?'sun':''}" data-act="tdayview" data-d="${d}" aria-label="${m+1}월 ${dt.getDate()}일">${dt.getDate()}</button>`;
       }
-      return `<div class="ym ${y===cy&&m===cm?'cur':''}"><h4><button data-act="tmonth" data-d="${first}">${m+1}월</button></h4><div class="ymg">${['월','화','수','목','금','토','일'].map(w=>`<span>${w}</span>`).join('')}${cells}</div></div>`;
+      return `<div class="ym ${y===cy&&m===cm?'cur':''}"><h4><button data-act="tmonth" data-d="${first}">${m+1}월</button></h4><div class="ymg">${WKC.map(w=>`<span>${w}</span>`).join('')}${cells}</div></div>`;
     };
     return{title:`${y}년`,nav:true,body:`<div class="yg">${Array.from({length:12},(_,i)=>mon(i)).join('')}</div>`,noAdd:true};
   }
@@ -1471,7 +1482,7 @@ button.tci:hover{background:var(--page)}
     const all=tasks(),open=all.filter(t=>!t.done),dt=parse(TODAY);
     const late=open.filter(t=>overdue(t)).sort(tsort),today=open.filter(t=>t.due===TODAY&&!overdue(t)).sort(tsort);
     const doneToday=all.filter(t=>t.done&&t.doneAt&&ymd(new Date(t.doneAt))===TODAY).length;
-    const w0=monday(TODAY),w1=addD(w0,6),wk=all.filter(t=>t.due&&t.due>=w0&&t.due<=w1),wkDone=wk.filter(t=>t.done).length;
+    const w0=wkStart(TODAY),w1=addD(w0,6),wk=all.filter(t=>t.due&&t.due>=w0&&t.due<=w1),wkDone=wk.filter(t=>t.done).length;
     const pct=wk.length?Math.round(wkDone/wk.length*100):0;
     const kpi=(n,v,sub,cls,act)=>`<button class="dk ${cls||''}" ${act||''}><span>${n}</span><b>${v}</b><small>${sub}</small></button>`;
     const kpis=`<div class="dc s12 dks">${kpi('오늘 할 일',today.length+late.length,late.length?`기한 지남 ${late.length}`:'모두 오늘 것','','data-act="tl" data-k="today"')}${kpi('기한 지남',late.length,late.length?'오늘로 연기 가능':'없음',late.length?'late':'','data-act="tl" data-k="today"')}${kpi('오늘 완료',doneToday,'개 끝냄','ok','data-act="tl" data-k="done"')}${kpi('이번 주 완료율',pct+'%',`${wkDone}/${wk.length}개`,'','data-act="tl" data-k="cal:w"')}</div>`;
@@ -1486,10 +1497,10 @@ button.tci:hover{background:var(--page)}
     const ncard=card('s7','다음 7일',nx||'<p class="empty">다음 7일 동안 예정된 할 일·일정이 없습니다.</p>',`<button class="lnk" data-act="tl" data-k="week">목록 →</button>`);
     // 이번 달 미니 달력
     const y=dt.getFullYear(),mo=dt.getMonth(),first=ymd(new Date(y,mo,1)),last=ymd(new Date(y,mo+1,0));let cells='';
-    for(let d=monday(first);d<=last||dow(d)!==0;d=addD(d,1)){const x=parse(d);if(x.getMonth()!==mo){cells+='<span></span>';continue}
+    for(let d=wkStart(first);d<=last||parse(d).getDay()!==0;d=addD(d,1)){const x=parse(d);if(x.getMonth()!==mo){cells+='<span></span>';continue}
       const ts=(by[d]||[]).filter(t=>!t.done),dots=[...new Set([...(ts.some(t=>overdue(t))?['var(--p3)']:[]),...ts.map(t=>listColor(t.list)),...gDay(d).map(e=>gColor(e.cal))])].slice(0,3);
       cells+=`<button class="${d===TODAY?'today':''} ${x.getDay()===0?'sun':x.getDay()===6?'sat':''}" data-act="tdayview" data-d="${d}"><b>${x.getDate()}</b><i>${dots.map(c=>`<u style="background:${c}"></u>`).join('')}</i></button>`}
-    const mcard=card('s5',`${mo+1}월`,`<div class="dmc">${['월','화','수','목','금','토','일'].map(w=>`<span class="h">${w}</span>`).join('')}${cells}</div>`,`<button class="lnk" data-act="tl" data-k="cal:m">월 보기 →</button>`);
+    const mcard=card('s5',`${mo+1}월`,`<div class="dmc">${WKC.map(w=>`<span class="h">${w}</span>`).join('')}${cells}</div>`,`<button class="lnk" data-act="tl" data-k="cal:m">월 보기 →</button>`);
     // 목록별
     const lrows=lists().concat([{id:'inbox',name:'받은함'}]).map(l=>{const o=open.filter(t=>(t.list||'inbox')===l.id),lt=o.filter(t=>overdue(t)).length,dn=all.filter(t=>(t.list||'inbox')===l.id&&t.done&&t.doneAt&&ymd(new Date(t.doneAt))>=w0).length;
       if(!o.length&&!dn&&l.id==='inbox')return'';const tot=o.length+dn,w=tot?Math.round(dn/tot*100):0;
@@ -1544,7 +1555,7 @@ button.tci:hover{background:var(--page)}
       <div class="td-r"><span class="lab">목록</span><div class="lchips">${ls.map(l=>`<button class="lchip ${t.list===l.id?'on':''}" data-act="tlist" data-t="${id}" data-l="${esc(l.id)}"><i class="ldot" style="--cc:${listColor(l.id)}"></i>${esc(l.name)}</button>`).join('')}<button class="lchip add" data-act="list-new" aria-label="목록 추가">+</button></div></div>
       <div class="td-r"><span class="lab">우선순위</span><div class="seg pri" role="group">${PRI.map(p=>`<button data-act="tpri" data-t="${id}" data-p="${p.v}" aria-pressed="${(t.pri||0)===p.v}">${flag(p.v)}${p.n}</button>`).join('')}</div></div>
       <div class="td-r"><span class="lab">태그</span><input class="tx bl" id="tTags" data-t="${id}" value="${esc((t.tags||[]).map(x=>'#'+x).join(' '))}" placeholder="#보고 #현장" autocomplete="off"></div>
-      <div class="td-r tsub"><span class="lab">체크리스트${(t.sub||[]).length?` <b>${(t.sub||[]).filter(x=>x.done).length}/${t.sub.length}</b>`:''}</span>${checklist(id,'sub','항목 추가')}</div>
+      <div class="td-r tsub"><span class="lab">체크리스트${(t.sub||[]).length?` <b>${(t.sub||[]).filter(x=>x.done).length}/${t.sub.length}</b>`:''}</span>${checklist(id,'sub','항목 추가',true)}</div>
       <div class="td-r"><span class="lab">메모</span><textarea class="ta lined" data-b="${id}|note" placeholder="메모">${esc(t.note||'')}</textarea></div>
       <div class="li wrap" style="justify-content:space-between"><span class="gnote">${t.created?new Date(t.created).toLocaleDateString('ko-KR')+' 만듦':''}</span><span class="li">${del}</span></div>
     </div>`;
@@ -1654,8 +1665,8 @@ button.tci:hover{background:var(--page)}
   function vYear(){
     const y=parse(S.cur).getFullYear();let n=0;
     const mini=m=>{
-      let h=`<div class="mini"><button class="mini-h" data-act="gomonth" data-d="${y}-${pad(m+1)}-01">${MON[m]}</button><div class="mini-g">${WD.map(w=>`<span class="mw">${w[0]}</span>`).join('')}`;
-      const first=(new Date(y,m,1).getDay()+6)%7,days=new Date(y,m+1,0).getDate();
+      let h=`<div class="mini"><button class="mini-h" data-act="gomonth" data-d="${y}-${pad(m+1)}-01">${MON[m]}</button><div class="mini-g">${WDC.map(w=>`<span class="mw">${w[0]}</span>`).join('')}`;
+      const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
       for(let i=0;i<first;i++)h+='<span></span>';
       for(let d=1;d<=days;d++){const id=`${y}-${pad(m+1)}-${pad(d)}`;const has=dayHas(id);if(has)n++;
         const lv=has?((D(id).photos||[]).length?'l3':'l1'):'';
@@ -1669,7 +1680,7 @@ button.tci:hover{background:var(--page)}
   function vMonth(){
     const d0=parse(S.cur),y=d0.getFullYear(),m=d0.getMonth(),mid=`m-${y}-${pad(m+1)}`,mdoc=D(mid);
     const end=new Date(y,m+1,0);const weeks=[];
-    for(let s=monday(ymd(new Date(y,m,1)));parse(s)<=end;s=addD(s,7))weeks.push(s);
+    for(let s=wkStart(ymd(new Date(y,m,1)));parse(s)<=end;s=addD(s,7))weeks.push(s);
     const photo=cfg().photoMode;let days=0,logs=0;
     for(let d=1;d<=end.getDate();d++){const id=`${y}-${pad(m+1)}-${pad(d)}`;if(dayHas(id))days++;const x=D(id);logs+=(x.events||[]).filter(e=>e.text).length+(x.logs||[]).filter(e=>e.text).length}
     const cell=id=>{
@@ -1689,10 +1700,10 @@ button.tci:hover{background:var(--page)}
     const memo=`<div class="memo"><h4 class="lab">Monthly goal</h4>${checklist(mid,'goals','목표 추가')}<h4 class="lab" style="margin-top:6px">Memo</h4><textarea class="ta" rows="2" data-b="${mid}|memo" placeholder="이 달의 메모">${esc(mdoc.memo||'')}</textarea></div>`;
     let left,right;
     if(wide.matches){
-      left=`<table class="cal"><thead><tr>${WD.slice(0,4).map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${wk(s)}${[0,1,2,3].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
-      right=`<table class="cal"><thead><tr>${WD.slice(4).map(w=>`<th>${w}</th>`).join('')}<th class="memo-h">MEMO</th></tr></thead><tbody>${weeks.map((s,r)=>`<tr>${[4,5,6].map(i=>cell(addD(s,i))).join('')}${r===0?`<td class="memo-td" rowspan="${weeks.length}">${memo}</td>`:''}</tr>`).join('')}</tbody></table>`;
+      left=`<table class="cal"><thead><tr>${WDC.slice(0,4).map(w=>`<th>${w}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${wk(s)}${[0,1,2,3].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
+      right=`<table class="cal"><thead><tr>${WDC.slice(4).map(w=>`<th>${w}</th>`).join('')}<th class="memo-h">MEMO</th></tr></thead><tbody>${weeks.map((s,r)=>`<tr>${[4,5,6].map(i=>cell(addD(s,i))).join('')}${r===0?`<td class="memo-td" rowspan="${weeks.length}">${memo}</td>`:''}</tr>`).join('')}</tbody></table>`;
     }else{
-      left=`<table class="cal"><thead><tr>${WD.map(w=>`<th>${w.slice(0,2)}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${wk(s)}${[0,1,2,3,4,5,6].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
+      left=`<table class="cal"><thead><tr>${WDC.map(w=>`<th>${w.slice(0,2)}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${wk(s)}${[0,1,2,3,4,5,6].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
       right=memo;
     }
     const tools=`<div class="tools"><div class="seg" role="group" aria-label="보기 방식"><button data-act="mode" data-m="0" aria-pressed="${!photo}">TEXT</button><button data-act="mode" data-m="1" aria-pressed="${photo}">PHOTO</button></div></div>`;
@@ -1919,6 +1930,9 @@ button.tci:hover{background:var(--page)}
     gomonth:b=>{S.cur=b.dataset.d;S.view='month';render();window.scrollTo(0,0)},
     add:b=>{const[id,f]=b.dataset.b.split('|');let n=0;update(id,d=>{d[f]=d[f]||[];d[f].push(TPL[b.dataset.tpl]());n=d[f].length-1});render();
       const el=app.querySelector(`.tx[data-b="${id}|${f}.${n}.text"]`);if(el)el.focus()},
+    mv:b=>{const[id,p]=b.dataset.b.split('|');const[f,i]=p.split('.'),from=+i,to=from+(+b.dataset.v);
+      let ok=false;update(id,d=>{const a=d[f]||[];if(to<0||to>=a.length)return;const[x]=a.splice(from,1);a.splice(to,0,x);ok=true},true);
+      render();if(ok){const n=app.querySelector(`.mv[data-b="${id}|${f}.${to}"][data-v="${b.dataset.v}"]`);if(n&&!n.disabled)n.focus()}},
     del:b=>{const[id,p]=b.dataset.b.split('|');const[f,i]=p.split('.');update(id,d=>{(d[f]||[]).splice(+i,1)},true);render()},
     habit:b=>{const id=b.dataset.d,h=b.dataset.h;update(id,d=>{d.habits=d.habits||{};d.habits[h]=!d.habits[h]},true);render()},
     mode:b=>{update('cfg',d=>{d.photoMode=b.dataset.m==='1'},true);render()},
