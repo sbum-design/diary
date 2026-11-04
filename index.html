@@ -675,6 +675,23 @@ button.tci:hover{background:var(--page)}
 .trow{display:flex;align-items:center;gap:10px;padding:10px 6px 10px 4px;border-bottom:1px solid var(--hair);border-radius:6px}
 .trow:hover{background:var(--fill)}
 .trow.sel{background:var(--ac-soft)}
+.cm-bg{position:fixed;inset:0;z-index:90}
+.cm{position:fixed;z-index:91;width:256px;background:var(--page);border:1px solid var(--rule);border-radius:12px;box-shadow:0 12px 32px rgba(30,40,60,.18);padding:6px;display:grid;gap:1px;font-size:.86rem}
+.cmh{padding:6px 10px 6px;font-size:.74rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmi{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:7px;text-align:left;color:var(--ink)}
+.cmi:hover{background:var(--fill)}
+.cmi.danger{color:var(--p3)}
+.cmic{width:16px;display:inline-flex;justify-content:center;color:var(--ink-3)}
+.cmic svg{width:15px;height:15px}
+.cmi.danger .cmic{color:var(--p3)}
+.cmsep{height:1px;background:var(--hair);margin:4px 2px}
+.cmrow{display:flex;align-items:center;gap:2px;padding:3px 6px 3px 10px}
+.cml{font-size:.72rem;color:var(--ink-3);width:50px;flex:none;white-space:nowrap}
+.cmc{white-space:nowrap;padding:4px 6px;border-radius:6px;font-size:.78rem;color:var(--ink-2);display:inline-flex;align-items:center;gap:3px}
+.cmc:hover{background:var(--fill);color:var(--ink)}
+.cmc.on{background:var(--ac-soft);color:var(--ac);font-weight:600}
+.cmc.pf svg{width:14px;height:14px}
+.cmc.pf.p0{color:var(--ink-3)}.cmc.pf.p1{color:var(--p1)}.cmc.pf.p2{color:var(--p2)}.cmc.pf.p3{color:var(--p3)}
 .trow.hs{border-bottom-color:transparent;padding-bottom:4px}
 .tsubl{display:grid;gap:1px;padding:0 6px 8px 32px;border-bottom:1px solid var(--hair)}
 .tsi{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--ink-2);cursor:pointer;padding:3px 0;min-width:0}
@@ -1362,6 +1379,34 @@ button.tci:hover{background:var(--page)}
   function pushBar(){const o=overdueList();return o.length?`<div class="pushbar"><span>기한 지난 할 일 <b>${o.length}</b>개</span><button class="btn sm" data-act="tpushall">오늘로 연기</button></div>`:''}
   function toggleDone(id){if(!S.docs[id])return;update(id,d=>{d.done=!d.done;d.doneAt=d.done?Date.now():0},true);scheduleAlarm(id,300);render()}
   S.undo=null;let undoT=null;
+  /* 오른쪽 클릭 메뉴 (할 일 · 체크리스트 항목) */
+  S.cm=null;
+  function cmHtml(){
+    const c=S.cm;if(!c)return'';const t=S.docs[c.t];if(!t){S.cm=null;return''}
+    const it=(act,label,ic,extra,cls)=>`<button class="cmi ${cls||''}" data-act="${act}" data-t="${c.t}" ${extra||''}>${ic?`<span class="cmic">${ic}</span>`:''}<span>${label}</span></button>`;
+    let body;
+    if(c.sub!=null){const n=(t.sub||[]).length,x=(t.sub||[])[c.sub]||{};
+      body=`<div class="cmh">${esc(x.text||'항목')}</div>
+        ${it('cm-subdone',x.done?'체크 해제':'체크',icon('check'),`data-i="${c.sub}"`)}
+        ${c.sub>0?it('cm-submv','위로 이동','↑',`data-i="${c.sub}" data-v="-1"`):''}
+        ${c.sub<n-1?it('cm-submv','아래로 이동','↓',`data-i="${c.sub}" data-v="1"`):''}
+        ${it('cm-subtask','별도 할 일로 빼기','↗',`data-i="${c.sub}"`)}
+        <div class="cmsep"></div>${it('cm-subdel','항목 삭제','×',`data-i="${c.sub}"`,'danger')}`;
+    }else{
+      body=`<div class="cmh">${esc(t.title||'(제목 없음)')}</div>
+        ${it('cm-done',t.done?'완료 취소':'완료',icon('check'))}
+        ${it('cm-open','열기 · 편집',icon('pen'))}
+        <div class="cmsep"></div>
+        <div class="cmrow"><span class="cml">날짜</span>${[['0','오늘'],['1','내일'],['7','다음 주'],['x','없음']].map(([v,n])=>`<button class="cmc" data-act="cm-due" data-t="${c.t}" data-v="${v}">${n}</button>`).join('')}</div>
+        <div class="cmrow"><span class="cml">우선순위</span>${[0,1,2,3].map(p=>`<button class="cmc pf p${p} ${(t.pri||0)===p?'on':''}" data-act="cm-pri" data-t="${c.t}" data-p="${p}" title="${PRI[p].n}">${icon('flag')}</button>`).join('')}</div>
+        <div class="cmrow"><span class="cml">목록</span>${lists().map(l=>`<button class="cmc ${t.list===l.id?'on':''}" data-act="cm-list" data-t="${c.t}" data-l="${esc(l.id)}"><i class="ldot" style="--cc:${listColor(l.id)}"></i>${esc(l.name)}</button>`).join('')}</div>
+        <div class="cmsep"></div>
+        ${it('cm-dup','복제',icon('plus'))}
+        ${it('cm-del','삭제','×','','danger')}`;
+    }
+    const W=256,H=c.sub!=null?220:320,x=Math.max(8,Math.min(c.x,innerWidth-W-8)),y=Math.max(8,Math.min(c.y,innerHeight-H-8));
+    return `<div class="cm-bg" data-act="cm-close"></div><div class="cm" role="menu" style="left:${x}px;top:${y}px">${body}</div>`;
+  }
   function delTask(id){
     const doc=S.docs[id];if(!doc)return;const keep=clone(doc),g=doc.gcal;
     remove(id);if(S.tsel===id)S.tsel=null;
@@ -1912,7 +1957,7 @@ button.tci:hover{background:var(--page)}
     const top=`<div class="top"><button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>`;
     const toast=S.undo?`<div class="toast" role="status"><span>할 일을 삭제했습니다</span><button data-act="undo">되돌리기</button></div>`:S.flash?`<div class="toast" role="status"><span>${esc(S.flash)}</span></div>`:'';
     updateBadge();
-    if(r.tasks){app.innerHTML=top+tasksLayout(r)+sheet+toast;app.querySelectorAll('textarea.ta').forEach(autosize);return}
+    if(r.tasks){app.innerHTML=top+tasksLayout(r)+sheet+toast+cmHtml();app.querySelectorAll('textarea.ta').forEach(autosize);return}
     app.innerHTML=`
       <div class="top"><button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>
       <div class="book">
@@ -1943,6 +1988,21 @@ button.tci:hover{background:var(--page)}
     gomonth:b=>{S.cur=b.dataset.d;S.view='month';render();window.scrollTo(0,0)},
     add:b=>{const[id,f]=b.dataset.b.split('|');let n=0;update(id,d=>{d[f]=d[f]||[];d[f].push(TPL[b.dataset.tpl]());n=d[f].length-1});render();
       const el=app.querySelector(`.tx[data-b="${id}|${f}.${n}.text"]`);if(el)el.focus()},
+    'cm-close':()=>{S.cm=null;render()},
+    'cm-done':b=>{S.cm=null;toggleDone(b.dataset.t)},
+    'cm-open':b=>{S.cm=null;S.tsel=b.dataset.t;render()},
+    'cm-due':b=>{S.cm=null;ACT.tdue(b)},
+    'cm-pri':b=>{S.cm=null;ACT.tpri(b)},
+    'cm-list':b=>{S.cm=null;ACT.tlist(b)},
+    'cm-dup':b=>{const t=S.docs[b.dataset.t];S.cm=null;if(!t)return render();const c=clone(t),id=newId();['gcal','alarmErr','doneAt'].forEach(k=>delete c[k]);
+      update(id,d=>Object.assign(d,c,{title:(t.title||'')+' (복사)',done:false,doneAt:0,created:Date.now(),sub:(t.sub||[]).map(x=>({text:x.text,done:false}))}),true);S.tsel=id;render()},
+    'cm-del':b=>{S.cm=null;delTask(b.dataset.t)},
+    'cm-subdone':b=>{const i=+b.dataset.i;S.cm=null;update(b.dataset.t,d=>{if(d.sub&&d.sub[i])d.sub[i].done=!d.sub[i].done},true);render()},
+    'cm-submv':b=>{const i=+b.dataset.i,j=i+(+b.dataset.v);S.cm=null;update(b.dataset.t,d=>{const a=d.sub||[];if(j<0||j>=a.length)return;const[x]=a.splice(i,1);a.splice(j,0,x)},true);render()},
+    'cm-subdel':b=>{const i=+b.dataset.i;S.cm=null;update(b.dataset.t,d=>{(d.sub||[]).splice(i,1)},true);render()},
+    'cm-subtask':b=>{const i=+b.dataset.i,t=S.docs[b.dataset.t];S.cm=null;if(!t||!t.sub||!t.sub[i])return render();const x=t.sub[i],id=newId();
+      update(id,d=>Object.assign(d,{title:x.text,due:t.due||'',time:'',pri:t.pri||0,list:t.list||defList(),tags:[...(t.tags||[])],note:'',done:!!x.done,doneAt:x.done?Date.now():0,created:Date.now()}),true);
+      update(b.dataset.t,d=>{(d.sub||[]).splice(i,1)},true);render()},
     mv:b=>{const[id,p]=b.dataset.b.split('|');const[f,i]=p.split('.'),from=+i,to=from+(+b.dataset.v);
       let ok=false;update(id,d=>{const a=d[f]||[];if(to<0||to>=a.length)return;const[x]=a.splice(from,1);a.splice(to,0,x);ok=true},true);
       render();if(ok){const n=app.querySelector(`.mv[data-b="${id}|${f}.${to}"][data-v="${b.dataset.v}"]`);if(n&&!n.disabled)n.focus()}},
@@ -2062,6 +2122,16 @@ button.tci:hover{background:var(--page)}
     if(Date.now()-swSuppress<400){e.preventDefault();e.stopPropagation();return}
     const ow=e.target.closest&&e.target.closest('.trow-w.open');if(ow&&!e.target.closest('.tswdel')){e.preventDefault();swClose();return}
   },true);
+  app.addEventListener('contextmenu',e=>{
+    const si=e.target.closest&&e.target.closest('.tsi input,.tsi');const row=e.target.closest&&e.target.closest('.trow-w');
+    let t=null,sub=null;
+    if(si){const inp=si.matches('input')?si:si.querySelector('input');const m=inp&&/^(.+)\|sub\.(\d+)\.done$/.exec(inp.dataset.b||'');if(m){t=m[1];sub=+m[2]}}
+    else if(row)t=row.dataset.sw;
+    else{const c=e.target.closest&&e.target.closest('[data-act="tsel"][data-t]');if(c)t=c.dataset.t}
+    if(!t||!S.docs[t])return;
+    e.preventDefault();S.cm={t,sub,x:e.clientX,y:e.clientY};render();
+  });
+  window.addEventListener('scroll',()=>{if(S.cm){S.cm=null;render()}},{passive:true});
   app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f){e.preventDefault();f(b,e)}});
   let composing=false,qaPending=false;
   app.addEventListener('compositionstart',()=>{composing=true});
@@ -2073,6 +2143,7 @@ button.tci:hover{background:var(--page)}
   /* Esc: 열린 팝업 → 할 일 상세 창 순서로 닫기 */
   document.addEventListener('keydown',e=>{
     if(e.key!=='Escape'||e.isComposing)return;
+    if(S.cm){e.preventDefault();S.cm=null;render();return}
     if(S.dp){e.preventDefault();ACT['dp-close']();return}
     if(S.mm){e.preventDefault();ACT['mm-close']();return}
     if(S.tp){e.preventDefault();S.tp=null;render();return}
