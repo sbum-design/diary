@@ -30,6 +30,11 @@
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{-webkit-text-size-adjust:100%;touch-action:pan-x pan-y}
 body{touch-action:pan-x pan-y}
+.ptr{position:fixed;top:calc(env(safe-area-inset-top,0px) + 4px);left:50%;transform:translate(-50%,-48px);opacity:0;z-index:80;display:flex;align-items:center;gap:8px;background:var(--page);color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:7px 14px 7px 10px;font-size:.8rem;box-shadow:0 6px 18px rgba(30,40,60,.12);pointer-events:none}
+.ptr i{width:16px;height:16px;border-radius:50%;border:2px solid var(--rule);border-top-color:var(--ac);transition:transform .2s}
+.ptr.ready{color:var(--ac)}.ptr.ready i{transform:rotate(180deg);border-color:var(--ac)}
+.ptr.spin i{animation:ptrspin .7s linear infinite;border-color:var(--rule);border-top-color:var(--ac)}
+@keyframes ptrspin{to{transform:rotate(360deg)}}
 body{margin:0}
 img{max-width:100%}
 [hidden]{display:none!important}
@@ -670,6 +675,12 @@ button.tci:hover{background:var(--page)}
 .trow{display:flex;align-items:center;gap:10px;padding:10px 6px 10px 4px;border-bottom:1px solid var(--hair);border-radius:6px}
 .trow:hover{background:var(--fill)}
 .trow.sel{background:var(--ac-soft)}
+.trow.hs{border-bottom-color:transparent;padding-bottom:4px}
+.tsubl{display:grid;gap:1px;padding:0 6px 8px 32px;border-bottom:1px solid var(--hair)}
+.tsi{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--ink-2);cursor:pointer;padding:3px 0;min-width:0}
+.tsi input{width:15px;height:15px;accent-color:var(--ac);flex:none;margin:0}
+.tsi span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tsi.done span{color:var(--ink-3);text-decoration:line-through}
 .tchk{width:18px;height:18px;border-radius:5px;border:1.6px solid var(--ink-3);flex:none;margin-top:0;position:relative;background:transparent}
 .tchk.p1{border-color:var(--p1)} .tchk.p2{border-color:var(--p2)} .tchk.p3{border-color:var(--p3)}
 .tchk.on{background:var(--ink-3);border-color:var(--ink-3)}
@@ -1333,7 +1344,9 @@ button.tci:hover{background:var(--page)}
     if(S.tl!=='l:'+t.list||S.view!=='tasks')right.push(`<span class="tl2"><i class="ldot" style="--cc:${listColor(t.list)}"></i>${esc(listName(t.list))}</span>`);
     const dl=o.day?(t.time||''):shortDue(t);
     if(dl)right.push(`<span class="due ${late?'late':t.due===TODAY?'today':''}">${esc(dl)}</span>`);
-    return `<div class="trow-w" data-sw="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''}" ${wide.matches?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button><button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button></div></div>`;
+    // 체크리스트를 할 일 아래에 바로 표시 (완료한 할 일은 숨김)
+    const subs=!t.done&&sb.length?`<div class="tsubl">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<label class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><span>${esc(x.text)}</span></label>`:'').join('')}</div>`:'';
+    return `<div class="trow-w" data-sw="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${wide.matches?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button><button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button></div></div>${subs}`;
   }
   function dayEvents(id){const ev=gDay(id);return ev.length?`<section class="sec"><h4 class="lab">Google calendar</h4><div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div></section>`:''}
   function dayCard(id,compact){
@@ -2018,6 +2031,23 @@ button.tci:hover{background:var(--page)}
 
   let sw=null,swOpen=null,swSuppress=0;const SWW=84;
   function swClose(){if(!swOpen)return;const r=swOpen.querySelector('.trow');if(r){r.style.transition='transform .2s';r.style.transform=''}swOpen.classList.remove('open');swOpen=null}
+  /* 맨 위에서 아래로 당기면 새로고침 (휴대폰·아이패드) */
+  (function pullToRefresh(){
+    const ptr=document.createElement('div');ptr.className='ptr';ptr.innerHTML='<i></i><span>당겨서 새로고침</span>';document.body.appendChild(ptr);
+    const TH=80;let y0=null,x0=0,dy=0,on=false,busy=false;
+    const blocked=t=>!t.closest||t.closest('.sheet,.drawer,.dp,.dp-bg,.tdetail,textarea,select,.toast')||(()=>{for(let el=t;el&&el!==document.body;el=el.parentElement){if(el.scrollTop>0)return true}return false})();
+    const set=d=>{const h=Math.min(d*.5,70);ptr.style.transform=`translate(-50%,${h-48}px)`;ptr.style.opacity=Math.min(1,d/TH);ptr.classList.toggle('ready',d>=TH);ptr.querySelector('span').textContent=d>=TH?'놓으면 새로고침':'당겨서 새로고침'};
+    const reset=()=>{y0=null;dy=0;on=false;ptr.style.transition='transform .2s,opacity .2s';ptr.style.transform='translate(-50%,-48px)';ptr.style.opacity='0';ptr.classList.remove('ready');setTimeout(()=>{ptr.style.transition=''},220)};
+    document.addEventListener('touchstart',e=>{if(busy||e.touches.length>1||(window.scrollY||document.documentElement.scrollTop)>0||blocked(e.target)){y0=null;return}y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;on=false},{passive:true});
+    document.addEventListener('touchmove',e=>{if(y0==null)return;const t=e.touches[0],d=t.clientY-y0,dx=Math.abs(t.clientX-x0);
+      if(!on){if(dx>12&&dx>d){y0=null;return}if(d<12)return;on=true}
+      if((window.scrollY||document.documentElement.scrollTop)>0){reset();return}dy=d;set(d)},{passive:true});
+    document.addEventListener('touchend',()=>{if(y0==null||!on){y0=null;return}
+      if(dy>=TH){busy=true;ptr.classList.add('spin');ptr.querySelector('span').textContent='새로고침 중…';ptr.style.transform='translate(-50%,16px)';
+        try{clearTimeout(syncTimer);saveLocal()}catch(x){}setTimeout(()=>location.reload(),250)}
+      else reset()},{passive:true});
+    document.addEventListener('touchcancel',()=>{if(y0!=null)reset()},{passive:true});
+  })();
   app.addEventListener('touchstart',e=>{const w=e.target.closest&&e.target.closest('.trow-w');if(swOpen&&swOpen!==w)swClose();if(!w||e.touches.length>1||e.target.closest('.tswdel'))return;const t=e.touches[0];sw={w,x:t.clientX,y:t.clientY,dx:0,dir:0,base:w.classList.contains('open')?-SWW:0}},{passive:true});
   app.addEventListener('touchmove',e=>{if(!sw)return;const t=e.touches[0],dx=t.clientX-sw.x,dy=t.clientY-sw.y;
     if(!sw.dir){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;sw.dir=Math.abs(dx)>Math.abs(dy)?1:2}
