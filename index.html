@@ -677,6 +677,11 @@ button.tci:hover{background:var(--page)}
 .trow{display:flex;align-items:center;gap:10px;padding:10px 6px 10px 4px;border-bottom:1px solid var(--hair);border-radius:6px}
 .trow:hover{background:var(--fill)}
 .trow.sel{background:var(--ac-soft)}
+.qp-bg{position:fixed;inset:0;z-index:95;background:rgba(20,28,40,.28)}
+.qp{position:fixed;z-index:96;left:50%;top:18vh;transform:translateX(-50%);width:min(640px,calc(100vw - 32px));background:var(--page);border-radius:16px;box-shadow:0 24px 60px rgba(20,28,40,.28);padding:14px 16px 16px;display:grid;gap:10px}
+.qph{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.qph b{font-size:.95rem}.qph span{font-size:.74rem;color:var(--ink-3)}
+.qp .cmpw{margin:0}
 .cm-bg{position:fixed;inset:0;z-index:90}
 .cm{position:absolute;z-index:91;width:256px;background:var(--page);border:1px solid var(--rule);border-radius:12px;box-shadow:0 12px 32px rgba(30,40,60,.18);padding:6px;display:grid;gap:1px;font-size:.86rem}
 .cmh{padding:6px 10px 6px;font-size:.74rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -696,6 +701,10 @@ button.tci:hover{background:var(--page)}
 .cmc.pf.p0{color:var(--ink-3)}.cmc.pf.p1{color:var(--p1)}.cmc.pf.p2{color:var(--p2)}.cmc.pf.p3{color:var(--p3)}
 .trow.hs{border-bottom-color:transparent;padding-bottom:4px}
 .tsubl{display:grid;gap:1px;padding:0 6px 8px 32px;border-bottom:1px solid var(--hair)}
+.tdx{flex:none;width:26px;height:26px;margin-left:2px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem;line-height:1;color:var(--ink-3);opacity:0;transition:opacity .15s}
+.trow:hover .tdx,.tdx:focus-visible{opacity:1}
+.tdx:hover{background:var(--fill);color:var(--p3)}
+@media (hover:none){.tdx{display:none}}
 .tsr{display:flex;align-items:center;gap:6px;border-radius:6px;padding-right:2px}
 .tsr:hover{background:var(--fill)}
 .tsr .tsi{flex:1}
@@ -1258,7 +1267,7 @@ button.tci:hover{background:var(--page)}
       el.disabled=true;
       const ok=await gInsert(e.due,e.p.title,e.time,e.end,cal);
       flash(S.gmsg);S.gmsg='';
-      if(ok){if(isCalK(S.tl))S.cur=e.due;S.qaText='';S.dp=null;S.mm=false;resetQa()}
+      if(ok){if(isCalK(S.tl))S.cur=e.due;S.qaText='';S.dp=null;S.mm=false;resetQa();if(S.qp){S.qp=false;render();return}}
       render();const n=document.getElementById('qa');if(n)n.focus();return;
     }
     let time=e.time,end=e.end;
@@ -1269,6 +1278,7 @@ button.tci:hover{background:var(--page)}
     if(e.due&&(time||e.cal))scheduleAlarm(id,300);
     if(isCalK(S.tl)&&e.due)S.cur=e.due;
     S.qaText='';S.dp=null;S.mm=false;resetQa();
+    if(S.qp){S.qp=false;flash(`'${e.p.title.slice(0,24)}' 할 일을 추가했습니다`);render();return}
     render();const n=document.getElementById('qa');if(n)n.focus();
   }
   /* date popover (TickTick style) */
@@ -1395,7 +1405,7 @@ button.tci:hover{background:var(--page)}
     // 체크리스트를 할 일 아래에 바로 표시 (완료한 할 일은 숨김)
     const subN=(t.sub||[]).length,up=icon('chev').replace('<svg','<svg style="transform:rotate(180deg)"');
     const subs=!t.done&&sb.length?`<div class="tsubl" data-into="${t.id}">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<div class="tsr"><label class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><span>${esc(x.text)}</span></label><span class="tsb"><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${up}</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===subN-1?'disabled':''}>${icon('chev')}</button><button class="mv x" data-act="del" data-b="${t.id}|sub.${i}" aria-label="항목 삭제" title="삭제">×</button></span></div>`:'').join('')}</div>`:'';
-    return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${wide.matches?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button><button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button></div></div>${subs}`;
+    return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${wide.matches?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button><button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button><button class="tdx" data-act="tdelx" data-t="${t.id}" aria-label="할 일 삭제" title="삭제 (Ctrl+Z로 되돌리기)">×</button></div></div>${subs}`;
   }
   function dayEvents(id){const ev=gDay(id);return ev.length?`<section class="sec"><h4 class="lab">Google calendar</h4><div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div></section>`:''}
   function dayCard(id,compact){
@@ -1411,6 +1421,15 @@ button.tci:hover{background:var(--page)}
   function pushBar(){const o=overdueList();return o.length?`<div class="pushbar"><span>기한 지난 할 일 <b>${o.length}</b>개</span><button class="btn sm" data-act="tpushall">오늘로 연기</button></div>`:''}
   function toggleDone(id){if(!S.docs[id])return;update(id,d=>{d.done=!d.done;d.doneAt=d.done?Date.now():0},true);scheduleAlarm(id,300);render()}
   S.undo=null;let undoT=null;
+  /* Ctrl+Space 빠른 추가 팝업 (할 일 · 일정) */
+  S.qp=false;
+  function qpHtml(){if(!S.qp)return'';return `<div class="qp-bg" data-act="qp-close"></div><div class="qp" role="dialog" aria-label="빠른 추가"><div class="qph"><b>빠른 추가</b><span>Enter 추가 · Esc 닫기</span></div>${composer()}</div>`}
+  function qpOpen(){const q=document.getElementById('qa');if(q)S.qaText=q.value;S.qp=true;S.cm=null;S.dp=null;S.mm=false;render();const n=document.getElementById('qa');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}
+  function qpClose(){const q=document.getElementById('qa');if(q)S.qaText=q.value;S.qp=false;S.dp=null;S.mm=false;render()}
+  document.addEventListener('keydown',e=>{
+    if(!e.ctrlKey||e.altKey||e.metaKey||!(e.code==='Space'||e.key===' '))return;
+    e.preventDefault();S.qp?qpClose():qpOpen();
+  });
   /* 오른쪽 클릭 메뉴 (할 일 · 체크리스트 항목) */
   S.cm=null;
   function cmHtml(){
@@ -1626,7 +1645,7 @@ button.tci:hover{background:var(--page)}
         ${calH?`<header class="th cth"><h2 class="mpill">${r.title}</h2>${calSeg()}${navHtml({},'')}</header>`:
         `<header class="th">${showSide?'':`<button class="ib" data-act="side" aria-label="메뉴">${icon('menu')}</button>`}<h2>${r.title}</h2>${r.sub?`<span class="sub">${r.sub}</span>`:''}${r.nav?navHtml({},''):''}</header>`}
         ${showSide?'':viewSeg()}
-        ${r.noAdd?'':composer()}
+        ${r.noAdd||S.qp?'':composer()}
         <div class="tlist">${r.body}</div>
       </section>
       ${inlineD?`<aside class="tdetail">${taskDetail(S.tsel)}</aside>`:''}
@@ -1990,14 +2009,14 @@ button.tci:hover{background:var(--page)}
     const top=`<div class="top"><button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>`;
     const toast=S.undo?`<div class="toast" role="status"><span>할 일을 삭제했습니다</span><button data-act="undo">되돌리기</button></div>`:S.flash?`<div class="toast" role="status"><span>${esc(S.flash)}</span></div>`:'';
     updateBadge();
-    if(r.tasks){app.innerHTML=top+tasksLayout(r)+sheet+toast+cmHtml();app.querySelectorAll('textarea.ta').forEach(autosize);return}
+    if(r.tasks){app.innerHTML=top+tasksLayout(r)+sheet+toast+cmHtml()+qpHtml();app.querySelectorAll('textarea.ta').forEach(autosize);return}
     app.innerHTML=`
       <div class="top"><button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>
       <div class="book">
         <section class="pg left"><header class="ph"><div class="ttl"><h2>${r.title}</h2><span class="sub">${r.sub||''}</span></div>${navHtml(r,'n-narrow')}</header><div class="pc">${r.left}</div><footer class="pf"><span>${r.footL||''}</span></footer></section>
         <section class="pg right"><header class="ph">${r.tools||''}${navHtml(r,'n-wide')}</header><div class="pc">${r.right}</div><footer class="pf"><span></span><span>${r.footR||''}</span></footer></section>
         <nav class="rail" aria-label="다이어리 탭">${VIEWS.map(v=>`<button class="tab ${v===S.view?'on':''} ${v==='setting'?'end':''}" data-act="tab" data-v="${v}" aria-current="${v===S.view?'page':'false'}">${v.toUpperCase()}</button>`).join('')}</nav>
-      </div>${sheet}${toast}`;
+      </div>${sheet}${toast}${qpHtml()}`;
     app.querySelectorAll('textarea.ta').forEach(autosize);
   }
   function autosize(t){t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px'}
@@ -2021,6 +2040,7 @@ button.tci:hover{background:var(--page)}
     gomonth:b=>{S.cur=b.dataset.d;S.view='month';render();window.scrollTo(0,0)},
     add:b=>{const[id,f]=b.dataset.b.split('|');let n=0;update(id,d=>{d[f]=d[f]||[];d[f].push(TPL[b.dataset.tpl]());n=d[f].length-1});render();
       const el=app.querySelector(`.tx[data-b="${id}|${f}.${n}.text"]`);if(el)el.focus()},
+    'qp-close':()=>qpClose(),
     'cm-close':()=>{S.cm=null;render()},
     'cm-done':b=>{S.cm=null;toggleDone(b.dataset.t)},
     'cm-open':b=>{S.cm=null;S.tsel=b.dataset.t;render()},
@@ -2066,6 +2086,7 @@ button.tci:hover{background:var(--page)}
     tlist:b=>{const id=b.dataset.t;update(id,d=>{d.list=b.dataset.l},true);scheduleAlarm(id,300);render()},
     tpri:b=>{update(b.dataset.t,d=>{d.pri=+b.dataset.p},true);render()},
     tdue:b=>{const id=b.dataset.t,v=b.dataset.v;update(id,d=>{if(v==='x'){d.due='';d.time=''}else d.due=v==='7'?addD(monday(TODAY),7):addD(TODAY,+v)},true);scheduleAlarm(id,300);render()},
+    tdelx:b=>{delTask(b.dataset.t)},
     tdel:b=>{const id=b.dataset.t;if(S.confirm!=='t:'+id){S.confirm='t:'+id;render();return}
       const g=D(id).gcal;remove(id);S.tsel=null;S.confirm=null;if(g&&authed())gDel(g).then(()=>syncWatches(true)).catch(()=>{});render()},
     tswdel:b=>delTask(b.dataset.t),
@@ -2184,6 +2205,7 @@ button.tci:hover{background:var(--page)}
     if(S.dp){e.preventDefault();ACT['dp-close']();return}
     if(S.mm){e.preventDefault();ACT['mm-close']();return}
     if(S.tp){e.preventDefault();S.tp=null;render();return}
+    if(S.qp){e.preventDefault();qpClose();return}
     if(S.confirm){e.preventDefault();S.confirm=null;render();return}
     if(S.side){e.preventDefault();S.side=false;render();return}
     if(S.tsel){e.preventDefault();const a=document.activeElement;if(a&&a.blur)a.blur();ACT.tclose()}
