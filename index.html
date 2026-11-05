@@ -415,6 +415,8 @@ td.today.pic .dn{background:#fff;color:#111;text-shadow:none}
 
 /* swipe to delete */
 .trow-w{position:relative;overflow:hidden;border-radius:6px}
+.trow-w.into .trow{background:var(--ac-soft);box-shadow:inset 0 0 0 2px var(--ac)}
+.tsubl.into{background:var(--ac-soft)}
 .trow-w .trow{position:relative;z-index:1;background:var(--page);touch-action:pan-y;border-radius:0}
 .tswdel{visibility:hidden}
 .tswdone{position:absolute;top:0;left:0;bottom:0;right:0;z-index:0;display:flex;align-items:center;gap:8px;padding-left:22px;background:var(--rule);color:#fff;font-size:.88rem;visibility:hidden;transition:background .12s}
@@ -895,13 +897,34 @@ button.tci:hover{background:var(--page)}
     setSaving(authed()?'저장 대기…':'이 기기에 저장됨 · 구글 연결 시 동기화');
     clearTimeout(syncTimer);if(authed())syncTimer=setTimeout(sync,now?250:1500);
   }
+  /* 실행 취소(Ctrl+Z) 기록: 사용자가 한 동작 단위로 바뀌기 전 상태를 저장 */
+  const HIST=[];let histG=0,histKind='',userOn=false,inUndo=false,userT=null;
+  function userMark(kind){histG++;histKind=kind;userOn=true;clearTimeout(userT);userT=setTimeout(()=>{userOn=false},0)}
+  ['click','change','drop','keydown','touchend'].forEach(ev=>document.addEventListener(ev,e=>{if(ev==='keydown'&&(e.ctrlKey||e.metaKey)&&(e.key==='z'||e.key==='Z'))return;userMark(ev)},true));
+  document.addEventListener('input',()=>userMark('input'),true);
+  function rec(id){
+    if(inUndo||!userOn)return;const now=Date.now(),top=HIST[HIST.length-1],snap=S.docs[id]?clone(S.docs[id]):null;
+    if(top&&histKind==='input'&&top.kind==='input'&&(id in top.prev)&&now-top.t<2500){top.t=now;return}
+    if(top&&top.g===histG){if(!(id in top.prev))top.prev[id]=snap;top.t=now;return}
+    HIST.push({g:histG,kind:histKind,t:now,prev:{[id]:snap}});if(HIST.length>60)HIST.shift();
+  }
+  function undoLast(){
+    const e=HIST.pop();if(!e){flash('되돌릴 작업이 없습니다');render();return}
+    inUndo=true;
+    try{for(const[id,prev]of Object.entries(e.prev)){const cur=S.docs[id];
+      if(prev===null){if(cur){const g=cur.gcal;clearTimeout(alarmT[id]);remove(id);if(g&&authed())gDel(g).then(()=>syncWatches(true)).catch(()=>{})}}
+      else{update(id,d=>{Object.keys(d).forEach(k=>delete d[k]);Object.assign(d,clone(prev));if(!cur)delete d.gcal},true);if(isTask(id))scheduleAlarm(id,300)}}}
+    finally{inUndo=false}
+    if(S.tsel&&!S.docs[S.tsel])S.tsel=null;S.undo=null;S.cm=null;flash('실행 취소했습니다');render();
+  }
   function update(id,fn,now){
+    rec(id);
     const d=clone(S.docs[id]||{});
     if(id==='cfg'&&!d.habits)d.habits=clone(DEFAULT_HABITS);
     if(id==='cfg'&&!d.lists)d.lists=clone(DEFAULT_LISTS);
     fn(d);d.updatedAt=Date.now();S.docs[id]=d;delete S.tomb[id];touchStore(now);
   }
-  function remove(id){delete S.docs[id];S.tomb[id]=Date.now();touchStore(true)}
+  function remove(id){rec(id);delete S.docs[id];S.tomb[id]=Date.now();touchStore(true)}
   function flushAll(){if(S.localDirty&&authed()){clearTimeout(syncTimer);sync()}}
   function setSaving(t){S.saving=t;const el=document.getElementById('saving');if(el)el.lastChild.textContent=' '+t}
 
@@ -1362,8 +1385,8 @@ button.tci:hover{background:var(--page)}
     const dl=o.day?(t.time||''):shortDue(t);
     if(dl)right.push(`<span class="due ${late?'late':t.due===TODAY?'today':''}">${esc(dl)}</span>`);
     // 체크리스트를 할 일 아래에 바로 표시 (완료한 할 일은 숨김)
-    const subs=!t.done&&sb.length?`<div class="tsubl">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<label class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><span>${esc(x.text)}</span></label>`:'').join('')}</div>`:'';
-    return `<div class="trow-w" data-sw="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${wide.matches?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button><button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button></div></div>${subs}`;
+    const subs=!t.done&&sb.length?`<div class="tsubl" data-into="${t.id}">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<label class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><span>${esc(x.text)}</span></label>`:'').join('')}</div>`:'';
+    return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${wide.matches?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button><button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button></div></div>${subs}`;
   }
   function dayEvents(id){const ev=gDay(id);return ev.length?`<section class="sec"><h4 class="lab">Google calendar</h4><div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div></section>`:''}
   function dayCard(id,compact){
@@ -2140,6 +2163,11 @@ button.tci:hover{background:var(--page)}
     if(e.key==='Enter'&&e.target.matches('.tsub .tx')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();const add=e.target.closest('.cl').querySelector('.add');if(add)add.click();return}
     if(e.key==='Backspace'&&e.target.matches('.tsub .tx')&&!e.target.value){const li=e.target.closest('.li'),prev=li&&li.previousElementSibling&&li.previousElementSibling.querySelector('.tx');const del=li&&li.querySelector('.del');if(del){e.preventDefault();del.click();if(prev){const b=prev.dataset.b,n=app.querySelector(`.tx[data-b="${b}"]`);if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}}return}
     if(e.target.id==='qa'&&e.key==='Enter'){e.preventDefault();if(e.isComposing||e.keyCode===229||composing){qaPending=true;return}cmpSubmit();return}if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-act]')){e.preventDefault();e.target.click()}});
+  document.addEventListener('keydown',e=>{
+    if(!(e.ctrlKey||e.metaKey)||e.shiftKey||e.altKey||(e.key!=='z'&&e.key!=='Z'))return;
+    const a=document.activeElement;if(a&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&!/^(checkbox|radio|button|file)$/.test(a.type))||a.isContentEditable))return; // 글자 입력 중엔 기본 되돌리기
+    e.preventDefault();undoLast();
+  });
   /* Esc: 열린 팝업 → 할 일 상세 창 순서로 닫기 */
   document.addEventListener('keydown',e=>{
     if(e.key!=='Escape'||e.isComposing)return;
@@ -2153,10 +2181,22 @@ button.tci:hover{background:var(--page)}
   });
   const DT='application/x-diary-task';let dragId=null;
   app.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('[data-drag]');if(!c){e.preventDefault();return}dragId=c.dataset.drag;try{e.dataTransfer.clearData()}catch(x){}e.dataTransfer.setData(DT,dragId);e.dataTransfer.effectAllowed='move'});
-  app.addEventListener('dragend',()=>{dragId=null;app.querySelectorAll('.over').forEach(x=>x.classList.remove('over'))});
-  app.addEventListener('dragover',e=>{if(!dragId)return;const c=e.target.closest&&e.target.closest('[data-drop]');if(!c){e.dataTransfer.dropEffect='none';return}e.preventDefault();e.dataTransfer.dropEffect='move';app.querySelectorAll('.over').forEach(x=>{if(x!==c)x.classList.remove('over')});c.classList.add('over')});
+  app.addEventListener('dragend',()=>{dragId=null;app.querySelectorAll('.over,.into').forEach(x=>x.classList.remove('over','into'))});
+  function nestTask(src,dst){
+    const s0=S.docs[src],d0=S.docs[dst];if(!s0||!d0||src===dst)return;
+    const items=[{text:s0.title||'(제목 없음)',done:!!s0.done}].concat((s0.sub||[]).filter(x=>x&&(x.text||'').trim()).map(x=>({text:x.text,done:!!x.done})));
+    update(dst,d=>{d.sub=(d.sub||[]).concat(items)},true);
+    const g=s0.gcal;clearTimeout(alarmT[src]);remove(src);if(S.tsel===src)S.tsel=null;if(g&&authed())gDel(g).then(()=>syncWatches(true)).catch(()=>{});
+    flash(`'${(s0.title||'').slice(0,20)}'을(를) '${(d0.title||'').slice(0,20)}' 체크리스트로 넣었습니다 · Ctrl+Z로 취소`);render();
+  }
+  app.addEventListener('dragover',e=>{if(!dragId)return;const n=e.target.closest&&e.target.closest('[data-into]');
+    if(n&&n.dataset.into!==dragId&&isTask(dragId)){e.preventDefault();e.dataTransfer.dropEffect='move';app.querySelectorAll('.over,.into').forEach(x=>x.classList.remove('over','into'));app.querySelectorAll(`[data-into="${n.dataset.into}"]`).forEach(x=>x.classList.add('into'));return}
+    app.querySelectorAll('.into').forEach(x=>x.classList.remove('into'));
+    const c=e.target.closest&&e.target.closest('[data-drop]');if(!c){e.dataTransfer.dropEffect='none';return}e.preventDefault();e.dataTransfer.dropEffect='move';app.querySelectorAll('.over').forEach(x=>{if(x!==c)x.classList.remove('over')});c.classList.add('over')});
   app.addEventListener('dragleave',e=>{const c=e.target.closest&&e.target.closest('[data-drop]');if(c&&!c.contains(e.relatedTarget))c.classList.remove('over')});
-  app.addEventListener('drop',e=>{const c=e.target.closest&&e.target.closest('[data-drop]');const id=dragId||(e.dataTransfer&&e.dataTransfer.getData(DT));dragId=null;
+  app.addEventListener('drop',e=>{const n=e.target.closest&&e.target.closest('[data-into]');const id0=dragId||(e.dataTransfer&&e.dataTransfer.getData(DT));
+    if(n&&id0&&n.dataset.into!==id0&&isTask(id0)){e.preventDefault();dragId=null;app.querySelectorAll('.into').forEach(x=>x.classList.remove('into'));nestTask(id0,n.dataset.into);return}
+    const c=e.target.closest&&e.target.closest('[data-drop]');const id=dragId||(e.dataTransfer&&e.dataTransfer.getData(DT));dragId=null;
     if(!c||!id){if(id)e.preventDefault();return}e.preventDefault();
     if(S.docs[id]&&isTask(id)&&S.docs[id].due!==c.dataset.drop){update(id,d=>{d.due=c.dataset.drop},true);scheduleAlarm(id,400)}S.cur=c.dataset.drop;render()});
   /* never paste dragged/copied task text into inputs */
