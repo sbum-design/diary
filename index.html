@@ -479,6 +479,12 @@ a.tci{text-decoration:none}
 .wke{color:var(--rule);text-align:center;font-size:.8rem;padding-top:8px}
 /* 대시보드 */
 .dgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;align-items:start}
+.agcols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:28px;align-items:start}
+.agc{min-width:0;display:grid;gap:12px;align-content:start}
+.agev{border-left:1px solid var(--hair);padding-left:24px}
+.agl{margin:0}
+@media (max-width:900px){.agcols{grid-template-columns:minmax(0,1fr);gap:16px}.agev{border-left:0;padding-left:0;border-top:1px solid var(--hair);padding-top:12px}}
+.tbook.hasd .agcols{grid-template-columns:minmax(0,1fr)}.tbook.hasd .agev{border-left:0;padding-left:0;border-top:1px solid var(--hair);padding-top:12px}
 .dc{grid-column:span 12;border:1px solid var(--hair);border-radius:14px;padding:14px 16px;background:var(--page);min-width:0;display:grid;gap:8px;align-content:start}
 .dc.s7{grid-column:span 7}.dc.s5{grid-column:span 5}
 .dch{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -701,6 +707,12 @@ button.tci:hover{background:var(--page)}
 .cmc.pf.p0{color:var(--ink-3)}.cmc.pf.p1{color:var(--p1)}.cmc.pf.p2{color:var(--p2)}.cmc.pf.p3{color:var(--p3)}
 .trow.hs{border-bottom-color:transparent;padding-bottom:4px}
 .tsubl{display:grid;gap:1px;padding:0 6px 8px 32px;border-bottom:1px solid var(--hair)}
+.ed{flex:none;font-size:.72rem;padding:3px 7px;border-radius:5px;color:var(--ink-3);border:1px solid var(--rule);background:var(--page);line-height:1.2;white-space:nowrap}
+.ed:hover{color:var(--ac);border-color:var(--ac)}
+.tde{opacity:0;transition:opacity .15s;margin-left:6px}
+.trow:hover .tde,.tde:focus-visible{opacity:1}
+.tsb .ed{margin-right:4px}
+@media (hover:none){.tde{display:none}}
 .tdx{flex:none;width:26px;height:26px;margin-left:2px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem;line-height:1;color:var(--ink-3);opacity:0;transition:opacity .15s}
 .trow:hover .tdx,.tdx:focus-visible{opacity:1}
 .tdx:hover{background:var(--fill);color:var(--p3)}
@@ -723,6 +735,7 @@ button.tci:hover{background:var(--page)}
 .tsb .mv.x:hover{color:var(--p3)}
 @media (hover:none){.tsb{opacity:.7}}
 .tsi{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--ink-2);cursor:default;padding:3px 0;min-width:0}
+label.tsi{cursor:pointer}
 .tsi input[type=checkbox]{width:15px;height:15px;accent-color:var(--ac);flex:none;margin:0}
 .tsi span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tsx{flex:1;min-width:0;border:0;background:transparent;font:inherit;color:inherit;padding:2px 6px;margin-left:-6px;border-radius:5px;outline:none;cursor:text;text-overflow:ellipsis}
@@ -741,6 +754,8 @@ button.tci:hover{background:var(--page)}
 .tchk.sm.on::after{left:3px;top:0;width:3px;height:7px}
 .tbody{flex:1;min-width:0;display:flex;align-items:center;gap:10px;text-align:left}
 .tt{flex:1;min-width:0;font-size:.92rem;line-height:1.45;overflow-wrap:anywhere}
+.tbody.editing{cursor:default}
+.tte{flex:1;min-width:0;font:inherit;font-size:.92rem;line-height:1.45;color:var(--ink);border:0;outline:none;background:var(--page);padding:2px 6px;margin:-2px 0 -2px -6px;border-radius:5px;box-shadow:inset 0 0 0 1.5px var(--ac)}
 .tr{flex:none;display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--ink-3);max-width:55%;overflow:hidden}
 .tr svg{width:13px;height:13px}
 .tr .tg2{color:var(--ac);opacity:.8}
@@ -1418,9 +1433,11 @@ button.tci:hover{background:var(--page)}
     if(dl)right.push(`<span class="due ${late?'late':t.due===TODAY?'today':''}">${esc(dl)}</span>`);
     // 체크리스트를 할 일 아래에 바로 표시 (완료한 할 일은 숨김)
     const subN=(t.sub||[]).length,up=icon('chev').replace('<svg','<svg style="transform:rotate(180deg)"');
-    const subs=!t.done&&sb.length?`<div class="tsubl" data-into="${t.id}">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<div class="tsr" data-subrow="${t.id}|sub.${i}"><span class="grip" draggable="true" data-subdrag="${t.id}|sub.${i}" title="끌어서 순서 바꾸기" aria-hidden="true">⠿</span><div class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><input class="tsx" data-b="${t.id}|sub.${i}.text" value="${esc(x.text)}" aria-label="체크리스트 항목 수정" spellcheck="false" autocomplete="off" enterkeyhint="done"></div><span class="tsb"><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${up}</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===subN-1?'disabled':''}>${icon('chev')}</button><button class="mv x" data-act="del" data-b="${t.id}|sub.${i}" aria-label="항목 삭제" title="삭제">×</button></span></div>`:'').join('')}</div>`:'';
-    return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${wide.matches?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button><button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button><button class="tdx" data-act="tdelx" data-t="${t.id}" aria-label="할 일 삭제" title="삭제 (Ctrl+Z로 되돌리기)">×</button></div></div>${subs}`;
+    const subs=!t.done&&sb.length?`<div class="tsubl" data-into="${t.id}">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<div class="tsr" data-subrow="${t.id}|sub.${i}"><span class="grip" draggable="true" data-subdrag="${t.id}|sub.${i}" title="끌어서 순서 바꾸기" aria-hidden="true">⠿</span>${S.sedit===t.id+'|'+i?`<div class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><input class="tsx" data-b="${t.id}|sub.${i}.text" value="${esc(x.text)}" aria-label="체크리스트 항목 수정" spellcheck="false" autocomplete="off" enterkeyhint="done"></div>`:`<label class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><span>${esc(x.text)}</span></label>`}<span class="tsb"><button class="ed" data-act="sedit" data-t="${t.id}" data-i="${i}" title="수정">수정</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${up}</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===subN-1?'disabled':''}>${icon('chev')}</button><button class="mv x" data-act="del" data-b="${t.id}|sub.${i}" aria-label="항목 삭제" title="삭제">×</button></span></div>`:'').join('')}</div>`:'';
+    return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${wide.matches&&S.tedit!==t.id?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button>${S.tedit===t.id?`<div class="tbody editing"><input class="tte" data-b="${t.id}|title" value="${esc(t.title||'')}" aria-label="제목 수정" spellcheck="false" autocomplete="off" enterkeyhint="done">${right.length?`<span class="tr">${right.join('')}</span>`:''}</div>`:`<button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button>`}${S.tedit===t.id?'':`<button class="tde ed" data-act="tedit" data-t="${t.id}" title="제목 수정">수정</button>`}<button class="tdx" data-act="tdelx" data-t="${t.id}" aria-label="할 일 삭제" title="삭제 (Ctrl+Z로 되돌리기)">×</button></div></div>${subs}`;
   }
+  // 단 나누기용: 일정이 없어도 자리(제목)를 유지
+  function evCol(id){const ev=gDay(id);return `<section class="sec"><h4 class="lab">Google calendar</h4>${ev.length?`<div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:`<p class="empty">${authed()?'이 날 구글 일정이 없습니다.':'구글에 연결하면 일정이 보입니다.'}</p>`}</section>`}
   function dayEvents(id){const ev=gDay(id);return ev.length?`<section class="sec"><h4 class="lab">Google calendar</h4><div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div></section>`:''}
   function dayCard(id,compact){
     const d=D(id),ph=(d.photos||[])[0],hs=cfg().habits.filter(h=>h.on),s=ph?src(ph):'';
@@ -1557,7 +1574,7 @@ button.tci:hover{background:var(--page)}
     };
     const grid=`<table class="cal tcal"><thead><tr>${WDC.map(w=>`<th>${W?w:w.slice(0,2)}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${[0,1,2,3,4,5,6].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
     const sel=S.cur,diff=Math.round((parse(sel)-parse(TODAY))/864e5),rel=diff===0?'오늘':diff===1?'내일':diff===-1?'어제':'';
-    const agenda=`<div class="agenda"><div class="agh"><h3>${md(sel)} ${WDK[parse(sel).getDay()]}요일</h3>${rel?`<span class="sub">${rel}</span>`:''}<button class="lnk" data-act="tl" data-k="cal:d">일 보기 →</button></div>${dayTasks(sel,true)}${dayEvents(sel)}</div>`;
+    const agenda=`<div class="agenda"><div class="agh"><h3>${md(sel)} ${WDK[parse(sel).getDay()]}요일</h3>${rel?`<span class="sub">${rel}</span>`:''}<button class="lnk" data-act="tl" data-k="cal:d">일 보기 →</button></div><div class="agcols"><div class="agc">${dayTasks(sel,true)}</div><div class="agc agev">${evCol(sel)}</div></div></div>`;
     return{title:`${y}년 ${m+1}월`,nav:true,body:`${pushBar()}${grid}${W?'<span class="gnote">할 일을 다른 날짜 칸으로 끌어다 놓으면 날짜가 바뀝니다.</span>':''}${agenda}`};
   }
   function calWeek(n){
@@ -1575,7 +1592,7 @@ button.tci:hover{background:var(--page)}
     const late=id===TODAY?tasks().filter(t=>overdue(t)&&t.due<TODAY).sort(tsort):[];
     const open=ts.filter(t=>!t.done),timed=open.filter(t=>t.time),free=open.filter(t=>!t.time),done=ts.filter(t=>t.done);
     const sec=(n,arr,cls,extra)=>arr.length?`<section class="tg"><h4 class="tgh ${cls||''}"><span class="tgc"><b>${n}</b><span>${arr.length}</span></span>${extra||''}</h4>${arr.map(t=>taskRow(t,{day:t.due===id})).join('')}</section>`:'';
-    const body=`${sec('기한 지남',late,'late','<button class="lnk" data-act="tpushall">오늘로 연기</button>')}${sec('시간 지정',timed)}${sec('종일',free)}${!open.length&&!late.length?'<p class="empty">이 날 할 일이 없습니다. 위 칸에서 추가하세요.</p>':''}${dayEvents(id)}${sec('완료',done)}`;
+    const body=`<div class="agcols"><div class="agc"><h4 class="lab agl">To do</h4>${sec('기한 지남',late,'late','<button class="lnk" data-act="tpushall">오늘로 연기</button>')}${sec('시간 지정',timed)}${sec('종일',free)}${!open.length&&!late.length?'<p class="empty">이 날 할 일이 없습니다. 위 칸에서 추가하세요.</p>':''}${sec('완료',done)}</div><div class="agc agev">${evCol(id)}</div></div>`;
     return{title:`${dt.getMonth()+1}월 ${dt.getDate()}일 ${WDK[dt.getDay()]}요일${rel?` <small>${rel}</small>`:''}`,nav:true,body};
   }
   function weekStrip(){
@@ -2094,13 +2111,16 @@ button.tci:hover{background:var(--page)}
     mini:()=>{S.mini=!S.mini;try{localStorage.setItem('diarybook-mini',S.mini?'1':'0')}catch(e){}render()},
     tmonth:b=>{S.cur=b.dataset.d;S.tl='cal:m';S.lastCal='cal:m';try{localStorage.setItem('diarybook-tl',S.tl);localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}if(!S.qa.pick)S.qa.due=S.cur;render()},
     tl:b=>{S.tl=b.dataset.k;if(!isCalK(S.tl)){S.lastList=S.tl;try{localStorage.setItem('diarybook-tlist',S.tl)}catch(e){}}else{S.lastCal=S.tl;try{localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}}S.side=false;S.addingList=false;try{localStorage.setItem('diarybook-tl',S.tl)}catch(e){}S.tsel=null;S.confirm=null;S.dp=null;S.mm=false;if(!S.qa.pick){const c=qaCtx();S.qa.due=c.due;S.qa.list=c.list||defList()}render()},
-    tsel:b=>{flushAll();S.tsel=b.dataset.t;S.confirm=null;S.dp=null;S.mm=false;render()},
+    tsel:(b,e)=>{flushAll();S.tsel=b.dataset.t;S.confirm=null;S.dp=null;S.mm=false;
+      render()},
     tclose:()=>{flushAll();S.tsel=null;S.confirm=null;S.dp=null;render()},
     tdone:b=>toggleDone(b.dataset.t),
     tlist:b=>{const id=b.dataset.t;update(id,d=>{d.list=b.dataset.l},true);scheduleAlarm(id,300);render()},
     tpri:b=>{update(b.dataset.t,d=>{d.pri=+b.dataset.p},true);render()},
     tdue:b=>{const id=b.dataset.t,v=b.dataset.v;update(id,d=>{if(v==='x'){d.due='';d.time=''}else d.due=v==='7'?addD(monday(TODAY),7):addD(TODAY,+v)},true);scheduleAlarm(id,300);render()},
     tdelx:b=>{delTask(b.dataset.t)},
+    tedit:b=>{S.sedit=null;S.tedit=b.dataset.t;render();const n=app.querySelector('.tte');if(n){n.focus();const L=n.value.length;n.setSelectionRange(L,L)}},
+    sedit:b=>{S.tedit=null;S.sedit=b.dataset.t+'|'+b.dataset.i;render();const n=app.querySelector('.tsx');if(n){n.focus();const L=n.value.length;n.setSelectionRange(L,L)}},
     tdel:b=>{const id=b.dataset.t;if(S.confirm!=='t:'+id){S.confirm='t:'+id;render();return}
       const g=D(id).gcal;remove(id);S.tsel=null;S.confirm=null;if(g&&authed())gDel(g).then(()=>syncWatches(true)).catch(()=>{});render()},
     tswdel:b=>delTask(b.dataset.t),
@@ -2204,6 +2224,7 @@ button.tci:hover{background:var(--page)}
   app.addEventListener('compositionstart',()=>{composing=true});
   app.addEventListener('compositionend',e=>{composing=false;if(e.target.id==='qa'){cmpSync();if(qaPending){qaPending=false;setTimeout(cmpSubmit,0)}}});
   app.addEventListener('keydown',e=>{
+    if((e.key==='Enter'||e.key==='Escape')&&e.target.matches('.tte')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();e.stopPropagation();e.target.blur();return}
     if((e.key==='Enter'||e.key==='Escape')&&e.target.matches('.tsx')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();e.stopPropagation();e.target.blur();return}
     if(e.key==='Enter'&&e.target.matches('.tsub .tx')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();const add=e.target.closest('.cl').querySelector('.add');if(add)add.click();return}
     if(e.key==='Backspace'&&e.target.matches('.tsub .tx')&&!e.target.value){const li=e.target.closest('.li'),prev=li&&li.previousElementSibling&&li.previousElementSibling.querySelector('.tx');const del=li&&li.querySelector('.del');if(del){e.preventDefault();del.click();if(prev){const b=prev.dataset.b,n=app.querySelector(`.tx[data-b="${b}"]`);if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}}return}
@@ -2226,6 +2247,9 @@ button.tci:hover{background:var(--page)}
     if(S.tsel){e.preventDefault();const a=document.activeElement;if(a&&a.blur)a.blur();ACT.tclose()}
   });
   const DT='application/x-diary-task';let dragId=null;
+  app.addEventListener('focusout',e=>{if(e.target.matches&&e.target.matches('.tsx')){S.sedit=null;setTimeout(()=>{if(!S.sedit)render()},0);return}
+    if(e.target.matches&&e.target.matches('.tte')){const id=S.tedit;S.tedit=null;
+    if(id&&S.docs[id]&&!(S.docs[id].title||'').trim())update(id,d=>{d.title='(제목 없음)'},true);setTimeout(()=>{if(!S.tedit)render()},0)}});
   /* 체크리스트 항목 끌어서 순서 바꾸기 */
   let subDrag=null;const SDT='application/x-diary-sub';
   const clearSub=()=>app.querySelectorAll('.dropa,.dropb').forEach(x=>x.classList.remove('dropa','dropb'));
