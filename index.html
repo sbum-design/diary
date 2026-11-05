@@ -2131,7 +2131,8 @@ button.tci:hover{background:var(--page)}
     if(!t||!S.docs[t])return;
     e.preventDefault();S.cm={t,sub,x:e.clientX,y:e.clientY};render();
   });
-  window.addEventListener('scroll',()=>{if(S.cm){S.cm=null;render()}},{passive:true});
+  // 메뉴가 열려 있는 동안에는 휠로 화면이 움직이지 않게 (메뉴는 그대로 유지)
+  document.addEventListener('wheel',e=>{if(S.cm)e.preventDefault()},{passive:false});
   app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f){e.preventDefault();f(b,e)}});
   let composing=false,qaPending=false;
   app.addEventListener('compositionstart',()=>{composing=true});
