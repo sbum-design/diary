@@ -705,6 +705,15 @@ button.tci:hover{background:var(--page)}
 .trow:hover .tdx,.tdx:focus-visible{opacity:1}
 .tdx:hover{background:var(--fill);color:var(--p3)}
 @media (hover:none){.tdx{display:none}}
+.grip{flex:none;width:14px;text-align:center;cursor:grab;color:var(--ink-3);opacity:0;user-select:none;-webkit-user-select:none;font-size:.95rem;line-height:1;transition:opacity .15s}
+.grip:active{cursor:grabbing}
+.tsr:hover .grip,.li:hover .grip{opacity:.85}
+@media (hover:none){.grip{display:none}}
+.tsr{position:relative}
+.tsr .grip{position:absolute;left:-18px;top:50%;transform:translateY(-50%)}
+.dropb{box-shadow:inset 0 2px 0 var(--ac)}
+.dropa{box-shadow:inset 0 -2px 0 var(--ac)}
+.dragging{opacity:.4}
 .tsr{display:flex;align-items:center;gap:6px;border-radius:6px;padding-right:2px}
 .tsr:hover{background:var(--fill)}
 .tsr .tsi{flex:1}
@@ -1012,7 +1021,7 @@ button.tci:hover{background:var(--page)}
   function checklist(id,field,addLabel,movable){
     const arr=D(id)[field]||[];
     const mv=i=>movable?`<span class="mvb"><button class="mv" data-act="mv" data-b="${id}|${field}.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${icon('chev').replace('<svg','<svg style="transform:rotate(180deg)"')}</button><button class="mv" data-act="mv" data-b="${id}|${field}.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===arr.length-1?'disabled':''}>${icon('chev')}</button></span>`:'';
-    return `<div class="cl">${arr.map((it,i)=>`<div class="li"><input type="checkbox" data-b="${id}|${field}.${i}.done" ${it.done?'checked':''} aria-label="완료"><input class="tx ${it.done?'done':''}" data-b="${id}|${field}.${i}.text" value="${esc(it.text||'')}" placeholder="내용 입력">${mv(i)}<button class="del" data-act="del" data-b="${id}|${field}.${i}" aria-label="삭제">×</button></div>`).join('')}<button class="add" data-act="add" data-b="${id}|${field}" data-tpl="item">+ ${addLabel}</button></div>`;
+    return `<div class="cl">${arr.map((it,i)=>`<div class="li" ${movable?`data-subrow="${id}|${field}.${i}"`:''}>${movable?`<span class="grip" draggable="true" data-subdrag="${id}|${field}.${i}" title="끌어서 순서 바꾸기" aria-hidden="true">⠿</span>`:''}<input type="checkbox" data-b="${id}|${field}.${i}.done" ${it.done?'checked':''} aria-label="완료"><input class="tx ${it.done?'done':''}" data-b="${id}|${field}.${i}.text" value="${esc(it.text||'')}" placeholder="내용 입력">${mv(i)}<button class="del" data-act="del" data-b="${id}|${field}.${i}" aria-label="삭제">×</button></div>`).join('')}<button class="add" data-act="add" data-b="${id}|${field}" data-tpl="item">+ ${addLabel}</button></div>`;
   }
   const TPL={item:()=>({text:'',done:false}),event:()=>({t:'',text:''}),log:()=>({text:''}),goal:()=>({text:'',done:false,pct:0})};
 
@@ -1404,7 +1413,7 @@ button.tci:hover{background:var(--page)}
     if(dl)right.push(`<span class="due ${late?'late':t.due===TODAY?'today':''}">${esc(dl)}</span>`);
     // 체크리스트를 할 일 아래에 바로 표시 (완료한 할 일은 숨김)
     const subN=(t.sub||[]).length,up=icon('chev').replace('<svg','<svg style="transform:rotate(180deg)"');
-    const subs=!t.done&&sb.length?`<div class="tsubl" data-into="${t.id}">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<div class="tsr"><label class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><span>${esc(x.text)}</span></label><span class="tsb"><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${up}</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===subN-1?'disabled':''}>${icon('chev')}</button><button class="mv x" data-act="del" data-b="${t.id}|sub.${i}" aria-label="항목 삭제" title="삭제">×</button></span></div>`:'').join('')}</div>`:'';
+    const subs=!t.done&&sb.length?`<div class="tsubl" data-into="${t.id}">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<div class="tsr" data-subrow="${t.id}|sub.${i}"><span class="grip" draggable="true" data-subdrag="${t.id}|sub.${i}" title="끌어서 순서 바꾸기" aria-hidden="true">⠿</span><label class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><span>${esc(x.text)}</span></label><span class="tsb"><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${up}</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===subN-1?'disabled':''}>${icon('chev')}</button><button class="mv x" data-act="del" data-b="${t.id}|sub.${i}" aria-label="항목 삭제" title="삭제">×</button></span></div>`:'').join('')}</div>`:'';
     return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${wide.matches?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button><button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button><button class="tdx" data-act="tdelx" data-t="${t.id}" aria-label="할 일 삭제" title="삭제 (Ctrl+Z로 되돌리기)">×</button></div></div>${subs}`;
   }
   function dayEvents(id){const ev=gDay(id);return ev.length?`<section class="sec"><h4 class="lab">Google calendar</h4><div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div></section>`:''}
@@ -2211,6 +2220,19 @@ button.tci:hover{background:var(--page)}
     if(S.tsel){e.preventDefault();const a=document.activeElement;if(a&&a.blur)a.blur();ACT.tclose()}
   });
   const DT='application/x-diary-task';let dragId=null;
+  /* 체크리스트 항목 끌어서 순서 바꾸기 */
+  let subDrag=null;const SDT='application/x-diary-sub';
+  const clearSub=()=>app.querySelectorAll('.dropa,.dropb').forEach(x=>x.classList.remove('dropa','dropb'));
+  const subTarget=e=>{const r=e.target.closest&&e.target.closest('[data-subrow]');if(!r||!subDrag)return null;const[sid,sp]=subDrag.split('|'),[rid,rp]=r.dataset.subrow.split('|');
+    if(sid!==rid||sp.split('.')[0]!==rp.split('.')[0])return null;const rc=r.getBoundingClientRect();return{r,id:sid,f:sp.split('.')[0],from:+sp.split('.')[1],at:+rp.split('.')[1],after:e.clientY>rc.top+rc.height/2}};
+  app.addEventListener('dragstart',e=>{const g=e.target.closest&&e.target.closest('[data-subdrag]');if(!g)return;e.stopImmediatePropagation();subDrag=g.dataset.subdrag;
+    try{e.dataTransfer.clearData()}catch(x){}e.dataTransfer.setData(SDT,subDrag);e.dataTransfer.effectAllowed='move';
+    const row=g.closest('[data-subrow]');if(row&&e.dataTransfer.setDragImage)e.dataTransfer.setDragImage(row,12,row.offsetHeight/2);row&&row.classList.add('dragging')},true);
+  app.addEventListener('dragover',e=>{if(!subDrag)return;e.stopImmediatePropagation();clearSub();const t=subTarget(e);if(!t){e.dataTransfer.dropEffect='none';return}e.preventDefault();e.dataTransfer.dropEffect='move';t.r.classList.add(t.after?'dropa':'dropb')},true);
+  app.addEventListener('drop',e=>{if(!subDrag)return;e.stopImmediatePropagation();e.preventDefault();const t=subTarget(e);subDrag=null;clearSub();
+    if(!t)return render();let to=t.at+(t.after?1:0);if(t.from<to)to--;if(to===t.from)return render();
+    update(t.id,d=>{const a=d[t.f]||[];if(!a[t.from])return;const[x]=a.splice(t.from,1);a.splice(to,0,x)},true);render()},true);
+  app.addEventListener('dragend',()=>{if(subDrag!==null||app.querySelector('.dragging')){subDrag=null;clearSub();app.querySelectorAll('.dragging').forEach(x=>x.classList.remove('dragging'))}},true);
   app.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('[data-drag]');if(!c){e.preventDefault();return}dragId=c.dataset.drag;try{e.dataTransfer.clearData()}catch(x){}e.dataTransfer.setData(DT,dragId);e.dataTransfer.effectAllowed='move'});
   app.addEventListener('dragend',()=>{dragId=null;app.querySelectorAll('.over,.into').forEach(x=>x.classList.remove('over','into'))});
   function nestTask(src,dst){
