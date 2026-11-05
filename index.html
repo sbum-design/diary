@@ -722,9 +722,14 @@ button.tci:hover{background:var(--page)}
 .tsb .mv.x{font-size:1rem;line-height:1}
 .tsb .mv.x:hover{color:var(--p3)}
 @media (hover:none){.tsb{opacity:.7}}
-.tsi{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--ink-2);cursor:pointer;padding:3px 0;min-width:0}
-.tsi input{width:15px;height:15px;accent-color:var(--ac);flex:none;margin:0}
+.tsi{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--ink-2);cursor:default;padding:3px 0;min-width:0}
+.tsi input[type=checkbox]{width:15px;height:15px;accent-color:var(--ac);flex:none;margin:0}
 .tsi span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tsx{flex:1;min-width:0;border:0;background:transparent;font:inherit;color:inherit;padding:2px 6px;margin-left:-6px;border-radius:5px;outline:none;cursor:text;text-overflow:ellipsis}
+.tsx:hover{box-shadow:inset 0 0 0 1px var(--rule)}
+.tsx:focus{background:var(--page);box-shadow:inset 0 0 0 1.5px var(--ac);color:var(--ink);text-decoration:none}
+.tsi.done .tsx{color:var(--ink-3);text-decoration:line-through}
+.tsi.done .tsx:focus{color:var(--ink);text-decoration:none}
 .tsi.done span{color:var(--ink-3);text-decoration:line-through}
 .tchk{width:18px;height:18px;border-radius:5px;border:1.6px solid var(--ink-3);flex:none;margin-top:0;position:relative;background:transparent}
 .tchk.p1{border-color:var(--p1)} .tchk.p2{border-color:var(--p2)} .tchk.p3{border-color:var(--p3)}
@@ -1413,7 +1418,7 @@ button.tci:hover{background:var(--page)}
     if(dl)right.push(`<span class="due ${late?'late':t.due===TODAY?'today':''}">${esc(dl)}</span>`);
     // 체크리스트를 할 일 아래에 바로 표시 (완료한 할 일은 숨김)
     const subN=(t.sub||[]).length,up=icon('chev').replace('<svg','<svg style="transform:rotate(180deg)"');
-    const subs=!t.done&&sb.length?`<div class="tsubl" data-into="${t.id}">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<div class="tsr" data-subrow="${t.id}|sub.${i}"><span class="grip" draggable="true" data-subdrag="${t.id}|sub.${i}" title="끌어서 순서 바꾸기" aria-hidden="true">⠿</span><label class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><span>${esc(x.text)}</span></label><span class="tsb"><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${up}</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===subN-1?'disabled':''}>${icon('chev')}</button><button class="mv x" data-act="del" data-b="${t.id}|sub.${i}" aria-label="항목 삭제" title="삭제">×</button></span></div>`:'').join('')}</div>`:'';
+    const subs=!t.done&&sb.length?`<div class="tsubl" data-into="${t.id}">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<div class="tsr" data-subrow="${t.id}|sub.${i}"><span class="grip" draggable="true" data-subdrag="${t.id}|sub.${i}" title="끌어서 순서 바꾸기" aria-hidden="true">⠿</span><div class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><input class="tsx" data-b="${t.id}|sub.${i}.text" value="${esc(x.text)}" aria-label="체크리스트 항목 수정" spellcheck="false" autocomplete="off" enterkeyhint="done"></div><span class="tsb"><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${up}</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===subN-1?'disabled':''}>${icon('chev')}</button><button class="mv x" data-act="del" data-b="${t.id}|sub.${i}" aria-label="항목 삭제" title="삭제">×</button></span></div>`:'').join('')}</div>`:'';
     return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${wide.matches?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button><button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button><button class="tdx" data-act="tdelx" data-t="${t.id}" aria-label="할 일 삭제" title="삭제 (Ctrl+Z로 되돌리기)">×</button></div></div>${subs}`;
   }
   function dayEvents(id){const ev=gDay(id);return ev.length?`<section class="sec"><h4 class="lab">Google calendar</h4><div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div></section>`:''}
@@ -2186,9 +2191,9 @@ button.tci:hover{background:var(--page)}
     const ow=e.target.closest&&e.target.closest('.trow-w.open');if(ow&&!e.target.closest('.tswdel')){e.preventDefault();swClose();return}
   },true);
   app.addEventListener('contextmenu',e=>{
-    const si=e.target.closest&&e.target.closest('.tsi input,.tsi');const row=e.target.closest&&e.target.closest('.trow-w');
+    const si=e.target.closest&&e.target.closest('.tsi input[type=checkbox],.tsi');const row=e.target.closest&&e.target.closest('.trow-w');
     let t=null,sub=null;
-    if(si){const inp=si.matches('input')?si:si.querySelector('input');const m=inp&&/^(.+)\|sub\.(\d+)\.done$/.exec(inp.dataset.b||'');if(m){t=m[1];sub=+m[2]}}
+    if(si){const inp=si.matches('input')?si:si.querySelector('input');const m=inp&&/^(.+)\|sub\.(\d+)\.(done|text)$/.exec(inp.dataset.b||'');if(m){t=m[1];sub=+m[2]}}
     else if(row)t=row.dataset.sw;
     else{const c=e.target.closest&&e.target.closest('[data-act="tsel"][data-t]');if(c)t=c.dataset.t}
     if(!t||!S.docs[t])return;
@@ -2199,6 +2204,7 @@ button.tci:hover{background:var(--page)}
   app.addEventListener('compositionstart',()=>{composing=true});
   app.addEventListener('compositionend',e=>{composing=false;if(e.target.id==='qa'){cmpSync();if(qaPending){qaPending=false;setTimeout(cmpSubmit,0)}}});
   app.addEventListener('keydown',e=>{
+    if((e.key==='Enter'||e.key==='Escape')&&e.target.matches('.tsx')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();e.stopPropagation();e.target.blur();return}
     if(e.key==='Enter'&&e.target.matches('.tsub .tx')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();const add=e.target.closest('.cl').querySelector('.add');if(add)add.click();return}
     if(e.key==='Backspace'&&e.target.matches('.tsub .tx')&&!e.target.value){const li=e.target.closest('.li'),prev=li&&li.previousElementSibling&&li.previousElementSibling.querySelector('.tx');const del=li&&li.querySelector('.del');if(del){e.preventDefault();del.click();if(prev){const b=prev.dataset.b,n=app.querySelector(`.tx[data-b="${b}"]`);if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}}return}
     if(e.target.id==='qa'&&e.key==='Enter'){e.preventDefault();if(e.isComposing||e.keyCode===229||composing){qaPending=true;return}cmpSubmit();return}if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-act]')){e.preventDefault();e.target.click()}});
