@@ -676,7 +676,7 @@ button.tci:hover{background:var(--page)}
 .trow:hover{background:var(--fill)}
 .trow.sel{background:var(--ac-soft)}
 .cm-bg{position:fixed;inset:0;z-index:90}
-.cm{position:fixed;z-index:91;width:256px;background:var(--page);border:1px solid var(--rule);border-radius:12px;box-shadow:0 12px 32px rgba(30,40,60,.18);padding:6px;display:grid;gap:1px;font-size:.86rem}
+.cm{position:absolute;z-index:91;width:256px;background:var(--page);border:1px solid var(--rule);border-radius:12px;box-shadow:0 12px 32px rgba(30,40,60,.18);padding:6px;display:grid;gap:1px;font-size:.86rem}
 .cmh{padding:6px 10px 6px;font-size:.74rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cmi{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:7px;text-align:left;color:var(--ink)}
 .cmi:hover{background:var(--fill)}
@@ -1404,8 +1404,9 @@ button.tci:hover{background:var(--page)}
         ${it('cm-dup','복제',icon('plus'))}
         ${it('cm-del','삭제','×','','danger')}`;
     }
-    const W=256,H=c.sub!=null?220:320,x=Math.max(8,Math.min(c.x,innerWidth-W-8)),y=Math.max(8,Math.min(c.y,innerHeight-H-8));
-    return `<div class="cm-bg" data-act="cm-close"></div><div class="cm" role="menu" style="left:${x}px;top:${y}px">${body}</div>`;
+    // 페이지 기준 위치 → 스크롤해도 메뉴가 그 항목 옆에 그대로 붙어 있음
+    let ox=0,oy=0;if(getComputedStyle(app).position!=='static'){const r=app.getBoundingClientRect();ox=r.left+scrollX;oy=r.top+scrollY}
+    return `<div class="cm-bg" data-act="cm-close"></div><div class="cm" role="menu" style="left:${c.px-ox}px;top:${c.py-oy}px">${body}</div>`;
   }
   function delTask(id){
     const doc=S.docs[id];if(!doc)return;const keep=clone(doc),g=doc.gcal;
@@ -2129,10 +2130,8 @@ button.tci:hover{background:var(--page)}
     else if(row)t=row.dataset.sw;
     else{const c=e.target.closest&&e.target.closest('[data-act="tsel"][data-t]');if(c)t=c.dataset.t}
     if(!t||!S.docs[t])return;
-    e.preventDefault();S.cm={t,sub,x:e.clientX,y:e.clientY};render();
+    e.preventDefault();{const W=256,H=sub!=null?220:320,x=Math.max(8,Math.min(e.clientX,innerWidth-W-8)),y=Math.max(8,Math.min(e.clientY,innerHeight-H-8));S.cm={t,sub,px:x+scrollX,py:y+scrollY}}render();
   });
-  // 메뉴가 열려 있는 동안에는 휠로 화면이 움직이지 않게 (메뉴는 그대로 유지)
-  document.addEventListener('wheel',e=>{if(S.cm)e.preventDefault()},{passive:false});
   app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f){e.preventDefault();f(b,e)}});
   let composing=false,qaPending=false;
   app.addEventListener('compositionstart',()=>{composing=true});
