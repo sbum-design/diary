@@ -731,6 +731,7 @@ button.tci:hover{background:var(--page)}
 .tsr:hover .grip,.li:hover .grip{opacity:.85}
 @media (hover:none){.grip{display:none}}
 .tsr{position:relative}
+.trow-w,.tsr,.tsi,.tci{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .tsr .grip{position:absolute;left:-18px;top:50%;transform:translateY(-50%)}
 .dropb{box-shadow:inset 0 2px 0 var(--ac)}
 .dropa{box-shadow:inset 0 -2px 0 var(--ac)}
@@ -889,6 +890,8 @@ label.tsi{cursor:pointer}
   const S={docs:{},view:'tasks',cur:TODAY,mode:'local',noteSel:null,habitEdit:false,confirm:null,saving:''};
   try{const v=localStorage.getItem(LSV);if(VIEWS.includes(v))S.view=v}catch(e){}
   const wide=matchMedia('(min-width:900px)');
+  // 손가락 위주 기기(아이패드·아이폰)는 끌기 대신 길게 누르기 메뉴
+  const fineP=matchMedia('(pointer:fine)');const canDrag=()=>wide.matches&&fineP.matches;
 
   /* ---------------- google sign-in ---------------- */
   // ↓ Google Cloud에서 발급한 OAuth 클라이언트 ID를 따옴표 안에 붙여넣으면 모든 기기에서 따로 입력할 필요가 없습니다.
@@ -1050,7 +1053,7 @@ label.tsi{cursor:pointer}
   function checklist(id,field,addLabel,movable){
     const arr=D(id)[field]||[];
     const mv=i=>movable?`<span class="mvb"><button class="mv" data-act="mv" data-b="${id}|${field}.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${icon('chev').replace('<svg','<svg style="transform:rotate(180deg)"')}</button><button class="mv" data-act="mv" data-b="${id}|${field}.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===arr.length-1?'disabled':''}>${icon('chev')}</button></span>`:'';
-    return `<div class="cl">${arr.map((it,i)=>`<div class="li" ${movable?`data-subrow="${id}|${field}.${i}"`:''}>${movable?`<span class="grip" draggable="true" data-subdrag="${id}|${field}.${i}" title="끌어서 순서 바꾸기" aria-hidden="true">⠿</span>`:''}<input type="checkbox" data-b="${id}|${field}.${i}.done" ${it.done?'checked':''} aria-label="완료"><input class="tx ${it.done?'done':''}" data-b="${id}|${field}.${i}.text" value="${esc(it.text||'')}" placeholder="내용 입력">${mv(i)}<button class="del" data-act="del" data-b="${id}|${field}.${i}" aria-label="삭제">×</button></div>`).join('')}<button class="add" data-act="add" data-b="${id}|${field}" data-tpl="item">+ ${addLabel}</button></div>`;
+    return `<div class="cl">${arr.map((it,i)=>`<div class="li" ${movable?`data-subrow="${id}|${field}.${i}"`:''}>${movable?`<span class="grip" ${fineP.matches?'draggable="true"':''} data-subdrag="${id}|${field}.${i}" title="끌어서 순서 바꾸기" aria-hidden="true">⠿</span>`:''}<input type="checkbox" data-b="${id}|${field}.${i}.done" ${it.done?'checked':''} aria-label="완료"><input class="tx ${it.done?'done':''}" data-b="${id}|${field}.${i}.text" value="${esc(it.text||'')}" placeholder="내용 입력">${mv(i)}<button class="del" data-act="del" data-b="${id}|${field}.${i}" aria-label="삭제">×</button></div>`).join('')}<button class="add" data-act="add" data-b="${id}|${field}" data-tpl="item">+ ${addLabel}</button></div>`;
   }
   const TPL={item:()=>({text:'',done:false}),event:()=>({t:'',text:''}),log:()=>({text:''}),goal:()=>({text:'',done:false,pct:0})};
 
@@ -1340,7 +1343,8 @@ label.tsi{cursor:pointer}
       <div class="dp-rows">
         <div class="dp-row">${icon('clock')}<span>시작</span><button type="button" class="tbtn ${p.time?'':'empty'}" data-act="dtp-open" data-v="time" ${p.due?'':'disabled'}>${p.time?fmtT(p.time):'시간 없음'}</button>${p.time?'<button type="button" class="dp-x" data-act="dp-notime" aria-label="시간 지우기">×</button>':''}</div>
         <div class="dp-row">${icon('clock')}<span>종료</span><button type="button" class="tbtn ${p.end?'':'empty'}" data-act="dtp-open" data-v="end" ${p.time?'':'disabled'}>${p.end?fmtT(p.end):'—'}</button></div>
-        <label class="dp-row">${icon('bell')}<span>알림</span>${alarmSel}</label>
+        ${p.for==='qa'&&S.qkind==='event'?(()=>{const cs=(S.gcals||[]).filter(c=>!c.holiday&&c.write),cur=S.qa.evCal||'';
+          return `<label class="dp-row">${icon('cal')}<span>캘린더</span>${cs.length?`<select id="dpEvCal" class="sel"><option value="" ${cur?'':'selected'}>자동 (점심·저녁 구분)</option>${cs.map(c=>`<option value="${esc(c.id)}" ${cur===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`:'<span class="sub">구글 연결 필요</span>'}</label>`})():`<label class="dp-row">${icon('bell')}<span>알림</span>${alarmSel}</label>`}
 
         ${p.alarm&&p.time&&!p.cal?'<span class="gnote dp-note">알림을 받으려면 구글 캘린더에 알림용 일정이 만들어집니다</span>':''}${p.cal&&p.due?`<span class="gnote dp-note">${esc(gName(alarmCal({list:p.for==='qa'?eff().list:D(p.for).list,title:p.for==='qa'?eff().p.title:D(p.for).title}))||'구글 캘린더')}에 ${p.time?(p.end?p.time+'–'+p.end:'1시간'):'종일'} 일정으로 올라갑니다</span>`:''}
       </div>
@@ -1444,8 +1448,8 @@ label.tsi{cursor:pointer}
     if(dl)right.push(`<span class="due ${late?'late':t.due===TODAY?'today':''}">${esc(dl)}</span>`);
     // 체크리스트를 할 일 아래에 바로 표시 (완료한 할 일은 숨김)
     const subN=(t.sub||[]).length,up=icon('chev').replace('<svg','<svg style="transform:rotate(180deg)"');
-    const subs=!t.done&&!t.subHide&&sb.length?`<div class="tsubl" data-into="${t.id}">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<div class="tsr" data-subrow="${t.id}|sub.${i}"><span class="grip" draggable="true" data-subdrag="${t.id}|sub.${i}" title="끌어서 순서 바꾸기" aria-hidden="true">⠿</span>${S.sedit===t.id+'|'+i?`<div class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><input class="tsx" data-b="${t.id}|sub.${i}.text" value="${esc(x.text)}" aria-label="체크리스트 항목 수정" spellcheck="false" autocomplete="off" enterkeyhint="done"></div>`:`<label class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><span>${esc(x.text)}</span></label>`}<span class="tsb"><button class="ed" data-act="sedit" data-t="${t.id}" data-i="${i}" title="수정">수정</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${up}</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===subN-1?'disabled':''}>${icon('chev')}</button><button class="mv x" data-act="del" data-b="${t.id}|sub.${i}" aria-label="항목 삭제" title="삭제">×</button></span></div>`:'').join('')}</div>`:'';
-    return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${wide.matches&&S.tedit!==t.id?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button>${S.tedit===t.id?`<div class="tbody editing"><input class="tte" data-b="${t.id}|title" value="${esc(t.title||'')}" aria-label="제목 수정" spellcheck="false" autocomplete="off" enterkeyhint="done">${right.length?`<span class="tr">${right.join('')}</span>`:''}</div>`:`<button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button>`}${sbBtn}${S.tedit===t.id?'':`<button class="tde ed" data-act="tedit" data-t="${t.id}" title="제목 수정">수정</button>`}<button class="tdx" data-act="tdelx" data-t="${t.id}" aria-label="할 일 삭제" title="삭제 (Ctrl+Z로 되돌리기)">×</button></div></div>${subs}`;
+    const subs=!t.done&&!t.subHide&&sb.length?`<div class="tsubl" data-into="${t.id}">${(t.sub||[]).map((x,i)=>x&&(x.text||'').trim()?`<div class="tsr" data-subrow="${t.id}|sub.${i}"><span class="grip" ${fineP.matches?'draggable="true"':''} data-subdrag="${t.id}|sub.${i}" title="끌어서 순서 바꾸기" aria-hidden="true">⠿</span>${S.sedit===t.id+'|'+i?`<div class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><input class="tsx" data-b="${t.id}|sub.${i}.text" value="${esc(x.text)}" aria-label="체크리스트 항목 수정" spellcheck="false" autocomplete="off" enterkeyhint="done"></div>`:`<label class="tsi ${x.done?'done':''}"><input type="checkbox" data-b="${t.id}|sub.${i}.done" ${x.done?'checked':''} aria-label="${esc(x.text)} 완료"><span>${esc(x.text)}</span></label>`}<span class="tsb"><button class="ed" data-act="sedit" data-t="${t.id}" data-i="${i}" title="수정">수정</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="-1" aria-label="위로" title="위로" ${i===0?'disabled':''}>${up}</button><button class="mv" data-act="mv" data-b="${t.id}|sub.${i}" data-v="1" aria-label="아래로" title="아래로" ${i===subN-1?'disabled':''}>${icon('chev')}</button><button class="mv x" data-act="del" data-b="${t.id}|sub.${i}" aria-label="항목 삭제" title="삭제">×</button></span></div>`:'').join('')}</div>`:'';
+    return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${canDrag()&&S.tedit!==t.id?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button>${S.tedit===t.id?`<div class="tbody editing"><input class="tte" data-b="${t.id}|title" value="${esc(t.title||'')}" aria-label="제목 수정" spellcheck="false" autocomplete="off" enterkeyhint="done">${right.length?`<span class="tr">${right.join('')}</span>`:''}</div>`:`<button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button>`}${sbBtn}${S.tedit===t.id?'':`<button class="tde ed" data-act="tedit" data-t="${t.id}" title="제목 수정">수정</button>`}<button class="tdx" data-act="tdelx" data-t="${t.id}" aria-label="할 일 삭제" title="삭제 (Ctrl+Z로 되돌리기)">×</button></div></div>${subs}`;
   }
   // 단 나누기용: 일정이 없어도 자리(제목)를 유지
   function evCol(id){const ev=gDay(id);return `<section class="sec"><h4 class="lab">Google calendar</h4>${ev.length?`<div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:`<p class="empty">${authed()?'이 날 구글 일정이 없습니다.':'구글에 연결하면 일정이 보입니다.'}</p>`}</section>`}
@@ -1572,7 +1576,7 @@ label.tsi{cursor:pointer}
     return body;
   }
   const byDue=()=>{const by={};tasks().forEach(t=>{if(t.due)(by[t.due]=by[t.due]||[]).push(t)});Object.values(by).forEach(a=>a.sort((x,y)=>(x.done?1:0)-(y.done?1:0)||tsort(x,y)));return by};
-  const chipFor=(t,click)=>`<${click?'button':'span'} class="tci lc p${t.pri||0} ${t.done?'done':''} ${overdue(t)?'late':''}" style="--cc:${listColor(t.list)}" ${click?`data-act="tsel" data-t="${t.id}" draggable="true" data-drag="${t.id}"`:''} title="${esc(t.title)}">${t.time?`<i>${t.time}</i> `:''}${esc(t.title)}</${click?'button':'span'}>`;
+  const chipFor=(t,click)=>`<${click?'button':'span'} class="tci lc p${t.pri||0} ${t.done?'done':''} ${overdue(t)?'late':''}" style="--cc:${listColor(t.list)}" ${click?`data-act="tsel" data-t="${t.id}" ${fineP.matches?'draggable="true"':''} data-drag="${t.id}"`:''} title="${esc(t.title)}">${t.time?`<i>${t.time}</i> `:''}${esc(t.title)}</${click?'button':'span'}>`;
   function calMonth(){
     const d0=parse(S.cur),y=d0.getFullYear(),m=d0.getMonth(),end=new Date(y,m+1,0),weeks=[];
     for(let s=wkStart(ymd(new Date(y,m,1)));parse(s)<=end;s=addD(s,7))weeks.push(s);
@@ -2193,6 +2197,23 @@ label.tsi{cursor:pointer}
 
   let sw=null,swOpen=null,swSuppress=0;const SWW=84;
   function swClose(){if(!swOpen)return;const r=swOpen.querySelector('.trow');if(r){r.style.transition='transform .2s';r.style.transform=''}swOpen.classList.remove('open');swOpen=null}
+  /* 길게 누르기 → 메뉴 (아이패드·아이폰: PC 오른쪽 클릭과 같은 메뉴) */
+  (function longPress(){
+    let tm=null,x0=0,y0=0,fired=0,holding=false,eatClick=false;
+    const target=el=>{const sr=el.closest&&el.closest('.tsr');if(sr){const inp=sr.querySelector('input[type=checkbox]'),m=inp&&/^(.+)\|sub\.(\d+)\.done$/.exec(inp.dataset.b||'');return m?{t:m[1],sub:+m[2]}:null}
+      const w=el.closest&&el.closest('.trow-w');if(w&&!el.closest('.tchk,.tdx,.tde,.tsubt,input'))return{t:w.dataset.sw,sub:null};
+      const c=el.closest&&el.closest('.tci[data-t]');return c?{t:c.dataset.t,sub:null}:null};
+    // 길게 누른 손가락의 touchend는 화면이 다시 그려져 사라진 요소로 가므로, 다음 터치 시작 때 상태를 초기화
+    document.addEventListener('touchstart',()=>{eatClick=false;holding=false},{capture:true,passive:true});
+    app.addEventListener('touchstart',e=>{if(e.touches.length>1)return;const g=target(e.target);if(!g||!S.docs[g.t])return;const p=e.touches[0];x0=p.clientX;y0=p.clientY;clearTimeout(tm);
+      tm=setTimeout(()=>{tm=null;fired=Date.now();holding=true;eatClick=true;if(navigator.vibrate)try{navigator.vibrate(10)}catch(x){}
+        const W=256,H=g.sub!=null?250:330,x=Math.max(8,Math.min(x0-W/2,innerWidth-W-8)),y=Math.max(8,Math.min(y0+14,innerHeight-H-8));
+        S.cm={t:g.t,sub:g.sub,px:x+scrollX,py:y+scrollY};render()},480)},{passive:true});
+    app.addEventListener('touchmove',e=>{if(!tm)return;const p=e.touches[0];if(Math.abs(p.clientX-x0)>8||Math.abs(p.clientY-y0)>8){clearTimeout(tm);tm=null}},{passive:true});
+    app.addEventListener('touchend',e=>{if(tm){clearTimeout(tm);tm=null}if(holding){holding=false;if(e.cancelable)e.preventDefault()}},{passive:false});
+    app.addEventListener('click',e=>{if(eatClick&&Date.now()-fired<700&&!(e.target.closest&&e.target.closest('.cm'))){eatClick=false;e.preventDefault();e.stopPropagation()}else eatClick=false},true);
+    app.addEventListener('contextmenu',e=>{if(Date.now()-fired<1500)e.preventDefault()},true);
+  })();
   /* 확대·축소 막기 (iOS는 viewport 설정을 무시하므로 직접 차단) */
   ['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
   document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
@@ -2348,6 +2369,7 @@ label.tsi{cursor:pointer}
     if(t.id==='gCal'){gCalTouched=true;return}
     if(S.dp&&t.id==='dpTime'){S.dp.time=t.value;if(!t.value)S.dp.end='';else if(!S.dp.alarmTouched&&!S.dp.alarm)S.dp.alarm=cfg().autoAlarm;render();return}
     if(S.dp&&t.id==='dpEnd'){S.dp.end=t.value;render();return}
+    if(S.dp&&t.id==='dpEvCal'){S.qa.evCal=t.value;const c=document.getElementById('qaChip');if(c){const e=eff();c.innerHTML=chipHtml(e)}return}
     if(S.dp&&t.id==='dpAlarm'){const v=+t.value;S.dp.alarmTouched=true;S.dp.alarm=v>=0;if(v>=0)S.dp.alarmMin=v;return}
     if(S.dp&&t.id==='dpCal'){S.dp.cal=t.checked;render();return}
     if(t.dataset&&t.dataset.tcal){const id=t.dataset.tcal,on=t.checked;update(id,d=>{d.cal=on;delete d.alarmErr},true);scheduleAlarm(id,200);render();return}
