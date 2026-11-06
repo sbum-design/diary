@@ -28,8 +28,10 @@
 *{box-sizing:border-box}
 :root{color-scheme:light only}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{-webkit-text-size-adjust:100%;touch-action:pan-x pan-y}
-body{touch-action:pan-x pan-y}
+html{-webkit-text-size-adjust:100%;touch-action:pan-y;overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none}
+body{touch-action:pan-y;overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;max-width:100vw}
+/* 가로로 넘기는 칸만 좌우 스크롤 허용 */
+.rail,.scroll,.tchips,.cseg{touch-action:pan-x pan-y}
 .ptr{position:fixed;top:calc(env(safe-area-inset-top,0px) + 4px);left:50%;transform:translate(-50%,-48px);opacity:0;z-index:80;display:flex;align-items:center;gap:8px;background:var(--page);color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:7px 14px 7px 10px;font-size:.8rem;box-shadow:0 6px 18px rgba(30,40,60,.12);pointer-events:none}
 .ptr i{width:16px;height:16px;border-radius:50%;border:2px solid var(--rule);border-top-color:var(--ac);transition:transform .2s}
 .ptr.ready{color:var(--ac)}.ptr.ready i{transform:rotate(180deg);border-color:var(--ac)}
@@ -2191,6 +2193,10 @@ label.tsi{cursor:pointer}
 
   let sw=null,swOpen=null,swSuppress=0;const SWW=84;
   function swClose(){if(!swOpen)return;const r=swOpen.querySelector('.trow');if(r){r.style.transition='transform .2s';r.style.transform=''}swOpen.classList.remove('open');swOpen=null}
+  /* 확대·축소 막기 (iOS는 viewport 설정을 무시하므로 직접 차단) */
+  ['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+  document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
+  let lastTouchEnd=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouchEnd<300&&!(e.target.closest&&e.target.closest('input,textarea,select,button,a,label')))e.preventDefault();lastTouchEnd=n},{passive:false});
   /* 맨 위에서 아래로 당기면 새로고침 (휴대폰·아이패드) */
   (function pullToRefresh(){
     const ptr=document.createElement('div');ptr.className='ptr';ptr.innerHTML='<i></i><span>당겨서 새로고침</span>';document.body.appendChild(ptr);
@@ -2222,9 +2228,14 @@ label.tsi{cursor:pointer}
     if(Date.now()-swSuppress<400){e.preventDefault();e.stopPropagation();return}
     const ow=e.target.closest&&e.target.closest('.trow-w.open');if(ow&&!e.target.closest('.tswdel')){e.preventDefault();swClose();return}
   },true);
-  const touchUI=matchMedia('(hover:none)');
+  // 손가락(또는 펜)으로 누른 경우만 메뉴: 아이패드에 키보드·트랙패드가 붙어 있어도 정확히 구분
+  let lastPtr='mouse';
+  document.addEventListener('pointerdown',e=>{lastPtr=e.pointerType||'mouse'},true);
+  document.addEventListener('touchstart',()=>{lastPtr='touch'},{capture:true,passive:true});
+  document.addEventListener('mousedown',e=>{if(!e.sourceCapabilities||!e.sourceCapabilities.firesTouchEvents){if(lastPtr!=='touch'||Date.now()-(window.__lt||0)>800)lastPtr='mouse'}},true);
+  document.addEventListener('touchend',()=>{window.__lt=Date.now()},{capture:true,passive:true});
   app.addEventListener('click',e=>{
-    if(!touchUI.matches)return;const sp=e.target.closest&&e.target.closest('label.tsi span');if(!sp)return;
+    if(lastPtr==='mouse')return;const sp=e.target.closest&&e.target.closest('label.tsi span, label.tsi');if(!sp||(e.target.matches&&e.target.matches('input[type=checkbox]')))return;
     const inp=sp.closest('.tsi').querySelector('input[type=checkbox]'),m=inp&&/^(.+)\|sub\.(\d+)\.done$/.exec(inp.dataset.b||'');if(!m||!S.docs[m[1]])return;
     e.preventDefault();e.stopPropagation();
     const W=256,H=250,x=Math.max(8,Math.min(e.clientX-W/2,innerWidth-W-8)),y=Math.max(8,Math.min(e.clientY+12,innerHeight-H-8));
