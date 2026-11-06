@@ -740,7 +740,7 @@ button.tci:hover{background:var(--page)}
 .tsr:hover .tsb,.tsb:focus-within{opacity:1}
 .tsb .mv.x{font-size:1rem;line-height:1}
 .tsb .mv.x:hover{color:var(--p3)}
-@media (hover:none){.tsb{opacity:.7}}
+@media (hover:none){.tsb{display:none}}
 .tsi{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--ink-2);cursor:default;padding:3px 0;min-width:0}
 label.tsi{cursor:pointer}
 .tsi input[type=checkbox]{width:15px;height:15px;accent-color:var(--ac);flex:none;margin:0}
@@ -1478,6 +1478,7 @@ label.tsi{cursor:pointer}
     let body;
     if(c.sub!=null){const n=(t.sub||[]).length,x=(t.sub||[])[c.sub]||{};
       body=`<div class="cmh">${esc(x.text||'항목')}</div>
+        ${it('cm-subedit','수정',icon('pen'),`data-i="${c.sub}"`)}
         ${it('cm-subdone',x.done?'체크 해제':'체크',icon('check'),`data-i="${c.sub}"`)}
         ${c.sub>0?it('cm-submv','위로 이동','↑',`data-i="${c.sub}" data-v="-1"`):''}
         ${c.sub<n-1?it('cm-submv','아래로 이동','↓',`data-i="${c.sub}" data-v="1"`):''}
@@ -2090,6 +2091,7 @@ label.tsi{cursor:pointer}
     'cm-dup':b=>{const t=S.docs[b.dataset.t];S.cm=null;if(!t)return render();const c=clone(t),id=newId();['gcal','alarmErr','doneAt'].forEach(k=>delete c[k]);
       update(id,d=>Object.assign(d,c,{title:(t.title||'')+' (복사)',done:false,doneAt:0,created:Date.now(),sub:(t.sub||[]).map(x=>({text:x.text,done:false}))}),true);S.tsel=id;render()},
     'cm-del':b=>{S.cm=null;delTask(b.dataset.t)},
+    'cm-subedit':b=>{S.cm=null;ACT.sedit(b)},
     'cm-subdone':b=>{const i=+b.dataset.i;S.cm=null;update(b.dataset.t,d=>{if(d.sub&&d.sub[i])d.sub[i].done=!d.sub[i].done},true);render()},
     'cm-submv':b=>{const i=+b.dataset.i,j=i+(+b.dataset.v);S.cm=null;update(b.dataset.t,d=>{const a=d.sub||[];if(j<0||j>=a.length)return;const[x]=a.splice(i,1);a.splice(j,0,x)},true);render()},
     'cm-subdel':b=>{const i=+b.dataset.i;S.cm=null;update(b.dataset.t,d=>{(d.sub||[]).splice(i,1)},true);render()},
@@ -2219,6 +2221,14 @@ label.tsi{cursor:pointer}
   app.addEventListener('click',e=>{
     if(Date.now()-swSuppress<400){e.preventDefault();e.stopPropagation();return}
     const ow=e.target.closest&&e.target.closest('.trow-w.open');if(ow&&!e.target.closest('.tswdel')){e.preventDefault();swClose();return}
+  },true);
+  const touchUI=matchMedia('(hover:none)');
+  app.addEventListener('click',e=>{
+    if(!touchUI.matches)return;const sp=e.target.closest&&e.target.closest('label.tsi span');if(!sp)return;
+    const inp=sp.closest('.tsi').querySelector('input[type=checkbox]'),m=inp&&/^(.+)\|sub\.(\d+)\.done$/.exec(inp.dataset.b||'');if(!m||!S.docs[m[1]])return;
+    e.preventDefault();e.stopPropagation();
+    const W=256,H=250,x=Math.max(8,Math.min(e.clientX-W/2,innerWidth-W-8)),y=Math.max(8,Math.min(e.clientY+12,innerHeight-H-8));
+    S.cm={t:m[1],sub:+m[2],px:x+scrollX,py:y+scrollY};render();
   },true);
   app.addEventListener('contextmenu',e=>{
     const si=e.target.closest&&e.target.closest('.tsi input[type=checkbox],.tsi');const row=e.target.closest&&e.target.closest('.trow-w');
