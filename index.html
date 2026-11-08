@@ -2302,6 +2302,21 @@ label.tsi{cursor:pointer}
   app.addEventListener('focusout',e=>{if(e.target.matches&&e.target.matches('.tsx')){S.sedit=null;setTimeout(()=>{if(!S.sedit)render()},0);return}
     if(e.target.matches&&e.target.matches('.tte')){const id=S.tedit;S.tedit=null;
     if(id&&S.docs[id]&&!(S.docs[id].title||'').trim())update(id,d=>{d.title='(제목 없음)'},true);setTimeout(()=>{if(!S.tedit)render()},0)}});
+  /* 끄는 동안 화면 위·아래 가장자리에 가면 자동으로 스크롤 (체크리스트·할 일 끌기 공통) */
+  (function dragAutoScroll(){
+    let y=-1,x=0,raf=0,on=false;const EDGE=90,MAX=22;
+    const scroller=el=>{for(let n=el;n&&n!==document.body;n=n.parentElement){const cs=getComputedStyle(n);if(/(auto|scroll)/.test(cs.overflowY)&&n.scrollHeight>n.clientHeight+2)return n}return null};
+    const step=()=>{raf=0;if(!on||y<0)return;
+      const el=document.elementFromPoint(x,y),sc=el&&scroller(el);let top=0,bot=innerHeight;
+      if(sc){const r=sc.getBoundingClientRect();top=Math.max(0,r.top);bot=Math.min(innerHeight,r.bottom)}
+      let d=0;if(y<top+EDGE)d=-Math.ceil(MAX*(1-(y-top)/EDGE));else if(y>bot-EDGE)d=Math.ceil(MAX*(1-(bot-y)/EDGE));
+      if(d){if(sc)sc.scrollTop+=d;else window.scrollBy(0,d)}
+      raf=requestAnimationFrame(step)};
+    document.addEventListener('dragstart',()=>{on=true},true);
+    document.addEventListener('dragover',e=>{x=e.clientX;y=e.clientY;if(on&&!raf)raf=requestAnimationFrame(step)},true);
+    const stop=()=>{on=false;y=-1;if(raf)cancelAnimationFrame(raf);raf=0};
+    document.addEventListener('dragend',stop,true);document.addEventListener('drop',stop,true);
+  })();
   /* 체크리스트 항목 끌어서 순서 바꾸기 */
   let subDrag=null;const SDT='application/x-diary-sub';
   const clearSub=()=>app.querySelectorAll('.dropa,.dropb').forEach(x=>x.classList.remove('dropa','dropb'));
