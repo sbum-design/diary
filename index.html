@@ -731,6 +731,8 @@ button.tci:hover{background:var(--page)}
 .tsr:hover .grip,.li:hover .grip{opacity:.85}
 @media (hover:none){.grip{display:none}}
 .tsr{position:relative}
+.pghost{opacity:.92;background:var(--page);border-radius:8px;box-shadow:0 10px 28px rgba(20,28,40,.22);list-style:none}
+body.pdrag,body.pdrag *{cursor:grabbing!important;user-select:none!important}
 .trow-w,.tsr,.tsi,.tci{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .tsr .grip{position:absolute;left:-18px;top:50%;transform:translateY(-50%)}
 .dropb{box-shadow:inset 0 2px 0 var(--ac)}
@@ -2302,6 +2304,43 @@ label.tsi{cursor:pointer}
   app.addEventListener('focusout',e=>{if(e.target.matches&&e.target.matches('.tsx')){S.sedit=null;setTimeout(()=>{if(!S.sedit)render()},0);return}
     if(e.target.matches&&e.target.matches('.tte')){const id=S.tedit;S.tedit=null;
     if(id&&S.docs[id]&&!(S.docs[id].title||'').trim())update(id,d=>{d.title='(제목 없음)'},true);setTimeout(()=>{if(!S.tedit)render()},0)}});
+  /* 마우스 끌기를 브라우저 기본 드래그 대신 직접 처리 → 끄는 중에도 마우스 휠 스크롤이 됨
+     (기존 dragstart/dragover/drop 처리는 그대로 쓰고, 이벤트만 직접 만들어 보냄) */
+  (function pointerDrag(){
+    let st=null,eatClick=false;
+    document.addEventListener('dragstart',e=>{if(e.isTrusted&&e.target&&e.target.closest&&e.target.closest('#app'))e.preventDefault()},true);
+    const fire=(el,type,x,y)=>{const ev=new DragEvent(type,{bubbles:true,cancelable:true,composed:true,clientX:x,clientY:y,dataTransfer:st.dt});el.dispatchEvent(ev);return ev};
+    const at=(x,y)=>{if(st.ghost)st.ghost.style.display='none';const el=document.elementFromPoint(x,y);if(st.ghost)st.ghost.style.display='';return el};
+    const over=(x,y)=>{if(!st||!st.started)return;st.x=x;st.y=y;
+      if(st.ghost)st.ghost.style.transform=`translate(${x-st.ox}px,${y-st.oy}px)`;
+      const el=at(x,y);if(el)fire(el,'dragover',x,y)};
+    const finish=(drop)=>{if(!st)return;const s0=st;st=null;
+      if(s0.started){const el=drop?(()=>{st=s0;const e=at(s0.x,s0.y);st=null;return e})():null;
+        st=s0;if(el)fire(el,'drop',s0.x,s0.y);fire(s0.src.isConnected?s0.src:app,'dragend',s0.x,s0.y);st=null;
+        if(s0.ghost)s0.ghost.remove();document.body.classList.remove('pdrag');eatClick=true;setTimeout(()=>{eatClick=false},0)}};
+    app.addEventListener('pointerdown',e=>{
+      if(e.pointerType!=='mouse'||e.button!==0)return;const src=e.target.closest&&e.target.closest('[draggable="true"]');if(!src)return;
+      if(e.target.closest('input,textarea,select'))return;
+      st={src,x0:e.clientX,y0:e.clientY,x:e.clientX,y:e.clientY,started:false};
+    });
+    document.addEventListener('pointermove',e=>{
+      if(!st)return;if(!(e.buttons&1)){finish(false);return}
+      if(!st.started){if(Math.hypot(e.clientX-st.x0,e.clientY-st.y0)<6)return;
+        st.dt=new DataTransfer();const ds=fire(st.src,'dragstart',st.x0,st.y0);if(ds.defaultPrevented){st=null;return}
+        st.started=true;const box=st.src.closest('[data-subrow]')||st.src,r=box.getBoundingClientRect();
+        const g=box.cloneNode(true);g.classList.add('pghost');g.removeAttribute('id');Object.assign(g.style,{position:'fixed',left:r.left+'px',top:r.top+'px',width:r.width+'px',margin:'0',pointerEvents:'none',zIndex:200});
+        st.ghost=g;st.ox=0;st.oy=0;g.style.left=(r.left-st.x0)+'px';g.style.top=(r.top-st.y0)+'px';g.style.transform=`translate(${st.x0}px,${st.y0}px)`;document.body.appendChild(g);document.body.classList.add('pdrag');
+        window.getSelection&&window.getSelection().removeAllRanges()}
+      e.preventDefault();over(e.clientX,e.clientY);
+    },{passive:false});
+    document.addEventListener('pointerup',()=>finish(true));
+    document.addEventListener('pointercancel',()=>finish(false));
+    window.addEventListener('blur',()=>finish(false));
+    document.addEventListener('keydown',e=>{if(st&&st.started&&e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();finish(false)}},true);
+    // 휠로 스크롤하면 마우스 아래 칸이 바뀌므로 다시 계산
+    document.addEventListener('scroll',()=>{if(st&&st.started)over(st.x,st.y)},true);
+    app.addEventListener('click',e=>{if(eatClick){eatClick=false;e.preventDefault();e.stopImmediatePropagation()}},true);
+  })();
   /* 끄는 동안 화면 위·아래 가장자리에 가면 자동으로 스크롤 (체크리스트·할 일 끌기 공통) */
   (function dragAutoScroll(){
     let y=-1,x=0,raf=0,on=false;const EDGE=90,MAX=22;
