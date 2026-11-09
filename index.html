@@ -960,7 +960,7 @@ label.tsi{cursor:pointer}
   /* 실행 취소(Ctrl+Z) 기록: 사용자가 한 동작 단위로 바뀌기 전 상태를 저장 */
   const HIST=[];let histG=0,histKind='',userOn=false,inUndo=false,userT=null;
   function userMark(kind){histG++;histKind=kind;userOn=true;clearTimeout(userT);userT=setTimeout(()=>{userOn=false},0)}
-  ['click','change','drop','keydown','touchend'].forEach(ev=>document.addEventListener(ev,e=>{if(ev==='keydown'&&(e.ctrlKey||e.metaKey)&&(e.key==='z'||e.key==='Z'))return;userMark(ev)},true));
+  ['click','change','drop','keydown','touchend'].forEach(ev=>document.addEventListener(ev,e=>{if(ev==='keydown'&&(e.ctrlKey||e.metaKey)&&(e.code==='KeyZ'||e.key==='z'||e.key==='Z'||e.key==='ㅋ'))return;userMark(ev)},true));
   document.addEventListener('input',()=>userMark('input'),true);
   function rec(id){
     if(inUndo||!userOn)return;const now=Date.now(),top=HIST[HIST.length-1],snap=S.docs[id]?clone(S.docs[id]):null;
@@ -2284,7 +2284,7 @@ label.tsi{cursor:pointer}
     if(e.key==='Backspace'&&e.target.matches('.tsub .tx')&&!e.target.value){const li=e.target.closest('.li'),prev=li&&li.previousElementSibling&&li.previousElementSibling.querySelector('.tx');const del=li&&li.querySelector('.del');if(del){e.preventDefault();del.click();if(prev){const b=prev.dataset.b,n=app.querySelector(`.tx[data-b="${b}"]`);if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}}return}
     if(e.target.id==='qa'&&e.key==='Enter'){e.preventDefault();if(e.isComposing||e.keyCode===229||composing){qaPending=true;return}cmpSubmit();return}if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-act]')){e.preventDefault();e.target.click()}});
   document.addEventListener('keydown',e=>{
-    if(!(e.ctrlKey||e.metaKey)||e.shiftKey||e.altKey||(e.key!=='z'&&e.key!=='Z'))return;
+    if(!(e.ctrlKey||e.metaKey)||e.shiftKey||e.altKey||!(e.code==='KeyZ'||e.key==='z'||e.key==='Z'||e.key==='ㅋ'))return;
     const a=document.activeElement;if(a&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&!/^(checkbox|radio|button|file)$/.test(a.type))||a.isContentEditable))return; // 글자 입력 중엔 기본 되돌리기
     e.preventDefault();undoLast();
   });
@@ -2359,16 +2359,41 @@ label.tsi{cursor:pointer}
   /* 체크리스트 항목 끌어서 순서 바꾸기 */
   let subDrag=null;const SDT='application/x-diary-sub';
   const clearSub=()=>app.querySelectorAll('.dropa,.dropb').forEach(x=>x.classList.remove('dropa','dropb'));
-  const subTarget=e=>{const r=e.target.closest&&e.target.closest('[data-subrow]');if(!r||!subDrag)return null;const[sid,sp]=subDrag.split('|'),[rid,rp]=r.dataset.subrow.split('|');
-    if(sid!==rid||sp.split('.')[0]!==rp.split('.')[0])return null;const rc=r.getBoundingClientRect();return{r,id:sid,f:sp.split('.')[0],from:+sp.split('.')[1],at:+rp.split('.')[1],after:e.clientY>rc.top+rc.height/2}};
+  const clearSubAll=()=>app.querySelectorAll('.dropa,.dropb,.into,.ordb,.orda,.over').forEach(x=>x.classList.remove('dropa','dropb','into','ordb','orda','over'));
+  const subTarget=e=>{if(!subDrag)return null;const[sid,sp]=subDrag.split('|'),[sf,si]=sp.split('.'),from=+si,el=e.target;
+    const r=el.closest&&el.closest('[data-subrow]');
+    if(r){const[rid,rp]=r.dataset.subrow.split('|'),[rf,ri]=rp.split('.');const rc=r.getBoundingClientRect(),after=e.clientY>rc.top+rc.height/2;
+      if(rid===sid&&rf===sf)return{kind:'reorder',r,id:sid,f:sf,from,at:+ri,after};
+      if(sf==='sub'&&rf==='sub'&&isTask(rid))return{kind:'subTo',r,id:sid,from,dst:rid,at:+ri,after};return null}
+    if(sf!=='sub')return null;
+    const w=el.closest&&el.closest('.trow-w[data-into]');
+    if(w){const dst=w.dataset.into,rc=w.getBoundingClientRect(),y=e.clientY-rc.top,z=y<rc.height*.3?'before':y>rc.height*.7?'after':'in';
+      if(z==='in'){if(dst===sid)return null;return{kind:'append',r:w,id:sid,from,dst}}
+      return{kind:'asTask',r:w,id:sid,from,dst,after:z==='after'}}
+    const l=el.closest&&el.closest('.tsubl[data-into]');if(l&&l.dataset.into!==sid)return{kind:'append',r:l,id:sid,from,dst:l.dataset.into};
+    const c=el.closest&&el.closest('[data-drop]');if(c)return{kind:'toDate',r:c,id:sid,from,date:c.dataset.drop};
+    return null};
+  const markSub=t=>{if(t.kind==='reorder'||t.kind==='subTo')t.r.classList.add(t.after?'dropa':'dropb');else if(t.kind==='append')app.querySelectorAll(`[data-into="${t.dst}"]`).forEach(x=>x.classList.add('into'));else if(t.kind==='asTask')t.r.classList.add(t.after?'orda':'ordb');else if(t.kind==='toDate')t.r.classList.add('over')};
+  function subAsTask(src,i,extra){const t=S.docs[src];if(!t||!t.sub||!t.sub[i])return null;const x=t.sub[i],id=newId();
+    update(id,d=>Object.assign(d,{title:x.text||'(제목 없음)',due:t.due||'',time:'',pri:0,list:t.list||defList(),tags:[],note:'',done:!!x.done,doneAt:x.done?Date.now():0,created:Date.now()},extra||{}),true);
+    update(src,d=>{(d.sub||[]).splice(i,1)},true);return id}
   app.addEventListener('dragstart',e=>{const g=e.target.closest&&e.target.closest('[data-subdrag]');if(!g)return;e.stopImmediatePropagation();subDrag=g.dataset.subdrag;
     try{e.dataTransfer.clearData()}catch(x){}e.dataTransfer.setData(SDT,subDrag);e.dataTransfer.effectAllowed='move';
     const row=g.closest('[data-subrow]');if(row&&e.dataTransfer.setDragImage)e.dataTransfer.setDragImage(row,12,row.offsetHeight/2);row&&row.classList.add('dragging')},true);
-  app.addEventListener('dragover',e=>{if(!subDrag)return;e.stopImmediatePropagation();clearSub();const t=subTarget(e);if(!t){e.dataTransfer.dropEffect='none';return}e.preventDefault();e.dataTransfer.dropEffect='move';t.r.classList.add(t.after?'dropa':'dropb')},true);
-  app.addEventListener('drop',e=>{if(!subDrag)return;e.stopImmediatePropagation();e.preventDefault();const t=subTarget(e);subDrag=null;clearSub();
-    if(!t)return render();let to=t.at+(t.after?1:0);if(t.from<to)to--;if(to===t.from)return render();
-    update(t.id,d=>{const a=d[t.f]||[];if(!a[t.from])return;const[x]=a.splice(t.from,1);a.splice(to,0,x)},true);render()},true);
-  app.addEventListener('dragend',()=>{if(subDrag!==null||app.querySelector('.dragging')){subDrag=null;clearSub();app.querySelectorAll('.dragging').forEach(x=>x.classList.remove('dragging'))}},true);
+  app.addEventListener('dragover',e=>{if(!subDrag)return;e.stopImmediatePropagation();clearSubAll();const t=subTarget(e);if(!t){e.dataTransfer.dropEffect='none';return}e.preventDefault();e.dataTransfer.dropEffect='move';markSub(t)},true);
+  app.addEventListener('drop',e=>{if(!subDrag)return;e.stopImmediatePropagation();e.preventDefault();const t=subTarget(e);subDrag=null;clearSubAll();
+    if(!t)return render();
+    if(t.kind==='reorder'){let to=t.at+(t.after?1:0);if(t.from<to)to--;if(to===t.from)return render();
+      update(t.id,d=>{const a=d[t.f]||[];if(!a[t.from])return;const[x]=a.splice(t.from,1);a.splice(to,0,x)},true);return render()}
+    const src=S.docs[t.id],x=src&&src.sub&&src.sub[t.from];if(!x)return render();const item={text:x.text,done:!!x.done};
+    const nm=s=>(s||'').slice(0,18);
+    if(t.kind==='subTo'||t.kind==='append'){update(t.id,d=>{(d.sub||[]).splice(t.from,1)},true);
+      update(t.dst,d=>{d.sub=d.sub||[];if(t.kind==='append')d.sub.push(item);else d.sub.splice(t.at+(t.after?1:0),0,item);if(d.subHide)d.subHide=false},true);
+      flash(`'${nm(item.text)}'을(를) '${nm(S.docs[t.dst].title)}'(으)로 옮겼습니다 · Ctrl+Z로 취소`);return render()}
+    if(t.kind==='asTask'){const id=subAsTask(t.id,t.from);if(id)reorderTask(id,t.dst,t.after);flash(`'${nm(item.text)}'을(를) 별도 할 일로 뺐습니다 · Ctrl+Z로 취소`);return render()}
+    if(t.kind==='toDate'){const id=subAsTask(t.id,t.from,{due:t.date});if(id)scheduleAlarm(id,300);flash(`'${nm(item.text)}'을(를) ${md(t.date)} 할 일로 뺐습니다 · Ctrl+Z로 취소`);return render()}
+    render()},true);
+  app.addEventListener('dragend',()=>{if(subDrag!==null||app.querySelector('.dragging')){subDrag=null;clearSubAll();app.querySelectorAll('.dragging').forEach(x=>x.classList.remove('dragging'))}},true);
   app.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('[data-drag]');if(!c){e.preventDefault();return}dragId=c.dataset.drag;try{e.dataTransfer.clearData()}catch(x){}e.dataTransfer.setData(DT,dragId);e.dataTransfer.effectAllowed='move'});
   app.addEventListener('dragend',()=>{dragId=null;clearDz()});
   // 같은 날짜 안에서 순서 바꾸기 (다른 날짜 줄에 놓으면 그 날짜로 옮김)
