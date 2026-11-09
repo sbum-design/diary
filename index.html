@@ -698,6 +698,13 @@ button.tci:hover{background:var(--page)}
 .qph b{font-size:.95rem}.qph span{font-size:.74rem;color:var(--ink-3)}
 .qp .cmpw{margin:0}
 .cm-bg{position:fixed;inset:0;z-index:90}
+.cmev{width:272px}
+.cmh small{font-size:.7rem;color:var(--ink-3)}
+.cmrow.wrap{flex-wrap:wrap;row-gap:2px}
+.cmrow.wrap .cml{align-self:flex-start;padding-top:4px}
+.cmedit{display:flex;gap:6px;padding:4px 6px 6px}
+.cmedit input{flex:1;min-width:0;border:1px solid var(--rule);border-radius:7px;padding:6px 8px;font:inherit;font-size:.86rem}
+.cmedit input:focus{outline:none;border-color:var(--ac)}
 .cm{position:absolute;z-index:91;width:256px;background:var(--page);border:1px solid var(--rule);border-radius:12px;box-shadow:0 12px 32px rgba(30,40,60,.18);padding:6px;display:grid;gap:1px;font-size:.86rem}
 .cmh{padding:6px 10px 6px;font-size:.74rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cmi{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:7px;text-align:left;color:var(--ink)}
@@ -909,22 +916,57 @@ label.tsi{cursor:pointer}
   S.authErr='';
   (function readAuth(){
     const h=new URLSearchParams(location.hash.slice(1));
+    let st0={};try{st0=JSON.parse(h.get('state')||'{}')}catch(e){}
+    // 조용한 재연결용 작은 창: 받은 출입증을 원래 창에 넘기고 바로 닫힘
+    if(st0.silent==='popup'&&(h.get('access_token')||h.get('error'))){
+      if(h.get('access_token'))lsSet(LS_AUTH,JSON.stringify({t:h.get('access_token'),exp:Date.now()+((+h.get('expires_in'))||3600)*1000-60000}));
+      try{window.opener&&window.opener.postMessage({diaryAuth:location.hash.slice(1)},location.origin)}catch(e){}
+      document.documentElement.innerHTML='<body style="font:14px system-ui;padding:24px;color:#555">구글 연결 갱신 중…</body>';setTimeout(()=>window.close(),50);throw 'auth-popup';
+    }
     if(h.get('access_token')){
       token={t:h.get('access_token'),exp:Date.now()+((+h.get('expires_in'))||3600)*1000-60000};
       lsSet(LS_AUTH,JSON.stringify(token));lsSet(LS_WAS,'1');
       try{const st=JSON.parse(h.get('state')||'{}');if(VIEWS.includes(st.v))S.view=st.v;if(/^\d{4}-\d\d-\d\d$/.test(st.c||''))S.cur=st.c}catch(e){}
       history.replaceState(null,'',location.pathname+location.search);return;
     }
-    if(h.get('error')){S.authErr=h.get('error');lsDel(LS_WAS);history.replaceState(null,'',location.pathname+location.search)}
+    if(h.get('error')){
+      if(st0.silent){try{sessionStorage.setItem('diarybook-silent-fail',String(Date.now()))}catch(e){}try{if(VIEWS.includes(st0.v))S.view=st0.v;if(/^\d{4}-\d\d-\d\d$/.test(st0.c||''))S.cur=st0.c}catch(e){}}
+      else{S.authErr=h.get('error');lsDel(LS_WAS)}
+      history.replaceState(null,'',location.pathname+location.search)}
     try{const t=JSON.parse(lsGet(LS_AUTH)||'null');if(t&&t.exp>Date.now())token=t}catch(e){}
   })();
   const authed=()=>!!(token&&token.exp>Date.now());
-  function signIn(){
+  function authUrl(silent){
+    const o={client_id:clientId(),redirect_uri:redirectUri(),response_type:'token',scope:SCOPES,include_granted_scopes:'true',state:JSON.stringify({v:S.view,c:S.cur,silent:silent||undefined})};
+    if(silent){o.prompt='none';const hint=lsGet('diarybook-hint');if(hint)o.login_hint=hint}
+    return 'https://accounts.google.com/o/oauth2/v2/auth?'+new URLSearchParams(o).toString();
+  }
+  function signIn(silent){
     if(!clientId()){S.view='setting';render();return}
     saveLocal();
-    const p=new URLSearchParams({client_id:clientId(),redirect_uri:redirectUri(),response_type:'token',scope:SCOPES,include_granted_scopes:'true',state:JSON.stringify({v:S.view,c:S.cur})});
-    location.href='https://accounts.google.com/o/oauth2/v2/auth?'+p.toString();
+    location.href=authUrl(silent?'page':'');
   }
+  /* 1시간마다 풀리는 연결을 조용히 다시 받기 */
+  const silentFailedRecently=()=>{try{return Date.now()-(+sessionStorage.getItem('diarybook-silent-fail')||0)<10*60000}catch(e){return false}};
+  const isStandalone=()=>!!(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches));
+  let silentBusy=false;
+  function onNewToken(hash){
+    const h=new URLSearchParams(hash||'');if(!h.get('access_token')){if(h.get('error')){try{sessionStorage.setItem('diarybook-silent-fail',String(Date.now()))}catch(e){}S.gerr='auth';requestRender()}return}
+    token={t:h.get('access_token'),exp:Date.now()+((+h.get('expires_in'))||3600)*1000-60000};lsSet(LS_AUTH,JSON.stringify(token));lsSet(LS_WAS,'1');S.gerr='';
+    if(!S.gcals)loadCals();sync();syncWatches(true);requestRender();
+  }
+  window.addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.diaryAuth){silentBusy=false;onNewToken(e.data.diaryAuth)}});
+  window.addEventListener('storage',e=>{if(e.key===LS_AUTH&&e.newValue&&silentBusy){try{const t=JSON.parse(e.newValue);if(t&&t.exp>Date.now()){silentBusy=false;token=t;S.gerr='';if(!S.gcals)loadCals();sync();syncWatches(true);requestRender()}}catch(x){}}});
+  function silentRenew(){
+    if(silentBusy||!clientId()||!lsGet(LS_WAS)||silentFailedRecently()||!navigator.onLine)return;
+    if(isStandalone()){const a=document.activeElement;if(a&&/INPUT|TEXTAREA/.test(a.tagName))return;signIn(true);return}
+    silentBusy=true;
+    const w=window.open(authUrl('popup'),'diaryauth','width=420,height=560,left='+Math.max(0,screen.width-460)+',top=40');
+    if(!w){silentBusy=false;return}
+    setTimeout(()=>{if(silentBusy){silentBusy=false;try{w.close()}catch(e){}}},20000);
+  }
+  // 만료 5분 전부터는 다음 클릭 때 미리 갱신 (클릭은 창을 열 수 있는 시점)
+  document.addEventListener('pointerdown',()=>{if(!lsGet(LS_WAS))return;if(!token||token.exp-Date.now()<5*60000)silentRenew()},true);
   function signOut(){
     if(token)fetch('https://oauth2.googleapis.com/revoke?token='+encodeURIComponent(token.t),{method:'POST'}).catch(()=>{});
     token=null;lsDel(LS_AUTH);lsDel(LS_WAS);S.gcals=null;S.gev={};render();
@@ -1074,6 +1116,7 @@ label.tsi{cursor:pointer}
     if(!authed()){S.gerr='auth';requestRender();return}
     try{
       const j=await(await api(`${CAL}/users/me/calendarList?maxResults=250&fields=items(id,summary,summaryOverride,accessRole,primary,backgroundColor)`)).json();
+      {const pr=(j.items||[]).find(c=>c.primary);if(pr&&/@/.test(pr.id))lsSet('diarybook-hint',pr.id)}
       S.gcals=(j.items||[]).map(c=>({id:c.id,name:c.summaryOverride||c.summary||c.id,holiday:/#holiday@/.test(c.id),primary:!!c.primary,write:c.accessRole==='owner'||c.accessRole==='writer',color:c.backgroundColor||''}));
       S.gerr=null;
     }catch(e){S.gerr=e&&e.code==='auth'?'auth':'http'}
@@ -1135,7 +1178,7 @@ label.tsi{cursor:pointer}
     const evs=gDay(id);
     const allow=S.gerr&&canAllow(S.gerr)?`<button class="btn dark" data-act="signin" style="justify-self:start">구글 연결</button>`:'';
     let list='';
-    if(S.gcals&&!S.gerr)list=evs.length?`<div class="glist">${evs.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:'<span class="empty">이 날 구글 일정이 없습니다.</span>';
+    if(S.gcals&&!S.gerr)list=evs.length?`<div class="glist">${evs.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:'<span class="empty">이 날 구글 일정이 없습니다.</span>';
     const cs=(S.gcals||[]).filter(c=>!c.holiday&&c.write);
     const form=S.gcals&&!S.gerr?`<form class="gadd" id="gadd" data-d="${id}"><input id="gTitle" class="tx" placeholder="구글 캘린더에 일정 추가" maxlength="120" required autocomplete="off">
       <div class="row"><input type="time" id="gStart" class="tm" aria-label="시작"><span class="empty">–</span><input type="time" id="gEnd" class="tm" aria-label="종료">
@@ -1302,6 +1345,9 @@ label.tsi{cursor:pointer}
     const pv=document.getElementById('qprev');if(pv)pv.innerHTML=e.p.tags.map(t=>`<span>#${esc(t)}</span>`).join('');
   }
   function resetQa(){const c=qaCtx();Object.assign(S.qa,{due:c.due,time:'',end:'',pri:0,list:c.list||defList(),cal:false,calSet:false,alarm:false,alarmSet:false,alarmMin:null,pick:false,evCal:''})}
+  app.addEventListener('submit',e=>{const f=e.target;if(!f.classList||!f.classList.contains('cmedit'))return;e.preventDefault();
+    const cal=f.dataset.cal,eid=f.dataset.eid,v=(f.querySelector('input').value||'').trim(),ev=findEv(cal,eid);S.cm=null;render();if(!v||!ev||v===ev.title)return;
+    evDo(cal,eid,()=>api(evUrl(cal,eid),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({summary:v})}),'일정 제목을 바꿨습니다')},true);
   async function cmpSubmit(){
     const el=document.getElementById('qa');if(!el||!el.value.trim())return;
     S.qaText=el.value;const e=eff();if(!e.p.title)return;
@@ -1454,8 +1500,8 @@ label.tsi{cursor:pointer}
     return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${canDrag()&&S.tedit!==t.id?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button>${S.tedit===t.id?`<div class="tbody editing"><input class="tte" data-b="${t.id}|title" value="${esc(t.title||'')}" aria-label="제목 수정" spellcheck="false" autocomplete="off" enterkeyhint="done">${right.length?`<span class="tr">${right.join('')}</span>`:''}</div>`:`<button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button>`}${sbBtn}${S.tedit===t.id?'':`<button class="tde ed" data-act="tedit" data-t="${t.id}" title="제목 수정">수정</button>`}<button class="tdx" data-act="tdelx" data-t="${t.id}" aria-label="할 일 삭제" title="삭제 (Ctrl+Z로 되돌리기)">×</button></div></div>${subs}`;
   }
   // 단 나누기용: 일정이 없어도 자리(제목)를 유지
-  function evCol(id){const ev=gDay(id);return `<section class="sec"><h4 class="lab">Google calendar</h4>${ev.length?`<div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:`<p class="empty">${authed()?'이 날 구글 일정이 없습니다.':'구글에 연결하면 일정이 보입니다.'}</p>`}</section>`}
-  function dayEvents(id){const ev=gDay(id);return ev.length?`<section class="sec"><h4 class="lab">Google calendar</h4><div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div></section>`:''}
+  function evCol(id){const ev=gDay(id);return `<section class="sec"><h4 class="lab">Google calendar</h4>${ev.length?`<div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:`<p class="empty">${authed()?'이 날 구글 일정이 없습니다.':'구글에 연결하면 일정이 보입니다.'}</p>`}</section>`}
+  function dayEvents(id){const ev=gDay(id);return ev.length?`<section class="sec"><h4 class="lab">Google calendar</h4><div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div></section>`:''}
   function dayCard(id,compact){
     const d=D(id),ph=(d.photos||[])[0],hs=cfg().habits.filter(h=>h.on),s=ph?src(ph):'';
     const pic=ph?`<figure class="pt"><img src="${esc(s||'data:image/gif;base64,R0lGODlhAQABAAAAACw=')}" alt="${md(id)} 사진"><label class="x" title="사진 바꾸기"><input class="sr" type="file" accept="image/*" data-d="${id}" data-rep="1">↻</label></figure>`
@@ -1481,7 +1527,9 @@ label.tsi{cursor:pointer}
   /* 오른쪽 클릭 메뉴 (할 일 · 체크리스트 항목) */
   S.cm=null;
   function cmHtml(){
-    const c=S.cm;if(!c)return'';const t=S.docs[c.t];if(!t){S.cm=null;return''}
+    const c=S.cm;if(!c)return'';
+    if(c.ev)return evMenuHtml(c);
+    const t=S.docs[c.t];if(!t){S.cm=null;return''}
     const it=(act,label,ic,extra,cls)=>`<button class="cmi ${cls||''}" data-act="${act}" data-t="${c.t}" ${extra||''}>${ic?`<span class="cmic">${ic}</span>`:''}<span>${label}</span></button>`;
     let body;
     if(c.sub!=null){const n=(t.sub||[]).length,x=(t.sub||[])[c.sub]||{};
@@ -1507,6 +1555,36 @@ label.tsi{cursor:pointer}
     // 페이지 기준 위치 → 스크롤해도 메뉴가 그 항목 옆에 그대로 붙어 있음
     let ox=0,oy=0;if(getComputedStyle(app).position!=='static'){const r=app.getBoundingClientRect();ox=r.left+scrollX;oy=r.top+scrollY}
     return `<div class="cm-bg" data-act="cm-close"></div><div class="cm" role="menu" style="left:${c.px-ox}px;top:${c.py-oy}px">${body}</div>`;
+  }
+  /* 구글 일정 오른쪽 클릭(길게 누르기) 메뉴 */
+  const findEv=(cal,id)=>(S.gev[cal]||[]).find(e=>e.id===id);
+  function evMenuHtml(c){
+    const e=findEv(c.ev.cal,c.ev.id);if(!e){S.cm=null;return''}
+    const cal=(S.gcals||[]).find(x=>x.id===e.cal),can=!!(cal&&cal.write&&!cal.holiday);
+    const k=`data-cal="${esc(e.cal)}" data-eid="${esc(e.id)}"`;
+    const it=(act,label,ic,extra,cls)=>`<button class="cmi ${cls||''}" data-act="${act}" ${k} ${extra||''}>${ic?`<span class="cmic">${ic}</span>`:''}<span>${label}</span></button>`;
+    const when=`${md(e.day)} ${WDK[parse(e.day).getDay()]} · ${e.allDay?'종일':e.time+(e.end&&e.end!==e.time?'–'+e.end:'')}`;
+    let body=`<div class="cmh">${esc(e.title)}<br><small>${esc(when)} · ${esc(gName(e.cal))}</small></div>`;
+    if(c.edit)body+=`<form class="cmedit" data-cal="${esc(e.cal)}" data-eid="${esc(e.id)}"><input id="evTitle" value="${esc(e.title)}" aria-label="일정 제목" autocomplete="off"><button class="btn dark sm" type="submit">저장</button></form>`;
+    body+=it('ev-open','구글 캘린더에서 열기',icon('cal'));
+    if(can){
+      body+=(c.edit?'':it('ev-edit','제목 수정',icon('pen')))+`<div class="cmsep"></div>
+        <div class="cmrow"><span class="cml">날짜</span>${[['t','오늘'],['m','내일'],['-1','−1일'],['1','+1일']].map(([v,n])=>`<button class="cmc" data-act="ev-day" ${k} data-v="${v}">${n}</button>`).join('')}</div>
+        <div class="cmrow wrap"><span class="cml">캘린더</span>${(S.gcals||[]).filter(x=>x.write&&!x.holiday).map(x=>`<button class="cmc ${x.id===e.cal?'on':''}" data-act="ev-cal" ${k} data-to="${esc(x.id)}"><i class="ldot" style="--cc:${gColor(x.id)}"></i>${esc(x.name)}</button>`).join('')}</div>
+        <div class="cmsep"></div>${it('ev-totask','할 일로 바꾸기',icon('check'))}
+        ${c.del?it('ev-del','한 번 더 누르면 삭제됩니다','×','','danger'):it('ev-del','일정 삭제','×','','danger')}`;
+    }else body+=`<div class="cmh"><small>읽기 전용 캘린더라 바꿀 수 없습니다.</small></div>`;
+    let ox=0,oy=0;if(getComputedStyle(app).position!=='static'){const r=app.getBoundingClientRect();ox=r.left+scrollX;oy=r.top+scrollY}
+    return `<div class="cm-bg" data-act="cm-close"></div><div class="cm cmev" role="menu" style="left:${c.px-ox}px;top:${c.py-oy}px">${body}</div>`;
+  }
+  async function evDo(cal,eid,fn,msg){
+    try{await fn();flash(msg);await syncWatches(true)}catch(err){flash(err&&err.code==='auth'?'구글 연결이 끊겼습니다. 다시 연결해 주세요.':'구글 일정을 바꾸지 못했습니다.')}
+    render();
+  }
+  function evShiftBody(e,day){
+    if(e.allDay){const dur=Math.round((parse(e.endDay)-parse(e.day))/864e5);return{start:{date:day},end:{date:addD(day,dur+1)}}}
+    const endDay=e.end&&e.end<e.time?addD(day,1):day;
+    return{start:{dateTime:`${day}T${e.time}:00`,timeZone:TZ},end:{dateTime:`${endDay}T${e.end||e.time}:00`,timeZone:TZ}};
   }
   function delTask(id){
     const doc=S.docs[id];if(!doc)return;const keep=clone(doc),g=doc.gcal;
@@ -1586,7 +1664,7 @@ label.tsi{cursor:pointer}
     const cell=id=>{
       const dt=parse(id),out=dt.getMonth()!==m,ts=by[id]||[];
       const items=ts.map(t=>chipFor(t,W));
-      gDay(id).forEach(e=>items.push(`<span class="tci g" style="--cc:${gColor(e.cal)}">${esc(e.title)}</span>`));
+      gDay(id).forEach(e=>items.push(`<span class="tci g" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}">${esc(e.title)}</span>`));
       const more=items.length>lim?`<span class="tci more">+${items.length-lim}</span>`:'';
       return `<td class="${id===TODAY?'today':''} ${id===S.cur?'sel':''} ${out?'dim':''}" data-drop="${id}"><div class="tcell" data-act="tday" data-d="${id}" role="button" tabindex="0" aria-label="${dt.getMonth()+1}월 ${dt.getDate()}일 · 할 일 ${ts.filter(t=>!t.done).length}개"><span class="dn">${dt.getDate()}</span>${items.slice(0,lim).join('')}${more}</div></td>`;
     };
@@ -1600,7 +1678,7 @@ label.tsi{cursor:pointer}
     const col=i=>{
       const id=addD(s,i),dt=parse(id),ts=by[id]||[],ev=gDay(id);
       return `<div class="wkc ${id===TODAY?'today':''}" data-drop="${id}"><button class="wkh" data-act="tdayview" data-d="${id}"><span>${WDK[dt.getDay()]}</span><b>${dt.getDate()}</b></button>
-        <div class="wki">${ts.map(t=>chipFor(t,true)).join('')}${ev.map(e=>`<a class="tci g" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener">${e.allDay?'':`<i>${e.time}</i> `}${esc(e.title)}</a>`).join('')}${!ts.length&&!ev.length?'<span class="wke">—</span>':''}</div></div>`;
+        <div class="wki">${ts.map(t=>chipFor(t,true)).join('')}${ev.map(e=>`<a class="tci g" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener">${e.allDay?'':`<i>${e.time}</i> `}${esc(e.title)}</a>`).join('')}${!ts.length&&!ev.length?'<span class="wke">—</span>':''}</div></div>`;
     };
     return{title:`${md(s)} – ${md(addD(s,n-1))}`,nav:true,body:`${pushBar()}<div class="wkg ${n===3?'n3':''}">${Array.from({length:n},(_,i)=>i).map(col).join('')}</div>`};
   }
@@ -1648,11 +1726,11 @@ label.tsi{cursor:pointer}
     const card=(cls,h,body,more)=>`<section class="dc ${cls}"><div class="dch"><h3>${h}</h3>${more||''}</div>${body}</section>`;
     const todayList=late.concat(today);
     const tcard=card('s7','오늘 할 일',(late.length?`<div class="pushbar mini"><span>기한 지난 할 일 <b>${late.length}</b>개</span><button class="lnk" data-act="tpushall">오늘로 연기</button></div>`:'')+(todayList.length?todayList.slice(0,10).map(t=>taskRow(t)).join('')+(todayList.length>10?`<button class="lnk" data-act="tl" data-k="today">+${todayList.length-10}개 더 보기</button>`:''):'<p class="empty">오늘 남은 할 일이 없습니다.</p>'),`<button class="lnk" data-act="tl" data-k="today">전체 →</button>`);
-    const ev=gDay(TODAY),ecard=card('s5','오늘 일정',!authed()?'<p class="empty">구글에 연결하면 오늘 일정이 보입니다.</p>':ev.length?`<div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:'<p class="empty">오늘 구글 일정이 없습니다.</p>',`<button class="lnk" data-act="tl" data-k="cal:d">일 보기 →</button>`);
+    const ev=gDay(TODAY),ecard=card('s5','오늘 일정',!authed()?'<p class="empty">구글에 연결하면 오늘 일정이 보입니다.</p>':ev.length?`<div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:'<p class="empty">오늘 구글 일정이 없습니다.</p>',`<button class="lnk" data-act="tl" data-k="cal:d">일 보기 →</button>`);
     // 다음 7일
     const by=byDue();let nx='';
     for(let i=1;i<=7;i++){const d=addD(TODAY,i),ts=(by[d]||[]).filter(t=>!t.done),es=gDay(d);if(!ts.length&&!es.length)continue;
-      const x=parse(d);nx+=`<div class="dn7"><button class="dn7d ${x.getDay()===0?'sun':x.getDay()===6?'sat':''}" data-act="tdayview" data-d="${d}"><b>${x.getDate()}</b><span>${i===1?'내일':WDK[x.getDay()]}</span></button><div class="dn7i">${ts.map(t=>`<button class="dn7t" data-act="tsel" data-t="${t.id}"><i style="background:${listColor(t.list)}"></i>${t.time?`<em>${t.time}</em>`:''}${esc(t.title)}</button>`).join('')}${es.map(e=>`<a class="dn7t ev" href="${esc(e.link)}" target="_blank" rel="noopener"><i style="background:${gColor(e.cal)}"></i>${e.time?`<em>${e.time}</em>`:''}${esc(e.title)}</a>`).join('')}</div></div>`}
+      const x=parse(d);nx+=`<div class="dn7"><button class="dn7d ${x.getDay()===0?'sun':x.getDay()===6?'sat':''}" data-act="tdayview" data-d="${d}"><b>${x.getDate()}</b><span>${i===1?'내일':WDK[x.getDay()]}</span></button><div class="dn7i">${ts.map(t=>`<button class="dn7t" data-act="tsel" data-t="${t.id}"><i style="background:${listColor(t.list)}"></i>${t.time?`<em>${t.time}</em>`:''}${esc(t.title)}</button>`).join('')}${es.map(e=>`<a class="dn7t ev" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><i style="background:${gColor(e.cal)}"></i>${e.time?`<em>${e.time}</em>`:''}${esc(e.title)}</a>`).join('')}</div></div>`}
     const ncard=card('s7','다음 7일',nx||'<p class="empty">다음 7일 동안 예정된 할 일·일정이 없습니다.</p>',`<button class="lnk" data-act="tl" data-k="week">목록 →</button>`);
     // 이번 달 미니 달력
     const y=dt.getFullYear(),mo=dt.getMonth(),first=ymd(new Date(y,mo,1)),last=ymd(new Date(y,mo+1,0));let cells='';
@@ -2091,6 +2169,17 @@ label.tsi{cursor:pointer}
       const el=app.querySelector(`.tx[data-b="${id}|${f}.${n}.text"]`);if(el)el.focus()},
     'qp-close':()=>qpClose(),
     'cm-close':()=>{S.cm=null;render()},
+    'ev-open':b=>{const e=findEv(b.dataset.cal,b.dataset.eid);S.cm=null;render();if(e&&e.link)window.open(e.link,'_blank','noopener')},
+    'ev-edit':()=>{if(S.cm){S.cm.edit=true;render();const n=document.getElementById('evTitle');if(n){n.focus();n.select()}}},
+    'ev-day':b=>{const{cal,eid}=b.dataset,e=findEv(cal,eid);S.cm=null;render();if(!e)return;const v=b.dataset.v,day=v==='t'?TODAY:v==='m'?addD(TODAY,1):addD(e.day,+v);
+      evDo(cal,eid,()=>api(evUrl(cal,eid),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(evShiftBody(e,day))}),`'${e.title.slice(0,20)}' 일정을 ${md(day)}(으)로 옮겼습니다`)},
+    'ev-cal':b=>{const{cal,eid,to}=b.dataset,e=findEv(cal,eid);S.cm=null;render();if(!e||to===cal)return;
+      evDo(cal,eid,()=>api(evUrl(cal,eid)+'/move?destination='+encodeURIComponent(to),{method:'POST'}),`'${e.title.slice(0,20)}' 일정을 ${gName(to)} 캘린더로 옮겼습니다`)},
+    'ev-totask':b=>{const{cal,eid}=b.dataset,e=findEv(cal,eid);S.cm=null;render();if(!e)return;
+      const id=newId();update(id,d=>Object.assign(d,{title:e.title,due:e.day,time:e.allDay?'':e.time,end:e.allDay?'':(e.end||''),pri:0,list:defList(),tags:[],note:'',done:false,doneAt:0,created:Date.now()}),true);
+      evDo(cal,eid,()=>gDel({cal,id:eid}),`'${e.title.slice(0,20)}'을(를) 할 일로 바꿨습니다`)},
+    'ev-del':b=>{const{cal,eid}=b.dataset,e=findEv(cal,eid);if(!S.cm.del){S.cm.del=true;render();return}S.cm=null;render();if(!e)return;
+      evDo(cal,eid,()=>gDel({cal,id:eid}),`'${e.title.slice(0,20)}' 일정을 삭제했습니다`)},
     'cm-done':b=>{S.cm=null;toggleDone(b.dataset.t)},
     'cm-open':b=>{S.cm=null;S.tsel=b.dataset.t;render()},
     'cm-due':b=>{S.cm=null;ACT.tdue(b)},
@@ -2202,15 +2291,16 @@ label.tsi{cursor:pointer}
   /* 길게 누르기 → 메뉴 (아이패드·아이폰: PC 오른쪽 클릭과 같은 메뉴) */
   (function longPress(){
     let tm=null,x0=0,y0=0,fired=0,holding=false,eatClick=false;
-    const target=el=>{const sr=el.closest&&el.closest('.tsr');if(sr){const inp=sr.querySelector('input[type=checkbox]'),m=inp&&/^(.+)\|sub\.(\d+)\.done$/.exec(inp.dataset.b||'');return m?{t:m[1],sub:+m[2]}:null}
+    const target=el=>{const ev=el.closest&&el.closest('[data-ev]');if(ev){const[cal,id]=ev.dataset.ev.split('|');return{ev:{cal,id}}}
+      const sr=el.closest&&el.closest('.tsr');if(sr){const inp=sr.querySelector('input[type=checkbox]'),m=inp&&/^(.+)\|sub\.(\d+)\.done$/.exec(inp.dataset.b||'');return m?{t:m[1],sub:+m[2]}:null}
       const w=el.closest&&el.closest('.trow-w');if(w&&!el.closest('.tchk,.tdx,.tde,.tsubt,input'))return{t:w.dataset.sw,sub:null};
       const c=el.closest&&el.closest('.tci[data-t]');return c?{t:c.dataset.t,sub:null}:null};
     // 길게 누른 손가락의 touchend는 화면이 다시 그려져 사라진 요소로 가므로, 다음 터치 시작 때 상태를 초기화
     document.addEventListener('touchstart',()=>{eatClick=false;holding=false},{capture:true,passive:true});
-    app.addEventListener('touchstart',e=>{if(e.touches.length>1)return;const g=target(e.target);if(!g||!S.docs[g.t])return;const p=e.touches[0];x0=p.clientX;y0=p.clientY;clearTimeout(tm);
+    app.addEventListener('touchstart',e=>{if(e.touches.length>1)return;const g=target(e.target);if(!g||(g.ev?!findEv(g.ev.cal,g.ev.id):!S.docs[g.t]))return;const p=e.touches[0];x0=p.clientX;y0=p.clientY;clearTimeout(tm);
       tm=setTimeout(()=>{tm=null;fired=Date.now();holding=true;eatClick=true;if(navigator.vibrate)try{navigator.vibrate(10)}catch(x){}
         const W=256,H=g.sub!=null?250:330,x=Math.max(8,Math.min(x0-W/2,innerWidth-W-8)),y=Math.max(8,Math.min(y0+14,innerHeight-H-8));
-        S.cm={t:g.t,sub:g.sub,px:x+scrollX,py:y+scrollY};render()},480)},{passive:true});
+        S.cm=g.ev?{ev:g.ev,px:x+scrollX,py:y+scrollY}:{t:g.t,sub:g.sub,px:x+scrollX,py:y+scrollY};render()},480)},{passive:true});
     app.addEventListener('touchmove',e=>{if(!tm)return;const p=e.touches[0];if(Math.abs(p.clientX-x0)>8||Math.abs(p.clientY-y0)>8){clearTimeout(tm);tm=null}},{passive:true});
     app.addEventListener('touchend',e=>{if(tm){clearTimeout(tm);tm=null}if(holding){holding=false;if(e.cancelable)e.preventDefault()}},{passive:false});
     app.addEventListener('click',e=>{if(eatClick&&Date.now()-fired<700&&!(e.target.closest&&e.target.closest('.cm'))){eatClick=false;e.preventDefault();e.stopPropagation()}else eatClick=false},true);
@@ -2265,6 +2355,9 @@ label.tsi{cursor:pointer}
     S.cm={t:m[1],sub:+m[2],px:x+scrollX,py:y+scrollY};render();
   },true);
   app.addEventListener('contextmenu',e=>{
+    const ev=e.target.closest&&e.target.closest('[data-ev]');
+    if(ev){const[cal,id]=ev.dataset.ev.split('|');if(!findEv(cal,id))return;e.preventDefault();e.stopPropagation();
+      const W=272,H=360,x=Math.max(8,Math.min(e.clientX,innerWidth-W-8)),y=Math.max(8,Math.min(e.clientY,innerHeight-H-8));S.cm={ev:{cal,id},px:x+scrollX,py:y+scrollY};render();return}
     const si=e.target.closest&&e.target.closest('.tsi input[type=checkbox],.tsi');const row=e.target.closest&&e.target.closest('.trow-w');
     let t=null,sub=null;
     if(si){const inp=si.matches('input')?si:si.querySelector('input');const m=inp&&/^(.+)\|sub\.(\d+)\.(done|text)$/.exec(inp.dataset.b||'');if(m){t=m[1];sub=+m[2]}}
@@ -2497,7 +2590,7 @@ label.tsi{cursor:pointer}
   ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
   document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
   let lastTap=0,lastEl=null;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<300&&e.target===lastEl&&!e.target.closest('input,textarea,select,button,label'))e.preventDefault();lastTap=n;lastEl=e.target},{passive:false});
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){saveLocal();flushAll();updateBadge(true)}else if(authed()){sync();syncWatches()}else render()});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){saveLocal();flushAll();updateBadge(true)}else if(authed()){sync();syncWatches()}else{render();if(isStandalone()&&lsGet(LS_WAS)&&!silentFailedRecently())signIn(true)}});
   window.addEventListener('pagehide',()=>{saveLocal();flushAll()});
   window.addEventListener('online',()=>{if(authed())sync()});
   setInterval(()=>{if(document.visibilityState!=='visible')return;if(authed()){sync();syncWatches()}else if(S.gcals){S.gerr='auth';requestRender()}},60000);
@@ -2510,7 +2603,7 @@ label.tsi{cursor:pointer}
   else{
     S.gerr=clientId()?'auth':'noid';
     let recent=false;try{recent=Date.now()-(+sessionStorage.getItem('diarybook-redirect')||0)<60000}catch(e){}
-    if(lsGet(LS_WAS)&&clientId()&&!S.authErr&&!recent){try{sessionStorage.setItem('diarybook-redirect',String(Date.now()))}catch(e){}signIn()}
+    if(lsGet(LS_WAS)&&clientId()&&!S.authErr&&!recent&&!silentFailedRecently()){try{sessionStorage.setItem('diarybook-redirect',String(Date.now()))}catch(e){}signIn(true)}
     else render();
   }
 })();
