@@ -662,7 +662,10 @@ button.tci:hover{background:var(--page)}
 .tpush:hover{border-color:var(--ink);color:var(--ink)}
 .lnk{margin-left:auto;font-size:.82rem;color:var(--ac);padding:2px 4px;border-radius:4px}
 /* 업무 포트폴리오 */
-.wadd{margin-bottom:12px}
+.wadd{margin-bottom:8px}
+.wtools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.wtools .btn{cursor:pointer}
+.wtools .btn[disabled]{opacity:.6}
 .wstats{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.8rem;color:var(--ink-2);margin:0 0 12px}
 .wstats b{color:var(--ink);font-family:var(--f-mono);margin-left:6px}
 .wbar{margin-bottom:10px}
@@ -673,7 +676,9 @@ button.tci:hover{background:var(--page)}
 .wcard:hover{border-color:var(--rule);border-left-color:var(--ac);box-shadow:0 4px 14px rgba(30,40,60,.06)}
 .wcard.plan,.wcard.plan:hover{border-left-color:var(--p2)}
 .wcard.done,.wcard.done:hover{border-left-color:var(--ink-3)}
-.wcard.sel{background:var(--ac-soft)}
+.wcard.sel{background:var(--ac-soft);justify-self:stretch}
+.wtl .tt{word-break:keep-all}
+.wtl .tr .tl2,.wtl .tr .tg2{display:none}
 .wtop{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.72rem;color:var(--ink-3)}
 .wst{font-weight:700;padding:1px 8px;border-radius:99px;background:var(--ac-soft);color:var(--ac)}
 .wst.plan{background:#fff4dc;color:#a86e00}
@@ -698,6 +703,25 @@ button.tci:hover{background:var(--page)}
 .tr .tw2{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;color:var(--ac);max-width:12em;overflow:hidden;text-overflow:ellipsis}
 .tr .tw2 .ic{width:12px;height:12px;flex:none}
 .dl.dw{grid-template-columns:minmax(110px,220px) minmax(0,1fr)}
+.cchip .cw{display:inline-flex;align-items:center;gap:3px;color:var(--ac);max-width:10em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cchip .cw .ic{width:12px;height:12px;flex:none}
+.qprev .qw{display:inline-flex;align-items:center;gap:4px;color:var(--ac);background:var(--ac-soft);border-color:transparent}
+.qprev .qw .ic{width:12px;height:12px}
+.qprev .qw.miss{color:var(--p3);background:#fdeeee}
+.mmb .ic{width:13px;height:13px;color:var(--ac)}
+.cmc .ic{width:12px;height:12px}
+.cmc.sug:not(.on){outline:1px dashed var(--ac);color:var(--ac)}
+.gev small{max-width:16em;overflow:hidden;text-overflow:ellipsis}
+.gev small .gw{color:var(--ac);font-weight:600}
+.wla{justify-self:start}
+.wev{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px;align-items:center;border-left:3px solid var(--cc);padding:4px 0 4px 8px;font-size:.84rem}
+.wev .d{font-family:var(--f-mono);font-size:.72rem;color:var(--ink-3);white-space:nowrap}
+.wev .x{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);text-decoration:none}
+.wev a.x:hover{text-decoration:underline}
+.wev.sug{border-left-style:dashed;opacity:.9}
+.wsug{display:grid;gap:4px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--rule)}
+.wle{display:inline-flex;align-items:center;gap:5px;color:var(--ink-2)}
+.wle::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--cc);flex:none}
 @media (max-width:520px){.tr .tw2{max-width:7em}.wgrid{grid-template-columns:1fr}}
 .lnk:hover{background:var(--ac-soft)}
 .dayline{display:flex;gap:12px;align-items:flex-start}
@@ -1059,7 +1083,7 @@ label.tsi{cursor:pointer}
     if(S.tsel&&!S.docs[S.tsel])S.tsel=null;S.undo=null;S.cm=null;flash('실행 취소했습니다');render();
   }
   function update(id,fn,now){
-    rec(id);
+    rec(id);EVW=null;
     const d=clone(S.docs[id]||{});
     if(id==='cfg'&&!d.habits)d.habits=clone(DEFAULT_HABITS);
     if(id==='cfg'&&!d.lists)d.lists=clone(DEFAULT_LISTS);
@@ -1197,6 +1221,7 @@ label.tsi{cursor:pointer}
         const j=await(await api(`${CAL}/calendars/${encodeURIComponent(cal)}/events?singleEvents=true&orderBy=startTime&maxResults=250&timeMin=${tmin}&timeMax=${tmax}&fields=items(id,summary,start,end,status,htmlLink,extendedProperties)`)).json();
         if(gw.key!==key)return;
         S.gev[cal]=(j.items||[]).map(x=>normEv(x,cal)).filter(Boolean);
+        refreshEvSnap(cal,S.gev[cal]);
         requestRender();
       }catch(err){if(err&&err.code==='auth'){S.gerr='auth';requestRender()}}
     });
@@ -1217,7 +1242,7 @@ label.tsi{cursor:pointer}
     const evs=gDay(id);
     const allow=S.gerr&&canAllow(S.gerr)?`<button class="btn dark" data-act="signin" style="justify-self:start">구글 연결</button>`:'';
     let list='';
-    if(S.gcals&&!S.gerr)list=evs.length?`<div class="glist">${evs.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:'<span class="empty">이 날 구글 일정이 없습니다.</span>';
+    if(S.gcals&&!S.gerr)list=evs.length?`<div class="glist">${evs.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${gevW(e)}${esc(gName(e.cal))}</small></a>`).join('')}</div>`:'<span class="empty">이 날 구글 일정이 없습니다.</span>';
     const cs=(S.gcals||[]).filter(c=>!c.holiday&&c.write);
     const form=S.gcals&&!S.gerr?`<form class="gadd" id="gadd" data-d="${id}"><input id="gTitle" class="tx" placeholder="구글 캘린더에 일정 추가" maxlength="120" required autocomplete="off">
       <div class="row"><input type="time" id="gStart" class="tm" aria-label="시작"><span class="empty">–</span><input type="time" id="gEnd" class="tm" aria-label="종료">
@@ -1239,10 +1264,10 @@ label.tsi{cursor:pointer}
       body.start={dateTime:`${id}T${st}:00`,timeZone:TZ};body.end={dateTime:`${id}T${en}:00`,timeZone:TZ};
     }else{body.start={date:id};body.end={date:addD(id,1)}}
     try{
-      await api(`${CAL}/calendars/${encodeURIComponent(cal)}/events`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      let made=null;try{made=await(await api(`${CAL}/calendars/${encodeURIComponent(cal)}/events`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json()}catch(x){if(x&&(x.code||x.status))throw x}
       S.gmsg=`'${title}'을(를) ${gName(cal)} 캘린더에 추가했습니다.`;
       syncWatches(true);
-      return true;
+      return made&&made.id?normEv(made,cal)||true:true;
     }catch(e){
       S.gmsg=e&&e.code==='auth'?'구글 연결이 끊겼습니다. 다시 연결한 뒤 추가해 주세요.':`추가하지 못했습니다${e&&e.message?': '+e.message:''}`.slice(0,140);
       return false;
@@ -1284,6 +1309,84 @@ label.tsi{cursor:pointer}
   const workName=id=>(S.docs[id]&&S.docs[id].title)||'(제목 없음)';
   const wStat=w=>w.status||'doing';
   function workProg(wid){const ts=tasks().filter(t=>t.work===wid);return{all:ts,n:ts.length,d:ts.filter(t=>t.done).length}}
+  /* 자동 연결: 업무 키워드(없으면 업무명 첫 단어)가 제목에 들어가면 그 업무로 */
+  const normT=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
+  function workKeys(w){const k=String(w.keys||'').split(/[,，]/).map(x=>x.trim()).filter(Boolean);if(k.length)return k.slice(0,8);const f=String(w.title||'').trim().split(/\s+/)[0]||'';return f.length>=2?[f]:[]}
+  function matchWork(title){const t=normT(title);if(!t)return'';let best='',bl=0,tie=false;
+    works().filter(w=>wStat(w)!=='done').forEach(w=>workKeys(w).forEach(k=>{const n=normT(k);if(n.length<2||!t.includes(n))return;if(n.length>bl){best=w.id;bl=n.length;tie=false}else if(n.length===bl&&best!==w.id)tie=true}));
+    return tie?'':best}
+  function findWorkByName(q){const n=normT(q);if(!n)return'';const ws=works().sort((a,b)=>(wStat(a)==='done')-(wStat(b)==='done'));
+    const w=ws.find(w=>normT(w.title).startsWith(n))||ws.find(w=>normT(w.title).includes(n))||ws.find(w=>workKeys(w).some(k=>normT(k).includes(n)));return w?w.id:''}
+  let EVW=null;
+  function evWork(cal,id){if(!EVW){EVW={};works().forEach(w=>(w.evs||[]).forEach(x=>{EVW[x.cal+'|'+x.id]=w.id}))}return EVW[cal+'|'+id]||''}
+  const snapEv=e=>({cal:e.cal,id:e.id,day:e.day,endDay:e.endDay||e.day,time:e.time||'',end:e.end||'',allDay:!!e.allDay,title:e.title||'',link:e.link||''});
+  function unlinkEv(cal,id,wid,skip){if(!S.docs[wid])return;update(wid,d=>{d.evs=(d.evs||[]).filter(x=>!(x.cal===cal&&x.id===id));if(skip){d.evx=(d.evx||[]).filter(k=>k!==cal+'|'+id);d.evx.push(cal+'|'+id)}},true)}
+  function linkEv(wid,e){if(!S.docs[wid]||!e)return;
+    works().forEach(w=>{if(w.id!==wid&&(w.evs||[]).some(x=>x.cal===e.cal&&x.id===e.id))unlinkEv(e.cal,e.id,w.id)});
+    update(wid,d=>{d.evs=(d.evs||[]).filter(x=>!(x.cal===e.cal&&x.id===e.id));d.evs.push(snapEv(e));d.evx=(d.evx||[]).filter(k=>k!==e.cal+'|'+e.id)},true)}
+  function refreshEvSnap(cal,list){const m={};list.forEach(e=>{m[e.id]=e});
+    works().forEach(w=>{if((w.evs||[]).some(x=>x.cal===cal&&m[x.id]&&(m[x.id].title!==x.title||m[x.id].day!==x.day||m[x.id].time!==(x.time||'')||m[x.id].endDay!==x.endDay)))
+      update(w.id,d=>{d.evs=d.evs.map(x=>x.cal===cal&&m[x.id]?snapEv(m[x.id]):x)})})}
+  const gevW=e=>{const w=evWork(e.cal,e.id);return w&&S.docs[w]?`<b class="gw">${esc(workName(w))}</b> · `:''};
+  /* 업무 상세: 키워드가 들어간 구글 일정 후보 */
+  S.wsug={};
+  async function fetchWorkSug(wid){
+    const w=D(wid),keys=workKeys(w).slice(0,3),cache=S.wsug[wid]={t:Date.now(),loading:true,items:[]};
+    if(!keys.length||!authed()||!S.gcals){cache.loading=false;return}
+    const st=wStat(w),t0=w.start?addD(w.start,-30):addD(TODAY,-120),t1=st==='done'&&w.end?addD(w.end,30):addD(TODAY,240);
+    const tmin=encodeURIComponent(parse(t0).toISOString()),tmax=encodeURIComponent(parse(t1).toISOString()),seen={},out=[];
+    const cals=gShown().filter(c=>!c.holiday).map(c=>c.id);
+    await Promise.all(cals.flatMap(cal=>keys.map(async k=>{
+      try{const j=await(await api(`${CAL}/calendars/${encodeURIComponent(cal)}/events?singleEvents=true&maxResults=50&q=${encodeURIComponent(k)}&timeMin=${tmin}&timeMax=${tmax}&fields=items(id,summary,start,end,status,htmlLink,extendedProperties)`)).json();
+        (j.items||[]).forEach(x=>{const e=normEv(x,cal);if(!e||seen[cal+'|'+e.id])return;seen[cal+'|'+e.id]=1;if(!normT(e.title).includes(normT(k)))return;out.push(e)})}catch(e){}
+    })));
+    if(S.wsug[wid]!==cache)return;
+    cache.items=out;cache.loading=false;requestRender();
+  }
+  /* 기존 할 일·일정을 업무 키워드로 한 번에 연결 */
+  async function fetchRangeAll(cal,t0,t1){
+    const out=[];let tok='';
+    for(let i=0;i<8;i++){
+      const j=await(await api(`${CAL}/calendars/${encodeURIComponent(cal)}/events?singleEvents=true&maxResults=2500&timeMin=${encodeURIComponent(parse(t0).toISOString())}&timeMax=${encodeURIComponent(parse(t1).toISOString())}&fields=nextPageToken,items(id,summary,start,end,status,htmlLink,extendedProperties)${tok?'&pageToken='+encodeURIComponent(tok):''}`)).json();
+      (j.items||[]).forEach(x=>{const e=normEv(x,cal);if(e)out.push(e)});
+      if(!j.nextPageToken)break;tok=j.nextPageToken;
+    }
+    return out;
+  }
+  S.wsync=false;
+  async function syncAllWorks(quiet){
+    if(S.wsync)return;S.wsync=true;render();
+    let nt=0,ne=0,err=false;
+    tasks().forEach(t=>{if(t.work&&S.docs[t.work])return;const w=matchWork(t.title);if(w){update(t.id,d=>{d.work=w});nt++}});
+    if(authed()&&S.gcals){
+      const t0=addD(TODAY,-400),t1=addD(TODAY,400);
+      for(const c of gShown().filter(c=>!c.holiday)){
+        try{(await fetchRangeAll(c.id,t0,t1)).forEach(e=>{
+          if(e.task&&S.docs[e.task])return;if(evWork(e.cal,e.id))return;
+          const w=matchWork(e.title);if(!w)return;if((D(w).evx||[]).includes(e.cal+'|'+e.id))return;
+          linkEv(w,e);ne++})}catch(x){err=true}
+      }
+    }
+    S.wsync=false;S.wsug={};
+    flash(`할 일 ${nt}개 · 일정 ${ne}개를 업무에 연결했습니다${!authed()?' (일정은 구글 연결 후)':err?' (일부 캘린더는 불러오지 못함)':''}`);render();
+  }
+  async function importWorks(input){
+    const f=input.files&&input.files[0];input.value='';if(!f)return;
+    let j;try{j=JSON.parse(await f.text())}catch(e){flash('파일을 읽지 못했습니다');render();return}
+    const list=Array.isArray(j)?j:(j.works||[]);let add=0,upd=0;
+    const have={};works().forEach(w=>{have[normT(w.title)]=w.id});
+    list.forEach((x,i)=>{if(!x||!x.title)return;const k=normT(x.title),ex=have[k];
+      const val={title:String(x.title),area:x.area||'',status:['plan','doing','done'].includes(x.status)?x.status:'doing',start:x.start||'',end:x.end||'',role:x.role||'',result:x.result||'',keys:x.keys||'',note:x.note||''};
+      if(ex){update(ex,d=>{['area','start','end','role','result','keys','note'].forEach(f=>{if(!d[f]&&val[f])d[f]=val[f]})});upd++}
+      else{const id='w-'+Date.now().toString(36)+i.toString(36)+Math.random().toString(36).slice(2,5);update(id,d=>Object.assign(d,val,{created:Date.now()}),true);have[k]=id;add++}});
+    flash(`업무 ${add}개 추가${upd?` · ${upd}개 보완`:''} — 기존 할 일·일정 연결 중…`);render();
+    await syncAllWorks();
+  }
+  function workSug(wid){
+    const c=S.wsug[wid];if(!authed()||!S.gcals)return[];
+    if(!c||(!c.loading&&Date.now()-c.t>300000)){fetchWorkSug(wid);return[]}
+    const x=D(wid).evx||[];return(c.items||[]).filter(e=>!evWork(e.cal,e.id)&&!x.includes(e.cal+'|'+e.id)&&!(e.task&&S.docs[e.task]));
+  }
   S.wsel=null;S.warea='';S.wf=(()=>{try{return localStorage.getItem('diarybook-wf')||'all'}catch(e){return'all'}})();
   const lists=()=>cfg().lists;
   const LPAL=['#f2a20c','#8e5cf7','#e5484d','#0ea5b7','#e0609a','#6b7c93'];
@@ -1312,7 +1415,7 @@ label.tsi{cursor:pointer}
   function validDate(y,mo,d){const x=new Date(y,mo-1,d);return x.getFullYear()===y&&x.getMonth()===mo-1&&x.getDate()===d}
   function parseQuick(raw){
     let s=' '+String(raw||'').replace(/\s+/g,' ')+' ';
-    const r={due:'',time:'',pri:0,list:'',tags:[]};
+    const r={due:'',time:'',pri:0,list:'',tags:[],wq:''};
     const cut=(re,fn)=>{s=s.replace(re,function(){const a=[].slice.call(arguments);return fn.apply(null,a)===false?a[0]:' '})};
     const setD=d=>{if(r.due)return false;r.due=d};
     cut(/\s!(높음|상|1|!!)(?=\s)/,()=>{r.pri=3});
@@ -1346,11 +1449,12 @@ label.tsi{cursor:pointer}
     cut(/\s(오전|오후|아침|낮|저녁|밤|새벽)?\s?(\d{1,2}):(\d{2})(?=\s)/,(m,mer,h,mi)=>{h=+h;mi=+mi;if(h>23||mi>59||r.time)return false;r.time=pad(mer?hh(mer,h):h)+':'+pad(mi)});
     cut(/\s(오전|오후|아침|낮|저녁|밤|새벽)?\s?(\d{1,2})\s?시(?!간)\s?(?:(\d{1,2})\s?분|(반))?(?=\s)/,(m,mer,h,mi,half)=>{h=+h;if(h>24||r.time)return false;h=hh(mer,h)%24;r.time=pad(h)+':'+pad(half?30:(+mi||0))});
     cut(/\s정오(?=\s)/,()=>{if(r.time)return false;r.time='12:00'});
+    cut(/\s@([^\s#~^!@]+)(?=\s)/,(m,n)=>{r.wq=n});
     r.title=s.replace(/\s+/g,' ').trim();
     return r;
   }
   const MEET=/(미팅|회의|면담|약속|점심|저녁|회식|방문|출장|교육|행사|세미나|워크숍|워크샵|인터뷰|상담|모임|만남|통화|콜)/;
-  S.qa={due:TODAY,time:'',end:'',pri:0,list:'',cal:false,calSet:false,alarm:false,alarmSet:false,alarmMin:null,pick:false,evCal:''};
+  S.qa={due:TODAY,time:'',end:'',pri:0,list:'',cal:false,calSet:false,alarm:false,alarmSet:false,alarmMin:null,pick:false,evCal:'',work:null};
   S.qkind=(()=>{try{return localStorage.getItem('diarybook-qkind')==='event'?'event':'task'}catch(e){return'task'}})();S.flash='';let flashT=null;
   function flash(t){S.flash=t;clearTimeout(flashT);flashT=setTimeout(()=>{S.flash='';requestRender()},3500)}S.qaText='';S.dp=null;S.mm=false;
   function eff(){
@@ -1358,18 +1462,31 @@ label.tsi{cursor:pointer}
     let due=q.pick?q.due:(p.due||q.due),time=q.pick?q.time:(p.time||q.time);
     if(time&&!due)due=TODAY;
     const am=q.alarmMin!=null?q.alarmMin:cfg().alarmMin;
-    if(S.qkind==='event'){const d=due||TODAY;return{p,kind:'event',due:d,time:time||'',end:time?q.end:'',evCal:q.evCal||defaultCal(p.title||''),pri:0,list:'',cal:false,alarm:false,alarmMin:am}}
-    return{p,due,time:due?time:'',end:due&&time?q.end:'',pri:p.pri||q.pri,list:p.list||q.list||defList(),
+    let work='',workHow='';
+    if(q.work!=null){work=S.docs[q.work]?q.work:'';workHow='pick'}
+    else if(p.wq){work=findWorkByName(p.wq);workHow=work?'at':'miss'}
+    else if(S.tl==='work'&&S.wsel&&S.docs[S.wsel]){work=S.wsel;workHow='ctx'}
+    else{work=matchWork(p.title);workHow=work?'auto':''}
+    if(S.qkind==='event'){const d=due||TODAY;return{p,kind:'event',due:d,time:time||'',end:time?q.end:'',evCal:q.evCal||defaultCal(p.title||''),pri:0,list:'',cal:false,alarm:false,alarmMin:am,work,workHow}}
+    return{p,work,workHow,due,time:due?time:'',end:due&&time?q.end:'',pri:p.pri||q.pri,list:p.list||q.list||defList(),
       cal:!!due&&(q.calSet?q.cal:false),alarm:!!(due&&time)&&(q.alarmSet?q.alarm:cfg().autoAlarm),alarmMin:am};
   }
   function chipHtml(e){
     const parts=[];
-    if(e.kind==='event'){parts.push(`<span class="cd">${esc(dueLabel({due:e.due,time:e.time}))}${e.end?'–'+esc(e.end):''}</span>`);if(e.evCal&&S.gcals)parts.push(`<span><i class="ldot" style="--cc:${gColor(e.evCal)}"></i>${esc(gName(e.evCal))}</span>`);return parts.join('')}
+    const wc=e.work&&S.docs[e.work]?`<span class="cw" title="업무: ${esc(workName(e.work))}">${icon('brief')}${esc(workName(e.work))}</span>`:'';
+    if(e.kind==='event'){parts.push(`<span class="cd">${esc(dueLabel({due:e.due,time:e.time}))}${e.end?'–'+esc(e.end):''}</span>`);if(e.evCal&&S.gcals)parts.push(`<span><i class="ldot" style="--cc:${gColor(e.evCal)}"></i>${esc(gName(e.evCal))}</span>`);if(wc)parts.push(wc);return parts.join('')}
     if(e.due)parts.push(`<span class="cd ${e.due<TODAY?'late':''}">${esc(dueLabel({due:e.due,time:e.time}))}${e.end?'–'+esc(e.end):''}</span>`);
     if(e.pri)parts.push(flag(e.pri));
     if(e.list&&e.list!=='inbox'&&e.list!==defList())parts.push(`<span>${esc(listName(e.list))}</span>`);
     if(e.cal)parts.push(`<span title="구글 캘린더에도 등록">${icon('people')}</span>`);else if(e.alarm)parts.push(`<span title="알림">${icon('bell')}</span>`);
+    if(wc)parts.push(wc);
     return parts.join('');
+  }
+  function qprevHtml(e){
+    const out=e.p.tags.map(t=>`<span>#${esc(t)}</span>`);
+    if(e.work&&S.docs[e.work])out.push(`<span class="qw">${icon('brief')}${esc(workName(e.work))}${e.workHow==='auto'?' · 자동 연결':e.workHow==='ctx'?' · 열어 둔 업무':''}</span>`);
+    else if(e.workHow==='miss')out.push(`<span class="qw miss">'@${esc(e.p.wq)}' 업무를 찾지 못했습니다</span>`);
+    return out.join('');
   }
   function composer(){
     const e=eff();
@@ -1379,10 +1496,10 @@ label.tsi{cursor:pointer}
         <input id="qa" value="${esc(S.qaText)}" placeholder="${S.qkind==='event'?'일정 추가':'할 일 추가'}" autocomplete="off" enterkeyhint="done" aria-label="${S.qkind==='event'?'일정':'할 일'}">
         <button type="button" class="cchip" id="qaChip" data-act="dp-open" data-for="qa">${chipHtml(e)}</button>
         <button type="button" class="ib" data-act="dp-open" data-for="qa" aria-label="날짜·시간">${icon('cal')}</button>
-        <button type="button" class="ib" data-act="mm-open" aria-label="${S.qkind==='event'?'캘린더 선택':'우선순위·목록'}">${icon('chev')}</button>
+        <button type="button" class="ib" data-act="mm-open" aria-label="${S.qkind==='event'?'캘린더·업무 선택':'우선순위·목록·업무'}">${icon('chev')}</button>
         <button type="submit" class="ib go">${icon('plus')}<span>추가</span></button>
       </form>
-      <div class="qprev" id="qprev">${e.p.tags.map(t=>`<span>#${esc(t)}</span>`).join('')}</div>
+      <div class="qprev" id="qprev">${qprevHtml(e)}</div>
       ${S.dp&&S.dp.for==='qa'?dpHtml():''}${S.mm?mmHtml(e):''}
     </div>`;
   }
@@ -1390,9 +1507,9 @@ label.tsi{cursor:pointer}
     const el=document.getElementById('qa');if(!el)return;
     S.qaText=el.value;const e=eff();
     const c=document.getElementById('qaChip');if(c)c.innerHTML=chipHtml(e);
-    const pv=document.getElementById('qprev');if(pv)pv.innerHTML=e.p.tags.map(t=>`<span>#${esc(t)}</span>`).join('');
+    const pv=document.getElementById('qprev');if(pv)pv.innerHTML=qprevHtml(e);
   }
-  function resetQa(){const c=qaCtx();Object.assign(S.qa,{due:c.due,time:'',end:'',pri:0,list:c.list||defList(),cal:false,calSet:false,alarm:false,alarmSet:false,alarmMin:null,pick:false,evCal:''})}
+  function resetQa(){const c=qaCtx();Object.assign(S.qa,{due:c.due,time:'',end:'',pri:0,list:c.list||defList(),cal:false,calSet:false,alarm:false,alarmSet:false,alarmMin:null,pick:false,evCal:'',work:null})}
   app.addEventListener('submit',e=>{const f=e.target;if(!f.classList||!f.classList.contains('cmedit'))return;e.preventDefault();
     const cal=f.dataset.cal,eid=f.dataset.eid,v=(f.querySelector('input').value||'').trim(),ev=findEv(cal,eid);S.cm=null;render();if(!v||!ev||v===ev.title)return;
     evDo(cal,eid,()=>api(evUrl(cal,eid),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({summary:v})}),'일정 제목을 바꿨습니다')},true);
@@ -1404,6 +1521,7 @@ label.tsi{cursor:pointer}
       const cal=e.evCal;if(!cal){flash('일정을 넣을 캘린더가 없습니다');render();return}
       el.disabled=true;
       const ok=await gInsert(e.due,e.p.title,e.time,e.end,cal);
+      if(ok&&ok.id&&e.work){linkEv(e.work,ok);S.gmsg+=` · '${workName(e.work).slice(0,16)}' 업무에 연결`}
       flash(S.gmsg);S.gmsg='';
       if(ok){if(isCalK(S.tl))S.cur=e.due;S.qaText='';S.dp=null;S.mm=false;resetQa();if(S.qp){S.qp=false;render();return}}
       render();const n=document.getElementById('qa');if(n)n.focus();return;
@@ -1412,11 +1530,12 @@ label.tsi{cursor:pointer}
     if(e.cal&&e.due&&!time&&/점심/.test(e.p.title)){time='12:00';end=end||'13:00'}
     const ctx=qaCtx(),tags=e.p.tags.slice();if(ctx.tag&&!tags.includes(ctx.tag))tags.push(ctx.tag);
     const id=newId();
-    update(id,d=>Object.assign(d,{title:e.p.title,due:e.due,time,end,pri:e.pri,list:e.list||defList(),tags,note:'',done:false,doneAt:0,created:Date.now(),cal:e.cal,alarm:!!time&&e.alarm,alarmMin:S.qa.alarmMin},S.tl==='work'&&S.wsel&&S.docs[S.wsel]?{work:S.wsel}:{}),true);
+    update(id,d=>Object.assign(d,{title:e.p.title,due:e.due,time,end,pri:e.pri,list:e.list||defList(),tags,note:'',done:false,doneAt:0,created:Date.now(),cal:e.cal,alarm:!!time&&e.alarm,alarmMin:S.qa.alarmMin},e.work?{work:e.work}:{}),true);
     if(e.due&&(time||e.cal))scheduleAlarm(id,300);
     if(isCalK(S.tl)&&e.due)S.cur=e.due;
     S.qaText='';S.dp=null;S.mm=false;resetQa();
-    if(S.qp){S.qp=false;flash(`'${e.p.title.slice(0,24)}' 할 일을 추가했습니다`);render();return}
+    if(S.qp){S.qp=false;flash(`'${e.p.title.slice(0,24)}' 할 일을 추가했습니다${e.work?' · '+workName(e.work).slice(0,16)+' 업무에 연결':''}`);render();return}
+    if(e.work&&e.workHow==='auto')flash(`'${workName(e.work).slice(0,20)}' 업무에 자동 연결했습니다`);
     render();const n=document.getElementById('qa');if(n)n.focus();
   }
   /* date popover (TickTick style) */
@@ -1463,12 +1582,17 @@ label.tsi{cursor:pointer}
     else{const id=p.for;update(id,d=>Object.assign(d,v,{alarmMin:p.alarmMin}),true);scheduleAlarm(id,300)}
     const f=p.for;S.dp=null;render();if(f==='qa'){const n=document.getElementById('qa');if(n)n.focus()}
   }
+  function wsecHtml(e){
+    const ws=works().filter(w=>wStat(w)!=='done');if(!ws.length)return'';
+    return `<span class="lab">업무</span><div class="mm-row">${ws.map(w=>`<button type="button" class="mmb ${e.work===w.id?'on':''}" data-act="mm-work" data-v="${w.id}">${icon('brief')}${esc(w.title||'(제목 없음)')}</button>`).join('')}<button type="button" class="mmb ${S.qa.work===''?'on':''}" data-act="mm-work" data-v="">연결 안 함</button>${S.qa.work!=null?`<button type="button" class="mmb" data-act="mm-work" data-v="auto">자동</button>`:''}</div><span class="gnote">고르지 않으면 제목에 업무 키워드가 있을 때 자동 연결 · 제목에 @업무명 을 써도 됩니다</span>`;
+  }
   function mmHtml(e){
     if(e.kind==='event'){const cs=(S.gcals||[]).filter(c=>!c.holiday&&c.write);
-      return `<div class="dp-bg" data-act="mm-close"></div><div class="dp mm" role="dialog" aria-label="캘린더 선택"><span class="lab">캘린더</span><div class="mm-row">${cs.length?cs.map(c=>`<button type="button" class="mmb ${e.evCal===c.id?'on':''}" data-act="mm-cal" data-v="${esc(c.id)}"><i class="ldot" style="--cc:${gColor(c.id)}"></i>${esc(c.name)}</button>`).join(''):'<span class="empty">구글에 연결하면 캘린더를 고를 수 있습니다.</span>'}</div><span class="gnote">고르지 않으면 점심→점심식사, 저녁·회식→저녁식사, 그 외→기본 캘린더</span></div>`}
+      return `<div class="dp-bg" data-act="mm-close"></div><div class="dp mm" role="dialog" aria-label="캘린더 선택"><span class="lab">캘린더</span><div class="mm-row">${cs.length?cs.map(c=>`<button type="button" class="mmb ${e.evCal===c.id?'on':''}" data-act="mm-cal" data-v="${esc(c.id)}"><i class="ldot" style="--cc:${gColor(c.id)}"></i>${esc(c.name)}</button>`).join(''):'<span class="empty">구글에 연결하면 캘린더를 고를 수 있습니다.</span>'}</div><span class="gnote">고르지 않으면 점심→점심식사, 저녁·회식→저녁식사, 그 외→기본 캘린더</span>${wsecHtml(e)}</div>`}
     return `<div class="dp-bg" data-act="mm-close"></div><div class="dp mm" role="dialog" aria-label="우선순위와 목록">
       <span class="lab">우선순위</span><div class="mm-row">${PRI.slice().reverse().map(p=>`<button type="button" class="mmb ${e.pri===p.v?'on':''}" data-act="mm-pri" data-v="${p.v}">${flag(p.v)}${p.n}</button>`).join('')}</div>
       <span class="lab">목록</span><div class="mm-row">${lists().map(l=>`<button type="button" class="mmb ${e.list===l.id?'on':''}" data-act="mm-list" data-v="${esc(l.id)}">${esc(l.name)}</button>`).join('')}</div>
+      ${wsecHtml(e)}
     </div>`;
   }
   function qaCtx(){const k=S.tl;return{due:(k==='today'||k==='week')?TODAY:isCalK(k)?S.cur:'',list:k.startsWith('l:')?k.slice(2):'',tag:k.startsWith('g:')?k.slice(2):''}}
@@ -1478,8 +1602,8 @@ label.tsi{cursor:pointer}
     if(!p.list&&ctx.list)p.list=ctx.list;
     if(ctx.tag&&!p.tags.includes(ctx.tag))p.tags.push(ctx.tag);
     if(p.time&&!p.due)p.due=TODAY;
-    const id=newId();
-    update(id,d=>Object.assign(d,{title:p.title,due:p.due,time:p.time,pri:p.pri,list:p.list||defList(),tags:p.tags,note:'',done:false,doneAt:0,created:Date.now(),alarm:!!(p.time&&cfg().autoAlarm)}),true);
+    const id=newId(),wk=ctx.work!=null?ctx.work:p.wq?findWorkByName(p.wq):matchWork(p.title);
+    update(id,d=>Object.assign(d,{title:p.title,due:p.due,time:p.time,pri:p.pri,list:p.list||defList(),tags:p.tags,note:'',done:false,doneAt:0,created:Date.now(),alarm:!!(p.time&&cfg().autoAlarm)},wk?{work:wk}:{}),true);
     if(p.time)scheduleAlarm(id,300);
     return id;
   }
@@ -1549,8 +1673,8 @@ label.tsi{cursor:pointer}
     return `<div class="trow-w" data-sw="${t.id}" data-into="${t.id}"><span class="tswdone" aria-hidden="true">${icon('check')}<b>${t.done?'완료 취소':'완료'}</b></span><button class="tswdel" data-act="tswdel" data-t="${t.id}" tabindex="-1">삭제</button><div class="trow ${t.done?'done':''} ${S.tsel===t.id?'sel':''} ${subs?'hs':''}" ${canDrag()&&S.tedit!==t.id?`draggable="true" data-drag="${t.id}"`:''}><button class="tchk p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${t.id}" aria-label="${t.done?'완료 취소':'완료'}"></button>${S.tedit===t.id?`<div class="tbody editing"><input class="tte" data-b="${t.id}|title" value="${esc(t.title||'')}" aria-label="제목 수정" spellcheck="false" autocomplete="off" enterkeyhint="done">${right.length?`<span class="tr">${right.join('')}</span>`:''}</div>`:`<button class="tbody" data-act="tsel" data-t="${t.id}"><span class="tt">${esc(t.title||'(제목 없음)')}</span>${right.length?`<span class="tr">${right.join('')}</span>`:''}</button>`}${sbBtn}${S.tedit===t.id?'':`<button class="tde ed" data-act="tedit" data-t="${t.id}" title="제목 수정">수정</button>`}<button class="tdx" data-act="tdelx" data-t="${t.id}" aria-label="할 일 삭제" title="삭제 (Ctrl+Z로 되돌리기)">×</button></div></div>${subs}`;
   }
   // 단 나누기용: 일정이 없어도 자리(제목)를 유지
-  function evCol(id){const ev=gDay(id);return `<section class="sec"><h4 class="lab">Google calendar</h4>${ev.length?`<div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:`<p class="empty">${authed()?'이 날 구글 일정이 없습니다.':'구글에 연결하면 일정이 보입니다.'}</p>`}</section>`}
-  function dayEvents(id){const ev=gDay(id);return ev.length?`<section class="sec"><h4 class="lab">Google calendar</h4><div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div></section>`:''}
+  function evCol(id){const ev=gDay(id);return `<section class="sec"><h4 class="lab">Google calendar</h4>${ev.length?`<div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${gevW(e)}${esc(gName(e.cal))}</small></a>`).join('')}</div>`:`<p class="empty">${authed()?'이 날 구글 일정이 없습니다.':'구글에 연결하면 일정이 보입니다.'}</p>`}</section>`}
+  function dayEvents(id){const ev=gDay(id);return ev.length?`<section class="sec"><h4 class="lab">Google calendar</h4><div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${gevW(e)}${esc(gName(e.cal))}</small></a>`).join('')}</div></section>`:''}
   function dayCard(id,compact){
     const d=D(id),ph=(d.photos||[])[0],hs=cfg().habits.filter(h=>h.on),s=ph?src(ph):'';
     const pic=ph?`<figure class="pt"><img src="${esc(s||'data:image/gif;base64,R0lGODlhAQABAAAAACw=')}" alt="${md(id)} 사진"><label class="x" title="사진 바꾸기"><input class="sr" type="file" accept="image/*" data-d="${id}" data-rep="1">↻</label></figure>`
@@ -1616,6 +1740,8 @@ label.tsi{cursor:pointer}
     let body=`<div class="cmh">${esc(e.title)}<br><small>${esc(when)} · ${esc(gName(e.cal))}</small></div>`;
     if(c.edit)body+=`<form class="cmedit" data-cal="${esc(e.cal)}" data-eid="${esc(e.id)}"><input id="evTitle" value="${esc(e.title)}" aria-label="일정 제목" autocomplete="off"><button class="btn dark sm" type="submit">저장</button></form>`;
     body+=it('ev-open','구글 캘린더에서 열기',icon('cal'));
+    {const cw=evWork(e.cal,e.id),sug=cw?'':matchWork(e.title),ws=works().filter(w=>wStat(w)!=='done'||w.id===cw);
+      if(ws.length)body+=`<div class="cmrow wrap"><span class="cml">업무</span>${ws.map(w=>`<button class="cmc ${w.id===cw?'on':''} ${w.id===sug?'sug':''}" data-act="ev-work" ${k} data-w="${w.id}" title="${w.id===sug?'키워드가 맞는 업무':''}">${icon('brief')}${esc(w.title||'(제목 없음)')}</button>`).join('')}${cw?`<button class="cmc" data-act="ev-work" ${k} data-w="">연결 해제</button>`:''}</div>`}
     if(can){
       body+=(c.edit?'':it('ev-edit','제목 수정',icon('pen')))+`<div class="cmsep"></div>
         <div class="cmrow"><span class="cml">날짜</span>${[['t','오늘'],['m','내일'],['-1','−1일'],['1','+1일']].map(([v,n])=>`<button class="cmc" data-act="ev-day" ${k} data-v="${v}">${n}</button>`).join('')}</div>
@@ -1778,7 +1904,7 @@ label.tsi{cursor:pointer}
     const card=(cls,h,body,more)=>`<section class="dc ${cls}"><div class="dch"><h3>${h}</h3>${more||''}</div>${body}</section>`;
     const todayList=late.concat(today);
     const tcard=card('s7','오늘 할 일',(late.length?`<div class="pushbar mini"><span>기한 지난 할 일 <b>${late.length}</b>개</span><button class="lnk" data-act="tpushall">오늘로 연기</button></div>`:'')+(todayList.length?todayList.slice(0,10).map(t=>taskRow(t)).join('')+(todayList.length>10?`<button class="lnk" data-act="tl" data-k="today">+${todayList.length-10}개 더 보기</button>`:''):'<p class="empty">오늘 남은 할 일이 없습니다.</p>'),`<button class="lnk" data-act="tl" data-k="today">전체 →</button>`);
-    const ev=gDay(TODAY),ecard=card('s5','오늘 일정',!authed()?'<p class="empty">구글에 연결하면 오늘 일정이 보입니다.</p>':ev.length?`<div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${esc(gName(e.cal))}</small></a>`).join('')}</div>`:'<p class="empty">오늘 구글 일정이 없습니다.</p>',`<button class="lnk" data-act="tl" data-k="cal:d">일 보기 →</button>`);
+    const ev=gDay(TODAY),ecard=card('s5','오늘 일정',!authed()?'<p class="empty">구글에 연결하면 오늘 일정이 보입니다.</p>':ev.length?`<div class="glist">${ev.map(e=>`<a class="gev" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener"><span class="t">${e.allDay?'종일':esc(e.time)}</span><span class="x">${esc(e.title)}</span><small>${gevW(e)}${esc(gName(e.cal))}</small></a>`).join('')}</div>`:'<p class="empty">오늘 구글 일정이 없습니다.</p>',`<button class="lnk" data-act="tl" data-k="cal:d">일 보기 →</button>`);
     // 다음 7일
     const by=byDue();let nx='';
     for(let i=1;i<=7;i++){const d=addD(TODAY,i),ts=(by[d]||[]).filter(t=>!t.done),es=gDay(d);if(!ts.length&&!es.length)continue;
@@ -1810,23 +1936,26 @@ label.tsi{cursor:pointer}
     const areas=[...new Set(all.map(w=>w.area).filter(Boolean))].sort();
     if(ar&&!areas.includes(ar))S.warea='';
     const ws=all.filter(w=>(f==='all'||wStat(w)===f)&&(!S.warea||w.area===S.warea));
-    ws.sort((a,b)=>rank[wStat(a)]-rank[wStat(b)]||(wStat(a)==='done'?(b.end||'').localeCompare(a.end||''):(a.end||'9999').localeCompare(b.end||'9999'))||(b.created||0)-(a.created||0));
+    const act={};tasks().forEach(t=>{if(t.work)act[t.work]=(act[t.work]||0)+1});all.forEach(w=>{act[w.id]=(act[w.id]||0)+(w.evs||[]).length});
+    ws.sort((a,b)=>rank[wStat(a)]-rank[wStat(b)]||(wStat(a)==='done'?(b.end||'').localeCompare(a.end||''):0)||(act[b.id]||0)-(act[a.id]||0)||(b.created||0)-(a.created||0));
     const cnt=s=>all.filter(w=>wStat(w)===s).length,doneT=tasks().filter(t=>t.work&&S.docs[t.work]&&t.done).length;
     const seg=`<div class="seg wseg" role="group" aria-label="상태">${[['all','전체'],['doing','진행 중'],['plan','예정'],['done','완료']].map(([k,n])=>`<button data-act="wf" data-v="${k}" aria-pressed="${f===k}">${n}</button>`).join('')}</div>`;
     const chips=areas.length?`<div class="lchips wareas"><button class="lchip ${!S.warea?'on':''}" data-act="warea" data-v="">모든 분야</button>${areas.map(a=>`<button class="lchip ${S.warea===a?'on':''}" data-act="warea" data-v="${esc(a)}">${esc(a)}</button>`).join('')}</div>`:'';
+    const tools=`<div class="wtools"><button class="btn sm" data-act="wsync" ${S.wsync?'disabled':''}>${S.wsync?'연결 중…':'기존 할 일·일정 연결'}</button><label class="btn sm">업무 가져오기<input class="sr" type="file" accept=".json,application/json" data-wimport="1"></label></div>`;
     const form=`<form class="qa wadd" id="workForm"><input id="wqa" placeholder="업무 추가 · 예) 성수동 빌딩 매입" autocomplete="off" enterkeyhint="done"><button class="btn dark" type="submit">추가</button></form>`;
     const stats=all.length?`<div class="wstats"><span>진행 중<b>${cnt('doing')}</b></span><span>예정<b>${cnt('plan')}</b></span><span>완료<b>${cnt('done')}</b></span><span>업무로 끝낸 할 일<b>${doneT}</b></span></div>`:'';
     const body=ws.length?`<div class="wgrid">${ws.map(workCard).join('')}</div>`:`<p class="empty">${all.length?'조건에 맞는 업무가 없습니다.':'맡았던 업무, 진행 중인 업무를 위 칸에 적어 보세요.<br>업무를 열어 할 일을 추가하거나, 할 일 상세에서 업무를 골라 연결할 수 있습니다.'}</p>`;
-    return{title:'업무 포트폴리오',sub:String(all.length||''),nav:false,noAdd:true,body:form+stats+(all.length?`<div class="wbar">${seg}</div>${chips}`:'')+body};
+    return{title:'업무 포트폴리오',sub:String(all.length||''),nav:false,noAdd:true,body:form+tools+stats+(all.length?`<div class="wbar">${seg}</div>${chips}`:'')+body};
   }
   function workCard(w){
     const p=workProg(w.id),st=wStat(w),pct=p.n?Math.round(p.d/p.n*100):0;
-    const next=p.all.filter(t=>!t.done).sort(tsort)[0],res=(w.result||'').split('\n').find(x=>x.trim())||'';
+    const nt=p.all.filter(t=>!t.done).sort(tsort)[0],ne=(w.evs||[]).filter(x=>x.day>=TODAY).sort((a,b)=>(a.day+a.time).localeCompare(b.day+b.time))[0],res=(w.result||'').split('\n').find(x=>x.trim())||'',evN=(w.evs||[]).length;
+    const next=ne&&(!nt||!nt.due||(ne.day+ne.time)<(nt.due+(nt.time||'')))?{title:ne.title,lab:`${md(ne.day)}${ne.allDay?'':' '+ne.time} 일정`}:nt?{title:nt.title,lab:nt.due?shortDue(nt):''}:null;
     return `<button class="wcard ${st} ${S.wsel===w.id?'sel':''}" data-act="wsel" data-w="${w.id}">
       <span class="wtop"><span class="wst ${st}">${WST[st]}</span>${w.area?`<span class="war">${esc(w.area)}</span>`:''}<span class="wper">${esc(wPeriod(w))}</span></span>
       <b class="wtt">${esc(w.title||'(제목 없음)')}</b>${res?`<span class="wres">${esc(res)}</span>`:''}
-      <span class="wpg"><span class="bar"><u style="width:${pct}%"></u></span><small>할 일 ${p.d}/${p.n}</small></span>
-      ${next?`<span class="wnx">다음 → ${esc(next.title||'')}${next.due?` · ${esc(shortDue(next))}`:''}</span>`:''}
+      <span class="wpg"><span class="bar"><u style="width:${pct}%"></u></span><small>할 일 ${p.d}/${p.n}${evN?` · 일정 ${evN}`:''}</small></span>
+      ${next?`<span class="wnx">다음 → ${esc(next.title||'')}${next.lab?` · ${esc(next.lab)}`:''}</span>`:''}
     </button>`;
   }
   function workDetail(id){
@@ -1834,11 +1963,21 @@ label.tsi{cursor:pointer}
     const cand=tasks().filter(t=>!t.done&&!(t.work&&S.docs[t.work])).sort(tsort).slice(0,100);
     const areas=[...new Set([...WAREAS,...works().map(x=>x.area).filter(Boolean)])];
     const del=S.confirm==='w:'+id?`<span>삭제할까요? 할 일은 남습니다</span><button class="btn warn" data-act="wdel" data-w="${id}">삭제</button><button class="btn" data-act="cancel">취소</button>`:`<button class="btn" data-act="wdel" data-w="${id}">삭제</button>`;
-    const log=done.map(t=>`<li><time>${t.doneAt?wDate(ymd(new Date(t.doneAt))):''}</time><button class="lnk" data-act="tsel" data-t="${t.id}">${esc(t.title||'(제목 없음)')}</button></li>`).join('');
+    const sugT=tasks().filter(t=>!(t.work&&S.docs[t.work])&&matchWork(t.title)===id);
+    const evs=(w.evs||[]).slice(),evUp=evs.filter(x=>(x.endDay||x.day)>=TODAY).sort((a,b)=>(a.day+(a.time||'')).localeCompare(b.day+(b.time||''))),evPast=evs.filter(x=>(x.endDay||x.day)<TODAY);
+    const sug=workSug(id),sc=S.wsug[id];
+    const evRow=(x,isSug)=>`<div class="wev ${isSug?'sug':''}" style="--cc:${gColor(x.cal)}"><span class="d">${wDate(x.day)} ${WDK[parse(x.day).getDay()]}${x.allDay?'':' '+esc(x.time)}</span>${x.link?`<a class="x" href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title)}</a>`:`<span class="x">${esc(x.title)}</span>`}${isSug?`<button class="btn sm" data-act="wevlink" data-w="${id}" data-cal="${esc(x.cal)}" data-eid="${esc(x.id)}">연결</button><button class="mv x" data-act="wevskip" data-w="${id}" data-cal="${esc(x.cal)}" data-eid="${esc(x.id)}" title="이 일정은 제안하지 않기" aria-label="제안 숨기기">×</button>`:`<button class="mv x" data-act="wevun" data-w="${id}" data-cal="${esc(x.cal)}" data-eid="${esc(x.id)}" title="업무 연결 해제" aria-label="연결 해제">×</button>`}</div>`;
+    const sugH=sug.length?`<div class="wsug"><div class="li"><span class="gnote">키워드가 들어간 구글 일정 ${sug.length}개</span><button class="lnk" data-act="wevall" data-w="${id}">모두 연결</button></div>${sug.sort((a,b)=>b.day.localeCompare(a.day)).slice(0,12).map(x=>evRow(x,true)).join('')}</div>`:sc&&sc.loading?'<span class="gnote">구글 캘린더에서 관련 일정 찾는 중…</span>':'';
+    const evH=`<div class="td-r"><span class="lab">일정 <b>${evs.length}</b></span>${evUp.map(x=>evRow(x)).join('')||`<p class="empty">${evs.length?'다가오는 일정이 없습니다.':authed()?'일정을 입력할 때 업무 키워드를 넣거나, 일정을 오른쪽 클릭(길게 누르기)해 업무를 고르면 여기 모입니다.':'구글에 연결하면 일정도 업무에 연결할 수 있습니다.'}</p>`}${sugH}</div>`;
+    const logItems=done.map(t=>({d:t.doneAt?ymd(new Date(t.doneAt)):'',h:`<button class="lnk" data-act="tsel" data-t="${t.id}">${esc(t.title||'(제목 없음)')}</button>`}))
+      .concat(evPast.map(x=>({d:x.day,h:`<span class="wle" style="--cc:${gColor(x.cal)}">${esc(x.title)}</span>`})))
+      .sort((a,b)=>b.d.localeCompare(a.d));
+    const log=logItems.map(x=>`<li><time>${x.d?wDate(x.d):''}</time>${x.h}</li>`).join('');
     return `<div class="td wd">
       <div class="td-h"><span class="wico">${icon('brief')}</span><input class="ttl-in" data-b="${id}|title" data-rr="1" value="${esc(w.title||'')}" placeholder="업무명" autocomplete="off"><button class="del" style="opacity:1" data-act="wclose" aria-label="닫기">×</button></div>
       <div class="td-r"><span class="lab">상태</span><div class="seg" role="group" aria-label="상태">${WSTAT.map(([k,n])=>`<button data-act="wstat" data-w="${id}" data-v="${k}" aria-pressed="${st===k}">${n}</button>`).join('')}</div></div>
       <div class="td-r"><span class="lab">분야</span><input class="tx bl" data-b="${id}|area" data-rr="1" list="wAreaList" value="${esc(w.area||'')}" placeholder="예) 부동산 매입·매각" autocomplete="off"><datalist id="wAreaList">${areas.map(a=>`<option value="${esc(a)}">`).join('')}</datalist></div>
+      <div class="td-r"><span class="lab">자동 연결 키워드</span><input class="tx bl" data-b="${id}|keys" data-rr="1" value="${esc(w.keys||'')}" placeholder="${esc(w.keys?'':'지금은 '+(workKeys({title:w.title}).join(', ')||'업무명 첫 단어')+' · 쉼표로 여러 개')}" autocomplete="off"><span class="gnote">이 단어가 제목에 들어간 할 일·일정은 입력할 때 이 업무에 자동으로 연결됩니다.</span>${sugT.length?`<button class="btn sm wla" data-act="wlinkall" data-w="${id}">키워드가 들어간 기존 할 일 ${sugT.length}개 연결</button>`:''}</div>
       <div class="td-r"><span class="lab">기간</span><div class="li wdates"><input type="date" data-b="${id}|start" data-rr="1" value="${esc(w.start||'')}" aria-label="시작일"><span>–</span><input type="date" data-b="${id}|end" data-rr="1" value="${esc(w.end||'')}" aria-label="종료일"></div></div>
       <div class="td-r"><span class="lab">내 역할</span><textarea class="ta lined" data-b="${id}|role" placeholder="예) 매입 검토, 감정평가 발주, 계약 실무 총괄">${esc(w.role||'')}</textarea></div>
       <div class="td-r"><span class="lab">성과</span><textarea class="ta lined" data-b="${id}|result" placeholder="예) 감정가 대비 3% 낮은 가격으로 매입 완료">${esc(w.result||'')}</textarea></div>
@@ -1847,7 +1986,8 @@ label.tsi{cursor:pointer}
         <form class="qa" id="wTaskForm" data-w="${id}"><input id="wtqa" placeholder="이 업무에 할 일 추가 · 예) 금요일 감정평가 의뢰" autocomplete="off" enterkeyhint="done"><button class="btn" type="submit">추가</button></form>
         ${cand.length?`<select class="tx bl wlink" id="wLink" data-w="${id}" aria-label="기존 할 일 연결"><option value="">＋ 기존 할 일 연결하기…</option>${cand.map(t=>`<option value="${t.id}">${esc(t.title||'(제목 없음)')}${t.due?' · '+esc(shortDue(t)):''}</option>`).join('')}</select>`:''}
       </div>
-      ${done.length?`<div class="td-r"><span class="lab">한 일 기록 <b>${done.length}</b></span><ol class="wlog">${log}</ol></div>`:''}
+      ${evH}
+      ${logItems.length?`<div class="td-r"><span class="lab">한 일 기록 <b>${logItems.length}</b></span><ol class="wlog">${log}</ol></div>`:''}
       <div class="td-r"><span class="lab">메모</span><textarea class="ta lined" data-b="${id}|note" placeholder="메모">${esc(w.note||'')}</textarea></div>
       <div class="li wrap" style="justify-content:space-between"><span class="gnote">${w.created?new Date(w.created).toLocaleDateString('ko-KR')+' 만듦':''}</span><span class="li">${del}</span></div>
     </div>`;
@@ -2235,7 +2375,7 @@ label.tsi{cursor:pointer}
   function requestRender(){if(typing())pending=true;else render()}
   function navHtml(r,cls){return r.nav===false?'':`<div class="nav ${cls}"><button data-act="prev" aria-label="이전">◂ PREV</button><span class="sep">|</span><button data-act="today" aria-label="오늘">TODAY</button><span class="sep">|</span><button data-act="next" aria-label="다음">NEXT ▸</button></div>`}
   function render(){
-    pending=false;
+    pending=false;EVW=null;
     syncWatches();
     const r=VIEW_FN[S.view]();
     const sheet=S.tsel&&S.docs[S.tsel]&&!(S.view==='tasks'&&wideDetail.matches)?`<div class="sheet-bg" data-act="tclose"></div><div class="sheet" role="dialog" aria-label="할 일 상세">${taskDetail(S.tsel)}</div>`
@@ -2281,11 +2421,15 @@ label.tsi{cursor:pointer}
     'ev-day':b=>{const{cal,eid}=b.dataset,e=findEv(cal,eid);S.cm=null;render();if(!e)return;const v=b.dataset.v,day=v==='t'?TODAY:v==='m'?addD(TODAY,1):addD(e.day,+v);
       evDo(cal,eid,()=>api(evUrl(cal,eid),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(evShiftBody(e,day))}),`'${e.title.slice(0,20)}' 일정을 ${md(day)}(으)로 옮겼습니다`)},
     'ev-cal':b=>{const{cal,eid,to}=b.dataset,e=findEv(cal,eid);S.cm=null;render();if(!e||to===cal)return;
+      {const ew=evWork(cal,eid);if(ew)update(ew,d=>{d.evs=(d.evs||[]).map(x=>x.cal===cal&&x.id===eid?Object.assign({},x,{cal:to}):x)},true)}
       evDo(cal,eid,()=>api(evUrl(cal,eid)+'/move?destination='+encodeURIComponent(to),{method:'POST'}),`'${e.title.slice(0,20)}' 일정을 ${gName(to)} 캘린더로 옮겼습니다`)},
+    'ev-work':b=>{const{cal,eid}=b.dataset,w=b.dataset.w,e=findEv(cal,eid);S.cm=null;if(!e){render();return}
+      const cur=evWork(cal,eid);if(cur)unlinkEv(cal,eid,cur);if(w&&w!==cur){linkEv(w,e);flash(`'${workName(w).slice(0,20)}' 업무에 연결했습니다`)}else if(cur)flash('업무 연결을 해제했습니다');render()},
     'ev-totask':b=>{const{cal,eid}=b.dataset,e=findEv(cal,eid);S.cm=null;render();if(!e)return;
-      const id=newId();update(id,d=>Object.assign(d,{title:e.title,due:e.day,time:e.allDay?'':e.time,end:e.allDay?'':(e.end||''),pri:0,list:defList(),tags:[],note:'',done:false,doneAt:0,created:Date.now()}),true);
+      const ew=evWork(cal,eid);if(ew)unlinkEv(cal,eid,ew);
+      const id=newId();update(id,d=>Object.assign(d,{title:e.title,due:e.day,time:e.allDay?'':e.time,end:e.allDay?'':(e.end||''),pri:0,list:defList(),tags:[],note:'',done:false,doneAt:0,created:Date.now()},ew?{work:ew}:{}),true);
       evDo(cal,eid,()=>gDel({cal,id:eid}),`'${e.title.slice(0,20)}'을(를) 할 일로 바꿨습니다`)},
-    'ev-del':b=>{const{cal,eid}=b.dataset,e=findEv(cal,eid);if(!S.cm.del){S.cm.del=true;render();return}S.cm=null;render();if(!e)return;
+    'ev-del':b=>{const{cal,eid}=b.dataset,e=findEv(cal,eid);if(!S.cm.del){S.cm.del=true;render();return}S.cm=null;{const ew=evWork(cal,eid);if(ew)unlinkEv(cal,eid,ew)}render();if(!e)return;
       evDo(cal,eid,()=>gDel({cal,id:eid}),`'${e.title.slice(0,20)}' 일정을 삭제했습니다`)},
     'cm-done':b=>{S.cm=null;toggleDone(b.dataset.t)},
     'cm-open':b=>{S.cm=null;S.tsel=b.dataset.t;render()},
@@ -2330,6 +2474,12 @@ label.tsi{cursor:pointer}
       render()},
     tclose:()=>{flushAll();S.tsel=null;S.confirm=null;S.dp=null;render()},
     wsel:b=>{flushAll();S.wsel=b.dataset.w;S.tsel=null;S.confirm=null;S.dp=null;render()},
+    wlinkall:b=>{const id=b.dataset.w,ts=tasks().filter(t=>!(t.work&&S.docs[t.work])&&matchWork(t.title)===id);ts.forEach(t=>update(t.id,d=>{d.work=id}));flash(`할 일 ${ts.length}개를 연결했습니다`);render()},
+    wevlink:b=>{const{w,cal,eid}=b.dataset,e=((S.wsug[w]||{}).items||[]).find(x=>x.cal===cal&&x.id===eid);if(e)linkEv(w,e);render()},
+    wevall:b=>{const w=b.dataset.w,list=workSug(w);list.forEach(e=>linkEv(w,e));flash(`일정 ${list.length}개를 연결했습니다`);render()},
+    wevskip:b=>{const{w,cal,eid}=b.dataset;update(w,d=>{d.evx=(d.evx||[]).filter(k=>k!==cal+'|'+eid);d.evx.push(cal+'|'+eid)},true);render()},
+    wevun:b=>{const{w,cal,eid}=b.dataset;unlinkEv(cal,eid,w,true);flash('일정 연결을 해제했습니다');render()},
+    wsync:()=>{syncAllWorks()},
     wclose:()=>{flushAll();S.wsel=null;S.confirm=null;render()},
     wopen:b=>{flushAll();S.view='tasks';S.tl='work';S.lastList='work';try{localStorage.setItem('diarybook-tl','work');localStorage.setItem('diarybook-tlist','work');localStorage.setItem(LSV,'tasks')}catch(e){}S.wsel=b.dataset.w;S.tsel=null;S.confirm=null;S.dp=null;S.side=false;render()},
     wstat:b=>{const id=b.dataset.w,v=b.dataset.v;update(id,d=>{d.status=v;if(v==='done'&&!d.end)d.end=TODAY;if(v==='doing'&&!d.start)d.start=TODAY},true);render()},
@@ -2386,6 +2536,7 @@ label.tsi{cursor:pointer}
     'mm-pri':b=>{S.qa.pri=+b.dataset.v;S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
     'mm-cal':b=>{S.qa.evCal=b.dataset.v;S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
     qkind:b=>{const q=document.getElementById('qa');if(q)S.qaText=q.value;S.qkind=b.dataset.v;try{localStorage.setItem('diarybook-qkind',S.qkind)}catch(e){}S.dp=null;S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
+    'mm-work':b=>{const v=b.dataset.v;S.qa.work=v==='auto'?null:v;S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
     'mm-list':b=>{S.qa.list=b.dataset.v;S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
     tpush:b=>{pushToday([b.dataset.t]);render()},
     tpushall:()=>{const o=overdueList();pushToday(o.map(t=>t.id));setSaving(`${o.length}개를 오늘로 연기했습니다`);render()},
@@ -2667,8 +2818,9 @@ label.tsi{cursor:pointer}
     if(t.type==='checkbox'&&t.dataset.gcal){const g=t.dataset.gcal,on=t.checked;update('cfg',d=>{const h=(d.gcalHide||[]).filter(x=>x!==g);if(!on)h.push(g);d.gcalHide=h},true);render();return}
     if(t.tagName==='SELECT'&&t.dataset.b){bindSet(t,t.value);flushAll();if(isTask(t.dataset.b.split('|')[0]))render();return}
     if(t.type==='checkbox'&&t.dataset.b){bindSet(t,t.checked);render();return}
+    if(t.type==='file'&&t.dataset.wimport){importWorks(t);return}
     if(t.type==='file'){onFile(t);return}
-    if(t.dataset&&t.dataset.rr){flushAll();render()}
+    if(t.dataset&&t.dataset.rr){if(/\|keys$/.test(t.dataset.b||''))delete S.wsug[t.dataset.b.split('|')[0]];flushAll();render()}
   });
   app.addEventListener('focusout',()=>setTimeout(()=>{if(pending&&!typing())render()},0));
   app.addEventListener('submit',e=>{
@@ -2681,7 +2833,7 @@ label.tsi{cursor:pointer}
       update(id,d=>Object.assign(d,{title:v,status:st,area:S.warea||'',start:st==='plan'?'':TODAY,end:st==='done'?TODAY:'',role:'',result:'',note:'',created:Date.now()}),true);
       S.wsel=id;S.tsel=null;inp.value='';render();return}
     if(e.target.id==='wTaskForm'){e.preventDefault();const inp=e.target.querySelector('input'),v=inp.value,wid=e.target.dataset.w;if(!v.trim())return;
-      const tid=addTask(v,{due:'',list:'',tag:''});if(tid)update(tid,d=>{d.work=wid},true);inp.value='';render();const n=document.getElementById('wtqa');if(n)n.focus();return}
+      addTask(v,{due:'',list:'',tag:'',work:wid});inp.value='';render();const n=document.getElementById('wtqa');if(n)n.focus();return}
     if(e.target.id==='listForm'){e.preventDefault();const name=document.getElementById('listName').value.trim();if(!name)return;const id='l'+Date.now().toString(36);
       update('cfg',d=>{d.lists.push({id,name,cal:''})},true);S.addingList=false;S.tl='l:'+id;render();return}
     if(e.target.id!=='hadd')return;e.preventDefault();
