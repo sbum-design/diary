@@ -53,6 +53,12 @@ svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;str
 .top{max-width:1280px;margin:0 auto 10px;display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:0 2px}
 .brand{font-family:var(--f-disp);font-weight:600;font-size:1rem;letter-spacing:.01em;color:var(--ink);background:none;border:0;padding:4px 0;cursor:pointer}
 .brand:hover{color:var(--ac)}
+.topl{display:inline-flex;align-items:center;gap:6px}
+.sbtog{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2);background:none;border:0;cursor:pointer;align-self:center}
+.sbtog:hover{background:var(--hair);color:var(--ink)}
+.sbtog .ic{width:19px;height:19px}
+.sbtog.off{color:var(--ac)}
+@media (min-width:900px){.book.tbook.noside{grid-template-columns:minmax(0,1fr) 38px}.book.tbook.noside.hasd{grid-template-columns:minmax(0,1fr) minmax(320px,380px) 38px}}
 .saving{font-size:.7rem;color:var(--ink-3);display:flex;align-items:center;gap:6px}
 .saving i{width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
 .saving.ok i{background:var(--ac)}
@@ -1099,6 +1105,7 @@ label.tsi{cursor:pointer}
     plus:'<path d="M12 5.5v13M5.5 12h13"/>',
     people:'<circle cx="9" cy="8.5" r="3"/><path d="M3.75 19c.5-3 2.6-4.75 5.25-4.75s4.75 1.75 5.25 4.75M15.5 5.75a3 3 0 0 1 0 5.5M17 14.4c2 .5 3.1 2.1 3.4 4.6"/>',
     chevr:'<path d="M10 7l5 5-5 5"/>',
+    panel:'<rect x="3.75" y="4.75" width="16.5" height="14.5" rx="2.75"/><path d="M9.25 4.75v14.5"/>',
     gantt:'<path d="M4 6.5h8.5M8 12h11.5M6 17.5h7"/>',
     sync:'<path d="M19.5 12a7.5 7.5 0 0 1-12.9 5.2M4.5 12A7.5 7.5 0 0 1 17.4 6.8M17.75 3.5v3.6h-3.6M6.25 20.5v-3.6h3.6"/>',
     upload:'<path d="M12 15.5V4.5M7.75 8.5L12 4.25l4.25 4.25M4.75 15v3.25c0 .97.78 1.75 1.75 1.75h11c.97 0 1.75-.78 1.75-1.75V15"/>',
@@ -1947,6 +1954,7 @@ label.tsi{cursor:pointer}
   S.side=false;
   const isCalK=k=>typeof k==='string'&&k.startsWith('cal:');
   const CALV=[['cal:a','목록'],['cal:d','일'],['cal:3','3일'],['cal:w','주'],['cal:m','월'],['cal:y','년']];
+  S.sideOff=(()=>{try{return localStorage.getItem('diarybook-sideoff')==='1'}catch(e){return false}})();
   S.mini=(()=>{try{return localStorage.getItem('diarybook-mini')!=='0'}catch(e){return true}})();
   S.lastCal=(()=>{try{const v=localStorage.getItem('diarybook-lcal');return CALV.some(c=>c[0]===v)?v:'cal:m'}catch(e){return'cal:m'}})();
   function sideHtml(mini){
@@ -2255,13 +2263,13 @@ label.tsi{cursor:pointer}
     return `<div class="vseg" role="group" aria-label="보기 전환">${b(S.lastList,'목록',!isCalK(S.tl))}${b('cal:m','월',S.tl==='cal:m'||S.tl==='cal:y')}${b('cal:w','주',S.tl==='cal:w'||S.tl==='cal:3')}${b('cal:d','일',S.tl==='cal:d'||S.tl==='cal:a')}</div>`;
   }
   function tasksLayout(r){
-    const det=S.tsel?'t':(S.wsel&&S.docs[S.wsel]&&S.tl==='work')?'w':'';const showSide=wideSide.matches,inlineD=det&&wideDetail.matches,mini=showSide&&S.mini,calH=showSide&&isCalK(S.tl);
+    const det=S.tsel?'t':(S.wsel&&S.docs[S.wsel]&&S.tl==='work')?'w':'';const sideOff=wideSide.matches&&S.sideOff,showSide=wideSide.matches&&!S.sideOff,inlineD=det&&wideDetail.matches,mini=showSide&&S.mini,calH=(showSide||sideOff)&&isCalK(S.tl);
     return `<div class="book tbook ${inlineD?'hasd':''} ${showSide?'':'noside'} ${mini?'mini':''}">
       ${showSide?`<aside class="tside ${mini?'mini':''}">${sideHtml(mini)}</aside>`:''}
       <section class="tmain">
         ${r.bare?'':calH?`<header class="th cth"><h2 class="mpill">${r.title}</h2>${calSeg()}${navHtml({},'')}</header>`:
-        `<header class="th">${showSide?'':`<button class="ib" data-act="side" aria-label="메뉴">${icon('menu')}</button>`}<h2>${r.title}</h2>${r.sub?`<span class="sub">${r.sub}</span>`:''}${r.nav?navHtml({},''):''}</header>`}
-        ${showSide||r.bare?'':viewSeg()}
+        `<header class="th">${showSide||sideOff?'':`<button class="ib" data-act="side" aria-label="메뉴">${icon('menu')}</button>`}<h2>${r.title}</h2>${r.sub?`<span class="sub">${r.sub}</span>`:''}${r.nav?navHtml({},''):''}</header>`}
+        ${showSide||sideOff||r.bare?'':viewSeg()}
         ${r.noAdd||S.qp?'':composer()}
         <div class="tlist">${r.body}</div>
       </section>
@@ -2625,7 +2633,7 @@ label.tsi{cursor:pointer}
     const r=VIEW_FN[S.view]();
     const sheet=S.tsel&&S.docs[S.tsel]&&!(S.view==='tasks'&&wideDetail.matches)?`<div class="sheet-bg" data-act="tclose"></div><div class="sheet" role="dialog" aria-label="할 일 상세">${taskDetail(S.tsel)}</div>`
       :S.wsel&&S.docs[S.wsel]&&S.view==='tasks'&&S.tl==='work'&&!wideDetail.matches?`<div class="sheet-bg" data-act="wclose"></div><div class="sheet" role="dialog" aria-label="업무 상세">${workDetail(S.wsel)}</div>`:'';
-    const top=`<div class="top"><button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>`;
+    const top=`<div class="top"><span class="topl">${wideSide.matches?`<button class="sbtog ${S.sideOff?'off':''}" data-act="sidetog" title="사이드바 ${S.sideOff?'열기':'숨기기'} (Ctrl+\\)" aria-label="사이드바 ${S.sideOff?'열기':'숨기기'}" aria-pressed="${!S.sideOff}">${icon('panel')}</button>`:''}<button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button></span><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>`;
     const toast=S.undo?`<div class="toast" role="status"><span>할 일을 삭제했습니다</span><button data-act="undo">되돌리기</button></div>`:S.flash?`<div class="toast" role="status"><span>${esc(S.flash)}</span></div>`:'';
     updateBadge();
     if(r.tasks){app.innerHTML=top+tasksLayout(r)+sheet+toast+cmHtml()+qpHtml();app.querySelectorAll('textarea.ta').forEach(autosize);if(r.bare&&S.wq)wFilterDom();return}
@@ -2713,6 +2721,7 @@ label.tsi{cursor:pointer}
       if(ok)update(id,d=>{const k=(d.events||[]).findIndex(x=>x.text===it.text&&(x.t||'')===(it.t||''));if(k>=0)d.events.splice(k,1)},true);
       render()},
     home:()=>{flushAll();S.view='tasks';S.cur=TODAY;S.tl=S.lastCal||'cal:m';try{localStorage.setItem('diarybook-tl',S.tl)}catch(e){}S.confirm=null;S.tsel=null;S.wsel=null;S.dp=null;S.mm=false;S.tp=null;S.side=false;S.qa.pick=false;S.qa.due=qaCtx().due;try{localStorage.setItem(LSV,S.view)}catch(e){}render();window.scrollTo(0,0)},
+    sidetog:()=>{S.sideOff=!S.sideOff;try{localStorage.setItem('diarybook-sideoff',S.sideOff?'1':'0')}catch(e){}render()},
     mini:()=>{S.mini=!S.mini;try{localStorage.setItem('diarybook-mini',S.mini?'1':'0')}catch(e){}render()},
     tmonth:b=>{S.cur=b.dataset.d;S.tl='cal:m';S.lastCal='cal:m';try{localStorage.setItem('diarybook-tl',S.tl);localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}if(!S.qa.pick)S.qa.due=S.cur;render()},
     tl:b=>{S.tl=b.dataset.k;if(!isCalK(S.tl)){S.lastList=S.tl;try{localStorage.setItem('diarybook-tlist',S.tl)}catch(e){}}else{S.lastCal=S.tl;try{localStorage.setItem('diarybook-lcal',S.tl)}catch(e){}}S.side=false;S.addingList=false;try{localStorage.setItem('diarybook-tl',S.tl)}catch(e){}S.tsel=null;S.wsel=null;S.confirm=null;S.dp=null;S.mm=false;if(!S.qa.pick){const c=qaCtx();S.qa.due=c.due;S.qa.list=c.list||defList()}render()},
@@ -2883,6 +2892,7 @@ label.tsi{cursor:pointer}
   let composing=false,qaPending=false;
   app.addEventListener('compositionstart',()=>{composing=true});
   app.addEventListener('compositionend',e=>{composing=false;if(e.target.id==='qa'){cmpSync();if(qaPending){qaPending=false;setTimeout(cmpSubmit,0)}}});
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.code==='Backslash'&&S.view==='tasks'&&wideSide.matches){e.preventDefault();ACT.sidetog()}});
   app.addEventListener('keydown',e=>{
     // 입력칸이 비어 있을 때(또는 종류 버튼에 있을 때) ← → 로 할 일/일정 전환
     if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&!e.shiftKey&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&!(e.isComposing||e.keyCode===229)&&((e.target.id==='qa'&&!e.target.value)||e.target.closest('.kseg'))){
