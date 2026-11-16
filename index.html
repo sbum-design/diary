@@ -1849,7 +1849,7 @@ label.tsi{cursor:pointer}
   S.undo=null;let undoT=null;
   /* Ctrl+Space 빠른 추가 팝업 (할 일 · 일정) */
   S.qp=false;
-  function qpHtml(){if(!S.qp)return'';return `<div class="qp-bg" data-act="qp-close"></div><div class="qp" role="dialog" aria-label="빠른 추가"><div class="qph"><b>빠른 추가</b><span>Enter 추가 · Esc 닫기</span></div>${composer()}</div>`}
+  function qpHtml(){if(!S.qp)return'';return `<div class="qp-bg" data-act="qp-close"></div><div class="qp" role="dialog" aria-label="빠른 추가"><div class="qph"><b>빠른 추가</b><span>← → 할 일·일정 · Enter 추가 · Esc 닫기</span></div>${composer()}</div>`}
   function qpOpen(){const q=document.getElementById('qa');if(q)S.qaText=q.value;S.qp=true;S.cm=null;S.dp=null;S.mm=false;render();const n=document.getElementById('qa');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}
   function qpClose(){const q=document.getElementById('qa');if(q)S.qaText=q.value;S.qp=false;S.dp=null;S.mm=false;render()}
   document.addEventListener('keydown',e=>{
@@ -2876,6 +2876,11 @@ label.tsi{cursor:pointer}
   app.addEventListener('compositionstart',()=>{composing=true});
   app.addEventListener('compositionend',e=>{composing=false;if(e.target.id==='qa'){cmpSync();if(qaPending){qaPending=false;setTimeout(cmpSubmit,0)}}});
   app.addEventListener('keydown',e=>{
+    // 입력칸이 비어 있을 때(또는 종류 버튼에 있을 때) ← → 로 할 일/일정 전환
+    if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&!e.shiftKey&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&!(e.isComposing||e.keyCode===229)&&((e.target.id==='qa'&&!e.target.value)||e.target.closest('.kseg'))){
+      const v=e.key==='ArrowLeft'?'task':'event';e.preventDefault();
+      if(S.qkind!==v){S.qkind=v;try{localStorage.setItem('diarybook-qkind',v)}catch(x){}S.dp=null;S.mm=false;render()}
+      const n=document.getElementById('qa');if(n)n.focus();return}
     if((e.key==='Enter'||e.key==='Escape')&&e.target.matches('.tte')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();e.stopPropagation();e.target.blur();return}
     if((e.key==='Enter'||e.key==='Escape')&&e.target.matches('.tsx')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();e.stopPropagation();e.target.blur();return}
     if(e.key==='Enter'&&e.target.matches('.tsub .tx')&&!(e.isComposing||e.keyCode===229)){e.preventDefault();const add=e.target.closest('.cl').querySelector('.add');if(add)add.click();return}
