@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>하루 기록장</title>
+<title>Diary Book</title>
 <link rel="apple-touch-icon" href="icon.png?v=3">
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2636,6 +2636,7 @@ label.tsi{cursor:pointer}
     const top=`<div class="top"><span class="topl">${wideSide.matches?`<button class="sbtog ${S.sideOff?'off':''}" data-act="sidetog" title="사이드바 ${S.sideOff?'열기':'숨기기'} (Ctrl+\\)" aria-label="사이드바 ${S.sideOff?'열기':'숨기기'}" aria-pressed="${!S.sideOff}">${icon('panel')}</button>`:''}<button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button></span><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>`;
     const toast=S.undo?`<div class="toast" role="status"><span>할 일을 삭제했습니다</span><button data-act="undo">되돌리기</button></div>`:S.flash?`<div class="toast" role="status"><span>${esc(S.flash)}</span></div>`:'';
     updateBadge();
+    {const tt=cfg().title||'Diary Book';if(document.title!==tt)document.title=tt}
     if(r.tasks){app.innerHTML=top+tasksLayout(r)+sheet+toast+cmHtml()+qpHtml();app.querySelectorAll('textarea.ta').forEach(autosize);if(r.bare&&S.wq)wFilterDom();return}
     app.innerHTML=`
       <div class="top"><button class="brand" data-act="home" title="메인으로">${esc(cfg().title)}</button><span class="topr">${authed()?'':'<button class="btn dark sm" data-act="signin">구글 연결</button>'}<span class="saving ${authed()?'ok':''}" id="saving"><i></i> ${esc(S.saving||(authed()?'구글 드라이브와 동기화':'이 기기에 저장 중'))}</span></span></div>
@@ -3064,7 +3065,7 @@ label.tsi{cursor:pointer}
     if(t.type==='range'&&t.nextElementSibling)t.nextElementSibling.textContent=t.value+'%';
     const[id,p]=t.dataset.b.split('|');
     if(id.startsWith('note-')&&p==='title'){const el=app.querySelector(`[data-nt="${id}"]`);if(el)el.textContent=t.value||'제목 없음'}
-    if(id==='cfg'&&p==='title'){const el=app.querySelector('.brand');if(el)el.textContent=t.value||'Diary Book'}
+    if(id==='cfg'&&p==='title'){const el=app.querySelector('.brand');if(el)el.textContent=t.value||'Diary Book';document.title=t.value||'Diary Book'}
   });
   app.addEventListener('change',e=>{
     const t=e.target;
