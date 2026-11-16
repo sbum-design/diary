@@ -54,6 +54,9 @@ svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;str
 .brand{font-family:var(--f-disp);font-weight:600;font-size:1rem;letter-spacing:.01em;color:var(--ink);background:none;border:0;padding:4px 0;cursor:pointer}
 .brand:hover{color:var(--ac)}
 .topl{display:inline-flex;align-items:center;gap:6px}
+/* 할 일·캘린더 화면은 넓은 모니터에서 가로 공간을 끝까지 사용 (일기장 펼침 화면은 1280 유지) */
+.book.tbook{max-width:1920px}
+.top:has(+ .book.tbook){max-width:1920px}
 .sbtog{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2);background:none;border:0;cursor:pointer;align-self:center}
 .sbtog:hover{background:var(--hair);color:var(--ink)}
 .sbtog .ic{width:19px;height:19px}
