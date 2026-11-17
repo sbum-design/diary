@@ -766,7 +766,6 @@ button.tci:hover{background:var(--page)}
 .gexr small{font-size:.76rem;color:var(--ink-3)}
 .gexr em{font-style:normal;font-family:var(--f-mono);font-size:.78rem;color:var(--ink-2);white-space:nowrap}
 .gexr em .ic{width:18px;height:18px;color:var(--gblue)}
-.gav{width:38px;height:38px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-weight:800;font-size:1.15rem;color:var(--gc);background:color-mix(in srgb,var(--gc) 13%,#fff)}
 /* 시트 */
 .gbg{position:fixed;inset:0;background:rgba(20,28,40,.38);z-index:60;animation:gfade .15s}
 .gsheet{position:fixed;z-index:61;left:50%;top:4vh;transform:translateX(-50%);width:min(680px,calc(100vw - 24px));max-height:92vh;overflow:auto;background:var(--page);border-radius:18px;box-shadow:0 20px 60px rgba(20,30,50,.25);padding:0 20px 24px;overscroll-behavior:contain;animation:gup .18s}
@@ -855,6 +854,47 @@ button.tci:hover{background:var(--page)}
 .gcd.on i .ic{width:11px;height:11px;stroke-width:3}
 .gcd.td{box-shadow:inset 0 0 0 2px var(--gblue)}
 .gcd.fut{color:var(--ink-3)}
+
+/* 운동 그림 */
+.gav{width:38px;height:38px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:var(--gc);background:color-mix(in srgb,var(--gc) 11%,#fff)}
+.gav svg{width:88%;height:88%;display:block}
+.gav .gb polyline{fill:none;stroke:currentColor;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.gav .gh{fill:currentColor}
+.gav .ge{stroke:#8b95a1;stroke-width:2.6;stroke-linecap:round}
+.gav .gc{stroke:#a7b0ba;stroke-width:1.2;fill:none}
+.gav .gf{fill:#8b95a1}
+.gav .gw{fill:none;stroke:#8b95a1;stroke-width:2;stroke-linejoin:round}
+.gav.lg{width:64px;height:64px;border-radius:16px}
+.gav.sm{width:30px;height:30px;border-radius:8px}
+.gexh .gav.lg{margin-right:4px}
+.gex header .gexn{display:flex;align-items:center;gap:8px;min-width:0}
+/* 운동 ⋯ 메뉴 (팝오버) */
+.gex header{position:relative}
+.gpopbg{position:fixed;inset:0;z-index:70;background:rgba(20,30,45,.18)}
+.gpop{position:absolute;right:0;top:calc(100% + 4px);z-index:71;width:min(290px,86vw);padding:6px;border-radius:14px;background:#fff;box-shadow:0 14px 40px rgba(20,30,50,.22),0 0 0 1px var(--hair);display:grid}
+.gpop>button,.gpop .gpsub>button{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:9px;font-size:.95rem;text-align:left;width:100%;color:var(--ink)}
+.gpop>button:hover,.gpop>button:focus-visible{background:var(--fill)}
+.gpop>button .ic{width:19px;height:19px;color:var(--gblue);flex:none}
+.gpop>button em{margin-left:auto;font-style:normal;color:var(--ink-3);font-size:.8rem;display:flex;align-items:center;gap:2px}
+.gpop>button em .ic{width:15px;height:15px;color:var(--gblue)}
+.gpop>button.warn,.gpop>button.warn .ic{color:#e5484d}
+.gpop .gpmv{display:flex;gap:6px;padding:4px 6px}
+.gpop .gpmv button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:9px;background:var(--fill);font-size:.84rem}
+.gpop .gpmv .ic{width:15px;height:15px}
+.gpop hr{border:0;border-top:1px solid var(--hair);margin:4px 6px}
+.gpop .gpback{color:var(--gblue);font-weight:700;font-size:.86rem;padding:8px 12px}
+.gpop .gpchips{display:flex;flex-wrap:wrap;gap:6px;padding:6px 10px 10px}
+.gpop .gpchips button{padding:7px 11px;border-radius:8px;background:var(--fill);font-size:.86rem}
+.gpop .gpchips button.on{background:var(--gblue);color:#fff}
+.gpop .gpnone{padding:10px 12px;font-size:.84rem;color:var(--ink-3)}
+/* 메모 · 스티커 · 슈퍼세트 */
+.gitnote{display:block;width:100%;border:0;border-radius:8px;background:var(--fill);padding:7px 10px;margin:0 0 6px;font-size:.86rem;resize:none;outline:0;color:var(--ink-2)}
+.gstick{display:flex;gap:8px;align-items:flex-start;border-radius:8px;background:#fff7d6;padding:7px 10px;margin:0 0 6px}
+.gstick .ic{width:15px;height:15px;color:#c28a00;flex:none;margin-top:3px}
+.gstick textarea{flex:1;border:0;background:transparent;resize:none;outline:0;font-size:.86rem;color:#6b5200;padding:0}
+.gex.ss{border-left:3px solid var(--ssc,#8250df);padding-left:10px;margin-left:-13px}
+.gex.ss.mid{margin-top:8px}
+.gsstag{font-size:.7rem;font-weight:700;color:var(--ssc,#8250df);letter-spacing:.02em;margin:0 0 2px}
 /* 잠금 화면 알림 카드 */
 .gpush{display:grid;gap:8px;padding:12px 14px;border-radius:12px;border:1px dashed #b9d6f5;background:#f6faff}
 .gpush.on{border-style:solid;border-color:#cfe6d8;background:var(--ggsoft);padding:8px 12px}
@@ -1351,6 +1391,16 @@ label.tsi{cursor:pointer}
     trophy:'<path d="M7.5 4.5h9v4a4.5 4.5 0 0 1-9 0zM7.5 6H4.75v1.5A2.75 2.75 0 0 0 7.5 10.25M16.5 6h2.75v1.5a2.75 2.75 0 0 1-2.75 2.75M12 13v3.5M8.5 19.75h7M9.5 16.5h5v3.25h-5z"/>',
     folder2:'<path d="M3.75 7.5c0-1 .8-1.75 1.75-1.75h4l2 2.25h7c1 0 1.75.8 1.75 1.75v7.5c0 1-.8 1.75-1.75 1.75h-13c-1 0-1.75-.8-1.75-1.75z"/>',
     panel:'<rect x="3.75" y="4.75" width="16.5" height="14.5" rx="2.75"/><path d="M9.25 4.75v14.5"/>',
+    gnote:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+    gpin:'<circle cx="12" cy="7.5" r="3.5"/><path d="M12 11v10"/>',
+    gwarm:'<path d="M3 12h6M6 9v6M14 12h7"/>',
+    gtimer:'<path d="M12 4a8.5 8.5 0 1 1-6 2.5"/><path d="M12 2v3M9 11l3 3"/>',
+    gswap:'<path d="M9 7H5V3"/><path d="M5.5 7.5A8 8 0 1 1 4 13"/>',
+    gss:'<path d="M5 4v16M10 7h10M10 12h10M10 17h10"/>',
+    gpref:'<path d="M7 4v16M17 4v16"/><circle cx="7" cy="15" r="2.4"/><circle cx="17" cy="9" r="2.4"/>',
+    gup:'<path d="M12 19V5M6 11l6-6 6 6"/>',
+    gdown:'<path d="M12 5v14M6 13l6 6 6-6"/>',
+    gx:'<path d="M6 6l12 12M18 6L6 18"/>',
     gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3.75v2M12 18.25v2M3.75 12h2M18.25 12h2M6.2 6.2l1.4 1.4M16.4 16.4l1.4 1.4M6.2 17.8l1.4-1.4M16.4 7.6l1.4-1.4"/>',
     gantt:'<path d="M4 6.5h8.5M8 12h11.5M6 17.5h7"/>',
     sync:'<path d="M19.5 12a7.5 7.5 0 0 1-12.9 5.2M4.5 12A7.5 7.5 0 0 1 17.4 6.8M17.75 3.5v3.6h-3.6M6.25 20.5v-3.6h3.6"/>',
@@ -2401,12 +2451,128 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   const e1rm=s=>gNum(s.w)*(1+gNum(s.r)/30);
   function gVolume(w){let v=0;(w.items||[]).forEach(it=>{const ex=gEx(it.ex);if(ex.kind!=='w')return;(it.sets||[]).forEach(s=>{if(s.done!==false&&w.end||s.done)v+=gNum(s.w)*gNum(s.r)})});return Math.round(v)}
   /* 이전 기록: 해당 운동을 마지막으로 끝낸 워크아웃의 세트 */
+  /* 이전 기록 짝짓기: 워밍업은 워밍업끼리, 일반 세트는 일반 세트끼리 순서대로 */
+  function gPrevAt(prev,sets,j){if(!prev)return null;const w=(sets[j]||{}).type==='W',n=sets.slice(0,j).filter(x=>(x.type==='W')===w).length;return prev.filter(x=>(x.type==='W')===w)[n]||null}
   function gPrevSets(exId,before){for(const w of gDone()){if(before&&w.start>=before)continue;const it=(w.items||[]).find(x=>x.ex===exId);if(it&&it.sets&&it.sets.length)return it.sets}return null}
   /* PR(추정 1RM 기준) 집계 */
   function gPRs(){const best={},out={};gDone().slice().reverse().forEach(w=>{let n=0;(w.items||[]).forEach(it=>{const ex=gEx(it.ex);if(ex.kind!=='w')return;let m=0;(it.sets||[]).forEach(s=>{const v=e1rm(s);if(v>m)m=v});if(m>0&&m>(best[it.ex]||0)){if(best[it.ex])n++;best[it.ex]=m}});out[w.id]=n});return out}
   const gAgo=ms=>{if(!ms)return'기록 없음';const d=Math.round((parse(TODAY)-parse(ymd(new Date(ms))))/864e5);return d<=0?'오늘':d===1?'어제':d<31?`${d}일 전`:d<365?`${Math.round(d/30)}개월 전`:`${Math.round(d/365)}년 전`};
   const gInitial=n=>{const c=String(n||'?').trim().charAt(0);const k=c.charCodeAt(0);if(k>=0xAC00&&k<=0xD7A3)return'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ'[Math.floor((k-0xAC00)/588)];return/[a-z]/i.test(c)?c.toUpperCase():'#'};
-  const gAv=ex=>`<span class="gav" style="--gc:${GPC[ex.part]||GPC.Other}">${esc(String(ex.name||'?').trim().charAt(0).toUpperCase())}</span>`;
+  /* 운동 그림: [머리 x,y | 몸 선들 | 기구] — 48×48 */
+  const GPOSE={
+  bench:['10,25','14,27 28,27|28,27 34,26 36,38|16,27 16,15','r:6,29,26,3 b:10,32,10,39 b:28,32,28,39 p:16,13,4'],
+  incline:['14,16','18,20 28,32|28,32 35,30 36,41|19,21 20,9','b:16,24,29,35 b:29,35,29,41 p:20,7,4'],
+  chestpress:['15,11','15,16 15,31|15,31 25,31 25,42|15,18 30,18','b:10,13,10,33 r:8,32,14,3 b:31,13,31,23 b:31,18,38,18'],
+  fly:['24,8','24,13 24,28|24,28 20,43|24,28 28,43|24,15 13,20 21,26|24,15 35,20 27,26','c:3,3,20,26 c:45,3,28,26'],
+  pecdeck:['24,10','24,15 24,29|24,29 18,31 18,42|24,29 30,31 30,42|24,16 12,17 12,7|24,16 36,17 36,7','r:9,5,6,13 r:33,5,6,13 r:16,29,16,3'],
+  dip:['24,8','24,13 24,29|24,29 21,38 25,43|24,29 27,38 23,43|24,15 15,13 15,22|24,15 33,13 33,22','b:13,22,13,44 b:35,22,35,44'],
+  pushup:['8,23','12,26 28,31|28,31 43,36|13,27 13,38','c:3,39,45,39'],
+  pulldown:['24,13','24,18 25,31|25,31 34,31 34,41|24,19 18,12 20,5','b:11,5,31,5 c:21,5,21,1 r:16,32,14,3 b:35,26,35,31'],
+  straightpull:['28,10','26,15 22,28|22,28 20,43|22,28 25,43|26,16 34,27','c:35,27,44,3 b:31,27,38,27'],
+  seatrow:['16,13','16,18 15,32|15,32 26,29 33,32|16,20 11,26 22,27','c:22,27,43,27 r:8,33,13,3 b:36,24,36,36'],
+  bentrow:['36,15','31,19 16,25|16,25 21,34 17,43|16,25 18,34 14,43|30,20 23,24 27,32','p:27,34,4'],
+  pullup:['24,11','24,16 24,30|24,30 21,41|24,30 27,41|24,17 15,16 16,6|24,17 33,16 32,6','b:8,6,40,6'],
+  hang:['24,14','24,19 24,33|24,33 22,45|24,33 26,45|24,20 18,6|24,20 30,6','b:8,6,40,6'],
+  hangleg:['27,13','22,18 22,31|22,31 39,31|22,19 22,6','p:22,5,3'],
+  dl:['33,13','29,16 17,24|17,24 24,32 20,43|29,17 27,32','p:26,37,6'],
+  ohp:['24,13','24,18 24,31|24,31 21,44|24,31 27,44|24,19 16,13 16,5|24,19 32,13 32,5','b:9,5,39,5'],
+  seatpress:['24,12','24,17 24,30|24,30 16,31 16,42|24,30 32,31 32,42|24,18 15,15 15,6|24,18 33,15 33,6','v:15,5 v:33,5 r:15,30,18,3'],
+  lateral:['24,8','24,13 24,28|24,28 21,43|24,28 27,43|24,15 7,16|24,15 41,16','v:6,16 v:42,16'],
+  frontraise:['20,8','20,13 20,28|20,28 18,43|20,28 22,43|20,15 37,15','v:38,15'],
+  revfly:['24,15','24,20 24,27|24,27 19,43|24,27 29,43|24,21 8,17|24,21 40,17','v:7,17 v:41,17'],
+  facepull:['19,9','19,14 19,28|19,28 17,43|19,28 21,43|19,15 13,13 27,14','c:27,14,44,10'],
+  upright:['24,8','24,13 24,28|24,28 21,43|24,28 27,43|24,15 14,12 21,19|24,15 34,12 27,19','b:13,19,35,19'],
+  shrug:['24,8','24,13 24,28|24,28 21,43|24,28 27,43|24,15 17,28|24,15 31,28','b:11,28,37,28'],
+  curl:['22,8','22,13 22,28|22,28 20,43|22,28 24,43|22,15 22,24 30,17','v:31,16'],
+  triext:['22,12','22,17 22,31|22,31 20,44|22,31 24,44|22,18 25,5 16,11','v:15,12'],
+  pushdown:['21,8','21,13 21,28|21,28 19,43|21,28 23,43|21,15 21,24 28,30','c:28,30,33,2 b:25,30,31,30'],
+  squat:['27,11','24,16 16,29|16,29 27,31 24,43|23,17 18,22 19,16','p:19,16,4'],
+  squatbw:['27,11','24,16 16,29|16,29 27,31 24,43|23,17 38,18',''],
+  goblet:['26,11','24,16 16,29|16,29 27,31 24,43|23,18 27,24 29,20','k:31,21'],
+  legpress:['7,15','9,20 15,33|15,33 22,22 31,25|10,21 15,27','b:5,14,13,36 b:29,17,36,30'],
+  legext:['17,12','17,17 18,30|18,30 27,30 37,24|17,18 20,26 23,29','r:11,31,14,3 b:10,15,10,32 r:36,22,4,4'],
+  legcurl:['8,24','12,26 27,26|27,26 37,26 35,15|13,26 12,31','r:8,28,32,3 b:12,31,12,40 b:36,31,36,40 r:33,13,4,4'],
+  lunge:['24,10','24,15 24,28|24,28 33,30 33,42|24,28 18,41 10,41|24,16 27,28','v:27,29 c:4,43,44,43'],
+  hipthrust:['8,19','11,24 25,22|25,22 33,24 34,38|12,24 15,30','r:3,24,9,13 p:25,18,4'],
+  kickback:['9,25','13,28 27,28|27,28 27,40 35,40|27,28 36,25 43,18|13,28 13,40','c:4,41,44,41'],
+  abd:['24,9','24,14 24,29|24,29 12,32 13,43|24,29 36,32 35,43|24,16 17,25|24,16 31,25','r:16,29,16,3 r:8,30,4,6 r:36,30,4,6'],
+  calf:['24,8','24,13 24,28|24,28 24,40 28,42|24,15 32,22','r:22,42,14,3 b:33,14,33,30'],
+  crunch:['9,25','12,29 22,36|22,36 30,27 36,37|12,29 9,21','c:3,40,45,40'],
+  abwheel:['13,30','17,32 30,29|30,29 33,38 43,38|18,32 8,36','w:7,37,3.5 c:3,41,45,41'],
+  plank:['9,28','13,30 28,34|28,34 43,38|13,30 13,38 20,38','c:3,40,45,40'],
+  legraise:['6,35','10,37 25,37|25,37 31,21|11,37 20,38','c:3,40,45,40'],
+  mountain:['8,23','12,26 27,30|27,30 43,36|27,30 19,32 24,37|13,27 13,38','c:3,39,45,39'],
+  run:['27,9','25,14 22,27|22,27 30,33 28,43|22,27 16,34 10,32|24,16 19,22 21,27|24,16 30,20 34,15',''],
+  bike:['33,11','30,16 20,24|20,24 27,30 24,37|30,17 36,24','w:11,36,7 w:37,36,7 b:11,36,22,26 b:22,26,37,36 b:20,23,22,26 b:34,24,37,36'],
+  stairs:['23,6','23,11 21,22|21,22 27,26 26,32|21,22 18,30 15,38|23,12 28,18|23,12 18,18','s:6,44,6,38,15,38,15,32,26,32,26,26,42,26'],
+  jumprope:['24,8','24,13 24,28|24,28 21,42|24,28 27,42|24,15 15,22 14,27|24,15 33,22 34,27','q:14,27,24,64,34,27'],
+  pullover:['10,25','14,27 28,27|28,27 34,26 36,38|16,27 6,20','r:6,29,26,3 b:10,32,10,39 b:28,32,28,39 v:5,19'],
+  stand:['24,8','24,13 24,28|24,28 21,43|24,28 27,43|24,15 19,28|24,15 29,28','v:19,29 v:29,29'],
+  };
+  function gPoseKey(name,part){const n=' '+String(name||'').toLowerCase().replace(/[_()\-]/g,' ').replace(/\s+/g,' ')+' ',h=(...a)=>a.some(x=>n.includes(x));
+    if(h('pec deck','butterfly','펙덱','버터플'))return'pecdeck';
+    if(h('reverse fly','rear delt','리어','리버스'))return'revfly';
+    if(h('face pull','페이스'))return'facepull';
+    if(h('pullover','pull over','풀오버'))return'pullover';
+    if(h('straight','스트레이트'))return'straightpull';
+    if(h('pulldown','pull down','랫풀','렛풀','풀다운'))return'pulldown';
+    if(h('hanging leg','hanging knee','행잉'))return'hangleg';
+    if(h('pull up','pullup','chin up','chinup','풀업','턱걸이'))return'pullup';
+    if(h('매달','dead hang',' hang '))return'hang';
+    if(h('leg raise','레그레이즈','레그 레이즈'))return'legraise';
+    if(h('upright'))return'upright';
+    if(h('shrug','슈럭','쉬러그'))return'shrug';
+    if(h('pushdown','push down','푸시다운','푸쉬다운'))return'pushdown';
+    if(h('tricep','skull','extension')&&!h('leg ext','back ext','레그'))return'triext';
+    if(h('삼두'))return'triext';
+    if(h('leg curl','레그컬','레그 컬'))return'legcurl';
+    if(h('curl','컬'))return'curl';
+    if(h('leg ext','레그익','레그 익'))return'legext';
+    if(h('leg press','레그프레스','레그 프레스'))return'legpress';
+    if(h('hip thrust','bridge','힙쓰','힙 쓰','브릿지'))return'hipthrust';
+    if(h('kickback','킥백'))return'kickback';
+    if(h('abduct','adduct','어브덕','어덕','이너','아웃'))return'abd';
+    if(h('calf','카프'))return'calf';
+    if(h('rowing','로잉머신'))return'seatrow';
+    if(h('bent','t bar','one arm','벤트','바벨로우','덤벨로우'))return'bentrow';
+    if(h(' row','로우','pulley','upper back'))return'seatrow';
+    if(h('deadlift','데드'))return'dl';
+    if(h('lateral','사이드','레터럴','레러럴'))return'lateral';
+    if(h('front raise','프론트'))return'frontraise';
+    if(h('step','stair','계단'))return'stairs';
+    if(h('lunge','split squat','런지'))return'lunge';
+    if(h('goblet','고블릿'))return'goblet';
+    if(h('squat','스쿼트')) return h('bodyweight','air','맨몸')?'squatbw':'squat';
+    if(h('military','overhead press','밀리터리','오버헤드')&&!h('seated'))return'ohp';
+    if(h('press','프레스')&&h('shoulder','overhead','arnold','military','숄더','아놀드'))return'seatpress';
+    if(h('incline','인클라인'))return'incline';
+    if(h('chest press','체스트'))return'chestpress';
+    if(h('bench','벤치'))return'bench';
+    if(h('fly','crossover','플라이','크로스오버','front chest'))return'fly';
+    if(h(' dip','딥스'))return'dip';
+    if(h('push up','pushup','푸시업','푸쉬업','팔굽'))return'pushup';
+    if(h('ab wheel','rollout','롤아웃','휠'))return'abwheel';
+    if(h('plank','플랭크'))return'plank';
+    if(h('mountain','마운틴'))return'mountain';
+    if(h('crunch','sit up','situp','twist','크런치','윗몸'))return'crunch';
+    if(h('cycl','bike','자전거','사이클','spin'))return'bike';
+    if(h('rope','줄넘기'))return'jumprope';
+    if(h('run','treadmill','walk','elliptic','aerobic','러닝','걷기','런닝'))return'run';
+    return{Chest:'bench',Back:'seatrow',Shoulders:'seatpress',Arms:'curl',Legs:'squat',Core:'crunch',Cardio:'run'}[part]||'stand'}
+  const GPSV={};
+  function gPoseSvg(k){if(GPSV[k])return GPSV[k];const p=GPOSE[k]||GPOSE.stand,[hx,hy]=p[0].split(',');const eq=(p[2]||'').split(' ').filter(Boolean).map(t=>{const[c,v]=t.split(':'),a=v.split(',').map(Number);
+      if(c==='b')return `<line x1="${a[0]}" y1="${a[1]}" x2="${a[2]}" y2="${a[3]}" class="ge"/>`;
+      if(c==='c')return `<line x1="${a[0]}" y1="${a[1]}" x2="${a[2]}" y2="${a[3]}" class="gc"/>`;
+      if(c==='r')return `<rect x="${a[0]}" y="${a[1]}" width="${a[2]}" height="${a[3]}" rx="1.5" class="gf"/>`;
+      if(c==='p')return `<circle cx="${a[0]}" cy="${a[1]}" r="${a[2]}" class="gf"/>`;
+      if(c==='w')return `<circle cx="${a[0]}" cy="${a[1]}" r="${a[2]}" class="gw"/>`;
+      if(c==='v')return `<rect x="${a[0]-1.6}" y="${a[1]-4}" width="3.2" height="8" rx="1.2" class="gf"/>`;
+      if(c==='k')return `<circle cx="${a[0]}" cy="${a[1]+1}" r="3.4" class="gf"/><path d="M${a[0]-2} ${a[1]-2}a2 2 0 0 1 4 0" class="gw"/>`;
+      if(c==='s')return `<polyline points="${a.join(' ').replace(/(\S+) (\S+)/g,'$1,$2')}" class="gw"/>`;
+      if(c==='q')return `<path d="M${a[0]} ${a[1]}Q${a[2]} ${a[3]} ${a[4]} ${a[5]}" class="gc"/>`;return''}).join('');
+    return GPSV[k]=`<svg viewBox="0 0 48 48" aria-hidden="true">${eq}<g class="gb">${p[1].split('|').map(l=>`<polyline points="${l}"/>`).join('')}</g><circle cx="${hx}" cy="${hy}" r="3.7" class="gh"/></svg>`}
+
+  const gAv=(ex,sz)=>`<span class="gav${sz?' '+sz:''}" style="--gc:${GPC[ex.part]||GPC.Other}">${gPoseSvg(gPoseKey(ex.name,ex.part))}</span>`;
   const gId=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   /* 상태 */
   S.gtab=(()=>{try{return localStorage.getItem('diarybook-gtab')||'start'}catch(e){return'start'}})();
@@ -2415,14 +2581,24 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   const gSaveRest=quiet=>{try{localStorage.setItem('diarybook-grest',JSON.stringify(S.grest))}catch(e){}if(!quiet)try{gPushSchedule()}catch(e){}};
   let gAudio=null;
   function gUnlockAudio(){try{if(!gAudio){const C=window.AudioContext||window.webkitAudioContext;if(C)gAudio=new C()}if(gAudio&&gAudio.state==='suspended')gAudio.resume()}catch(e){}}
-  function gBeep(){try{gUnlockAudio();if(!gAudio)return;const t0=gAudio.currentTime;[0,.28,.56].forEach((d,i)=>{const o=gAudio.createOscillator(),g=gAudio.createGain();o.type='sine';o.frequency.value=i===2?1175:880;g.gain.setValueAtTime(0.0001,t0+d);g.gain.exponentialRampToValueAtTime(0.35,t0+d+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t0+d+0.22);o.connect(g).connect(gAudio.destination);o.start(t0+d);o.stop(t0+d+0.25)})}catch(e){}try{navigator.vibrate&&navigator.vibrate([250,120,250])}catch(e){}}
+  /* 휴식 끝 종소리: 맑은 벨 두 번(찰랑) — 이어폰으로도 나오고, 지원 기기에서는 음악 소리를 잠깐 줄였다가 되돌림 */
+  function gBeep(){
+    try{if(navigator.audioSession)navigator.audioSession.type='transient'}catch(e){}
+    try{gUnlockAudio();if(!gAudio)return;const A=gAudio,t0=A.currentTime+0.03,out=A.createGain();out.gain.value=0.9;out.connect(A.destination);
+      const strike=(t,f,v)=>[[1,1,1.6],[2.01,.45,1.1],[2.76,.32,.8],[4.07,.18,.5],[5.43,.1,.35]].forEach(([r,a,d])=>{
+        const o=A.createOscillator(),g=A.createGain();o.type='sine';o.frequency.value=f*r;
+        g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v*a,t+0.004);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+        o.connect(g).connect(out);o.start(t);o.stop(t+d+0.05)});
+      strike(t0,1568,.32);strike(t0+.16,2093,.26);strike(t0+.9,1568,.24);strike(t0+1.06,2093,.2);
+      setTimeout(()=>{try{if(navigator.audioSession)navigator.audioSession.type='auto'}catch(e){}},2600)}catch(e){}
+    try{navigator.vibrate&&navigator.vibrate([250,120,250])}catch(e){}}
   function gStartRest(w,i,j,sec){if(!sec){S.grest=null;gSaveRest();return}S.grest={end:Date.now()+sec*1000,total:sec,w,i,j};gSaveRest()}
   /* 1초마다 타이머 숫자만 갱신 (전체 다시 그리기 없음) */
   setInterval(()=>{
     const a=gActive();
     if(a)app.querySelectorAll('[data-gt="el"]').forEach(el=>{el.textContent=gElapsed(Date.now()-a.start)});
     if(S.grest){const rem=(S.grest.end-Date.now())/1000;
-      if(rem<=0){S.grest=null;gSaveRest(true);gBeep();flash('휴식 끝! 다음 세트를 시작하세요');requestRender();return}
+      if(rem<=0){S.grest=null;gSaveRest(true);if(rem>-5)gBeep();flash('휴식 끝! 다음 세트를 시작하세요');requestRender();return}
       app.querySelectorAll('[data-gt="rest"]').forEach(el=>{el.textContent=mmss(rem)});
       app.querySelectorAll('[data-gt="restbar"]').forEach(el=>{el.style.width=(rem/S.grest.total*100).toFixed(1)+'%'})}
   },500);
@@ -2475,23 +2651,44 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   }
 
   /* ---------- 워크아웃·템플릿 편집기 (공용) ---------- */
+  const GSSC=['#8250df','#d9730d','#14916a','#c94f8b','#0f8b9c'];
+  const gSSColor=k=>{let h=0;for(const c of String(k))h=(h*31+c.charCodeAt(0))>>>0;return GSSC[h%GSSC.length]};
+  /* 운동 ⋯ 메뉴 */
+  function gExMenu(docId,i,it,ex,rest,mk){
+    const a=`data-d="${docId}" data-i="${i}"`,items=D(docId).items||[],bg=`<div class="gpopbg" data-act="gmenu" data-k="${mk}"></div>`;
+    if(S.gsub==='rest')return bg+`<div class="gpop" role="menu"><button class="gpback" data-act="gmsub" data-v="">‹ 휴식 타이머</button><div class="gpchips">${[0,30,40,45,60,75,90,120,150,180,240].map(s=>`<button class="${rest===s?'on':''}" data-act="grest" ${a} data-s="${s}">${s?mmss(s):'끄기'}</button>`).join('')}</div></div>`;
+    if(S.gsub==='ss'){const others=items.map((x,k)=>({x,k})).filter(o=>o.k!==i);
+      return bg+`<div class="gpop" role="menu"><button class="gpback" data-act="gmsub" data-v="">‹ 함께 묶을 운동</button>${others.length?others.map(o=>`<button data-act="gssset" ${a} data-t="${o.k}">${gAv(gEx(o.x.ex),'sm')}<span>${esc(gEx(o.x.ex).name)}</span>${o.x.ss&&o.x.ss===it.ss?`<em>${icon('check')}</em>`:''}</button>`).join(''):'<p class="gpnone">이 워크아웃에 다른 운동이 없습니다.</p>'}</div>`}
+    return bg+`<div class="gpop" role="menu">
+      <button data-act="gnoteadd" ${a}>${icon('gnote')}${it.note!=null?'메모 지우기':'메모 추가'}</button>
+      <button data-act="gstick" data-x="${ex.id}">${icon('gpin')}${ex.sticky!=null?'스티커 메모 지우기':'스티커 메모 추가'}</button>
+      <button data-act="gwarmadd" ${a}>${icon('gwarm')}워밍업 세트 추가</button>
+      <button data-act="gmsub" data-v="rest">${icon('gtimer')}휴식 타이머<em>${rest?mmss(rest):'끄기'}${icon('chevr')}</em></button>
+      <button data-act="grepl" ${a}>${icon('gswap')}운동 대체</button>
+      ${it.ss?`<button data-act="gssoff" ${a}>${icon('gss')}슈퍼세트 해제</button>`:`<button data-act="gmsub" data-v="ss">${icon('gss')}슈퍼세트 만들기<em>${icon('chevr')}</em></button>`}
+      <button data-act="gexedit" data-x="${ex.id}">${icon('gpref')}기본 설정<em>${icon('chevr')}</em></button>
+      <hr><div class="gpmv"><button data-act="gmv" ${a} data-dir="-1" ${i?'':'disabled'}>${icon('gup')}위로</button><button data-act="gmv" ${a} data-dir="1" ${i<items.length-1?'':'disabled'}>${icon('gdown')}아래로</button></div>
+      <button class="warn" data-act="gexdel" ${a}>${icon('gx')}운동 제거</button></div>`;
+  }
   function gBlocks(docId,mode){
     const d=D(docId),before=mode==='w'?d.start:Date.now()+1;
     return (d.items||[]).map((it,i)=>{
       const ex=gEx(it.ex),prev=mode!=='t'?gPrevSets(it.ex,before):null,rest=it.rest!=null?it.rest:ex.rest;
       const cols=ex.kind==='w'?['kg','렙']:ex.kind==='t'?['분']:['렙'];
       const mk=`ex|${docId}|${i}`;
-      const menu=S.gmenu===mk?`<div class="gmenu"><span class="gml">휴식</span>${[0,30,40,60,90,120,180].map(s=>`<button class="${rest===s?'on':''}" data-act="grest" data-d="${docId}" data-i="${i}" data-s="${s}">${s?mmss(s):'끄기'}</button>`).join('')}<span class="gbr"></span><button data-act="gmv" data-d="${docId}" data-i="${i}" data-dir="-1">위로</button><button data-act="gmv" data-d="${docId}" data-i="${i}" data-dir="1">아래로</button><button data-act="gexv" data-x="${it.ex}">기록 보기</button><button class="warn" data-act="gexdel" data-d="${docId}" data-i="${i}">운동 삭제</button></div>`:'';
+      const menu=S.gmenu===mk?gExMenu(docId,i,it,ex,rest,mk):'';
+      const ssNext=it.ss&&(d.items||[]).some((x,k)=>k>i&&x.ss===it.ss),ssPrev=it.ss&&i>0&&d.items[i-1].ss===it.ss,ssFirst=it.ss&&!(d.items||[]).some((x,k)=>k<i&&x.ss===it.ss);
       const rows=(it.sets||[]).map((s,j)=>{
-        const p=prev&&prev[j],ph=p||((it.sets[j-1])||{});const done=mode==='w'&&s.done;
+        const p=gPrevAt(prev,it.sets,j),ph=p||((it.sets[j-1])||{});const done=mode==='w'&&s.done;
         const inp=f=>`<input class="gin" type="text" inputmode="${f==='w'?'decimal':'numeric'}" enterkeyhint="next" data-gs="${docId}|${i}|${j}|${f}" value="${esc(s[f]==null?'':String(s[f]))}" placeholder="${esc(ph[f]!=null&&ph[f]!==''?String(ph[f]):'')}" aria-label="${j+1}세트 ${f==='w'?'무게':ex.kind==='t'?'분':'횟수'}">`;
         const sk=`set|${docId}|${i}|${j}`,active=S.grest&&S.grest.w===docId&&S.grest.i===i&&S.grest.j===j;
-        const rs=mode==='w'&&rest?(active?`<div class="grs on"><button data-act="gradj" data-v="-15">−15</button><button class="grbar" data-act="gskip"><u data-gt="restbar" style="width:${((S.grest.end-Date.now())/1000/S.grest.total*100).toFixed(1)}%"></u><span data-gt="rest">${mmss((S.grest.end-Date.now())/1000)}</span></button><button data-act="gradj" data-v="15">+15</button></div>`:`<div class="grs"><i></i><span>${mmss(rest)}</span><i></i></div>`):'';
+        const rs=mode==='w'&&rest&&!ssNext?(active?`<div class="grs on"><button data-act="gradj" data-v="-15">−15</button><button class="grbar" data-act="gskip"><u data-gt="restbar" style="width:${((S.grest.end-Date.now())/1000/S.grest.total*100).toFixed(1)}%"></u><span data-gt="rest">${mmss((S.grest.end-Date.now())/1000)}</span></button><button data-act="gradj" data-v="15">+15</button></div>`:`<div class="grs"><i></i><span>${mmss(rest)}</span><i></i></div>`):'';
         return `<div class="gsr ${done?'done':''} ${s.type==='W'?'warm':''} k-${ex.kind}"><button class="gsn" data-act="gmenu" data-k="${sk}">${s.type==='W'?'W':j+1-(it.sets.slice(0,j).filter(x=>x.type==='W').length)}</button>${mode!=='t'?`<span class="gpv">${p?esc(gSetTxt(ex,p)):'—'}</span>`:''}${ex.kind==='w'?inp('w'):''}${inp('r')}${mode==='w'?`<button class="gck ${done?'on':''}" data-act="gdone" data-d="${docId}" data-i="${i}" data-j="${j}" aria-label="${j+1}세트 완료">${icon('check')}</button>`:`<button class="gck x" data-act="gsdel" data-d="${docId}" data-i="${i}" data-j="${j}" aria-label="세트 삭제">×</button>`}</div>
           ${S.gmenu===sk?`<div class="gmenu"><button data-act="gwarm" data-d="${docId}" data-i="${i}" data-j="${j}">${s.type==='W'?'일반 세트로':'워밍업 세트로'}</button><button class="warn" data-act="gsdel" data-d="${docId}" data-i="${i}" data-j="${j}">세트 삭제</button></div>`:''}${rs}`}).join('');
-      return `<section class="gex"><header><button class="gexn" data-act="gexv" data-x="${it.ex}">${esc(ex.name)}</button><button class="gdot" data-act="gmenu" data-k="${mk}" aria-label="운동 메뉴">${icon('more')}</button></header>${menu}
+      return `<section class="gex${it.ss?' ss':''}${ssPrev?' mid':''}"${it.ss?` style="--ssc:${gSSColor(it.ss)}"`:''}>${ssFirst?'<p class="gsstag">슈퍼세트</p>':''}<header><button class="gexn" data-act="gexv" data-x="${it.ex}">${gAv(ex,'sm')}<span>${esc(ex.name)}</span></button><button class="gdot" data-act="gmenu" data-k="${mk}" aria-label="운동 메뉴">${icon('more')}</button>${menu}</header>
+        ${ex.sticky!=null?`<div class="gstick">${icon('gpin')}<textarea rows="1" data-gxs="${ex.id}" placeholder="이 운동을 할 때마다 보이는 메모">${esc(ex.sticky)}</textarea></div>`:''}${it.note!=null?`<textarea class="gitnote" rows="1" data-gin="${docId}|${i}" placeholder="이번 운동 메모">${esc(it.note)}</textarea>`:''}
         <div class="gsr gsh k-${ex.kind} ${mode==='t'?'tpl':''}"><span>세트</span>${mode!=='t'?'<span>이전</span>':''}${cols.map(c=>`<span>${c}</span>`).join('')}<span>${mode==='w'?icon('check'):''}</span></div>${rows}
-        <button class="gadd" data-act="gsadd" data-d="${docId}" data-i="${i}">+ 세트 추가${mode==='w'&&rest?` (${mmss(rest)})`:''}</button></section>`;
+        <button class="gadd" data-act="gsadd" data-d="${docId}" data-i="${i}">+ 세트 추가${mode==='w'&&rest&&!ssNext?` (${mmss(rest)})`:''}</button></section>`;
     }).join('');
   }
   function gWorkoutSheet(id){
@@ -2525,8 +2722,9 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   function gPicker(){
     const sel=S.gpsel,all=gExAll().filter(x=>!S.gpart||x.part===S.gpart),used={};gDone().forEach(w=>(w.items||[]).forEach(it=>{used[it.ex]=Math.max(used[it.ex]||0,w.start)}));
     const recent=all.filter(x=>used[x.id]).sort((a,b)=>used[b.id]-used[a.id]).slice(0,8),rest=all.slice().sort((a,b)=>a.name.localeCompare(b.name,'ko'));
-    const row=x=>`<button class="gexr ${sel.includes(x.id)?'on':''}" data-act="gpsel" data-x="${x.id}" data-gq="${esc(normT(x.name+' '+GPK[x.part]+' '+x.part))}">${gAv(x)}<span><b>${esc(x.name)}</b><small>${GPK[x.part]||x.part}</small></span><em>${sel.includes(x.id)?icon('check'):''}</em></button>`;
-    return `<div class="gsheet-h"><button class="gib" data-act="gpclose" aria-label="닫기">×</button><b class="gst">운동 추가</b><button class="gtxt" data-act="gpadd" ${sel.length?'':'disabled'}>추가${sel.length?` (${sel.length})`:''}</button></div>
+    const rp=S.grepl!=null;
+    const row=x=>`<button class="gexr ${sel.includes(x.id)?'on':''}" data-act="${rp?'gprepl':'gpsel'}" data-x="${x.id}" data-gq="${esc(normT(x.name+' '+GPK[x.part]+' '+x.part))}">${gAv(x)}<span><b>${esc(x.name)}</b><small>${GPK[x.part]||x.part}</small></span><em>${sel.includes(x.id)?icon('check'):''}</em></button>`;
+    return `<div class="gsheet-h"><button class="gib" data-act="gpclose" aria-label="닫기">×</button><b class="gst">${rp?'운동 대체':'운동 추가'}</b>${rp?'<span style="width:40px"></span>':`<button class="gtxt" data-act="gpadd" ${sel.length?'':'disabled'}>추가${sel.length?` (${sel.length})`:''}</button>`}</div>
       <div class="gsh2"><label class="psrch gsrch">${icon('search')}<input id="gpq" placeholder="검색" autocomplete="off"></label><select id="gpartSel2" class="psel" aria-label="신체 부위"><option value="">모든 부위</option>${GPARTS.map(p=>`<option value="${p}" ${S.gpart===p?'selected':''}>${GPK[p]}</option>`).join('')}</select><button class="gpill" data-act="gexnew" data-from="pick">${icon('plus')}새 운동</button></div>
       <div class="gexl">${recent.length?`<h4>최근</h4>${recent.map(row).join('')}<h4>전체</h4>`:''}${rest.map(row).join('')}</div>`;
   }
@@ -2546,7 +2744,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     const mx=Math.max(1,...pts),mn=Math.min(...pts,mx);
     const spark=pts.length>1?`<svg class="gspark" viewBox="0 0 300 70" preserveAspectRatio="none"><polyline fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${pts.map((v,i)=>`${(i/(pts.length-1)*296+2).toFixed(1)},${(66-(v-mn)/((mx-mn)||1)*60).toFixed(1)}`).join(' ')}"/></svg>`:'';
     return `<div class="gsheet-h"><button class="gib" data-act="gexvclose" aria-label="닫기">×</button><b class="gst">${esc(ex.name)}</b><button class="gtxt" data-act="gexedit" data-x="${id}">수정</button></div>
-      <div class="gexh">${gAv(ex)}<span>${GPK[ex.part]||ex.part} · ${GKIND[ex.kind]} · 기본 휴식 ${mmss(ex.rest)}</span></div>
+      <div class="gexh">${gAv(ex,'lg')}<span>${GPK[ex.part]||ex.part} · ${GKIND[ex.kind]} · 기본 휴식 ${mmss(ex.rest)}</span></div>
       <div class="gstats"><div><b>${ss.length}</b><span>수행 횟수</span></div><div><b>${best?gFmtN(best)+(ex.kind==='w'?' kg':ex.kind==='t'?'분':' 렙'):'—'}</b><span>${ex.kind==='w'?'최고 무게':'최고 기록'}</span></div>${ex.kind==='w'?`<div><b>${rm?Math.round(rm)+' kg':'—'}</b><span>추정 1RM</span></div>`:''}</div>
       ${spark?`<div class="gchart"><span class="gnote">${ex.kind==='w'?'추정 1RM':'최고 횟수'} 추이 (최근 ${pts.length}회)</span>${spark}</div>`:''}
       <div class="gexhist">${ss.length?ss.slice(0,30).map(x=>{const d=new Date(x.w.start);return `<div class="gexhr"><span>${d.getMonth()+1}.${d.getDate()} ${WDK[d.getDay()]}<small>${esc(x.w.name||'')}</small></span><span>${x.sets.map(s=>esc(gSetTxt(ex,s))).filter(Boolean).join('<br>')}</span></div>`}).join(''):'<p class="empty">아직 기록이 없습니다.</p>'}</div>`;
@@ -2707,9 +2905,9 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     gcancel:()=>{if(!S.gcancel){S.gcancel=true;render();return}const id=S.gview;remove(id);S.gview=null;S.gcancel=false;S.grest=null;gSaveRest();flash('워크아웃을 취소했습니다 (Ctrl+Z로 되돌리기)');render()},
     gdone:b=>{gUnlockAudio();const{d:id,i,j}=b.dataset,ii=+i,jj=+j;const w=D(id),it=w.items[ii],s=it.sets[jj],ex=gEx(it.ex);
       const turnOn=!s.done;
-      if(turnOn){const prev=gPrevSets(it.ex,w.start),p=(prev&&prev[jj])||it.sets[jj-1]||{};
+      if(turnOn){const prev=gPrevSets(it.ex,w.start),p=gPrevAt(prev,it.sets,jj)||it.sets[jj-1]||{};
         update(id,d=>{const x=d.items[ii].sets[jj];if(x.w===''||x.w==null)x.w=p.w!=null?String(p.w):'';if(x.r===''||x.r==null)x.r=p.r!=null?String(p.r):'';x.done=true},true);
-        const rest=it.rest!=null?it.rest:ex.rest;if(w.active)gStartRest(id,ii,jj,rest)}
+        const rest=it.rest!=null?it.rest:ex.rest,ssNext=it.ss&&w.items.some((x,k)=>k>ii&&x.ss===it.ss);if(w.active&&!ssNext)gStartRest(id,ii,jj,rest)}
       else{update(id,d=>{d.items[ii].sets[jj].done=false},true);if(S.grest&&S.grest.w===id&&S.grest.i===ii&&S.grest.j===jj){S.grest=null;gSaveRest()}}
       render()},
     gskip:()=>{S.grest=null;gSaveRest();render()},
@@ -2717,19 +2915,34 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     gsadd:b=>{const{d:id,i}=b.dataset;update(id,d=>{const it=d.items[+i];const last=it.sets[it.sets.length-1]||{};it.sets.push({w:last.w||'',r:last.r||'',done:false,type:''})},true);render()},
     gsdel:b=>{const{d:id,i,j}=b.dataset;update(id,d=>{d.items[+i].sets.splice(+j,1)},true);S.gmenu=null;render()},
     gwarm:b=>{const{d:id,i,j}=b.dataset;update(id,d=>{const s=d.items[+i].sets[+j];s.type=s.type==='W'?'':'W'},true);S.gmenu=null;render()},
-    gmenu:b=>{const k=b.dataset.k;S.gmenu=S.gmenu===k?null:k;S.gconfirm=null;render()},
-    grest:b=>{const{d:id,i,s}=b.dataset;update(id,d=>{d.items[+i].rest=+s},true);S.gmenu=null;render()},
+    gmenu:b=>{const k=b.dataset.k;S.gmenu=S.gmenu===k?null:k;S.gsub=null;S.gconfirm=null;render()},
+    gmsub:b=>{S.gsub=b.dataset.v||null;render()},
+    gnoteadd:b=>{const{d:id,i}=b.dataset,had=D(id).items[+i].note!=null;update(id,d=>{const it=d.items[+i];if(had)delete it.note;else it.note=''},true);S.gmenu=null;render();
+      if(!had)setTimeout(()=>{const n=document.querySelector(`[data-gin="${id}|${i}"]`);if(n)n.focus()},30)},
+    gstick:b=>{const x=b.dataset.x,had=gEx(x).sticky!=null;update(x,d=>{if(had)delete d.sticky;else d.sticky=''},true);S.gmenu=null;render();
+      if(!had)setTimeout(()=>{const n=document.querySelector(`[data-gxs="${x}"]`);if(n)n.focus()},30)},
+    gwarmadd:b=>{const{d:id,i}=b.dataset;update(id,d=>{const it=d.items[+i],f=(it.sets||[]).find(x=>x.type!=='W'&&gNum(x.w))||(it.sets||[])[0]||{};const w=gNum(f.w)?String(Math.round(gNum(f.w)*0.5/2.5)*2.5):'';
+      it.sets=it.sets||[];it.sets.splice((it.sets.findIndex(x=>x.type!=='W')+1||it.sets.length+1)-1,0,{w,r:f.r!=null&&f.r!==''?String(f.r):'',done:false,type:'W'})},true);S.gmenu=null;render()},
+    grepl:b=>{const{d:id,i}=b.dataset;S.gpick=id;S.grepl=+i;S.gpsel=[];S.gmenu=null;render()},
+    gssset:b=>{const{d:id,i,t}=b.dataset;update(id,d=>{const A=d.items[+i],B=d.items[+t];const k=B.ss||A.ss||gId('ss');A.ss=k;B.ss=k;
+        /* 묶은 운동을 바로 아래로 모아 둠 */
+        const a=+i,bI=+t;if(Math.abs(a-bI)>1){const x=d.items.splice(bI,1)[0];const na=d.items.indexOf(A);d.items.splice(na+1,0,x)}},true);S.gmenu=null;S.gsub=null;render()},
+    gssoff:b=>{const{d:id,i}=b.dataset;update(id,d=>{const k=d.items[+i].ss;delete d.items[+i].ss;const left=d.items.filter(x=>x.ss===k);if(left.length===1)delete left[0].ss},true);S.gmenu=null;render()},
+    grest:b=>{const{d:id,i,s}=b.dataset;update(id,d=>{d.items[+i].rest=+s},true);S.gmenu=null;S.gsub=null;render()},
     gmv:b=>{const{d:id,i,dir}=b.dataset,a=+i,c=a+(+dir);update(id,d=>{if(c<0||c>=d.items.length)return;const x=d.items.splice(a,1)[0];d.items.splice(c,0,x)},true);S.gmenu=null;render()},
     gexdel:b=>{const{d:id,i}=b.dataset;update(id,d=>{d.items.splice(+i,1)},true);S.gmenu=null;render()},
     gpick:b=>{S.gpick=b.dataset.d;S.gpsel=[];S.gmenu=null;render();setTimeout(()=>{const n=document.getElementById('gpq');if(n&&wideSide.matches)n.focus()},30)},
-    gpclose:()=>{S.gpick=null;render()},
+    gpclose:()=>{S.gpick=null;S.grepl=null;render()},
+    gprepl:b=>{const id=S.gpick,i=S.grepl,x=b.dataset.x;if(id==null||i==null)return;const isW=id.startsWith('gw-');
+      update(id,d=>{const it=d.items[i];if(!it)return;const prev=isW?gPrevSets(x,d.start):null;it.ex=x;it.sets=(it.sets||[]).map((s,j)=>({w:prev&&prev[j]&&prev[j].w!=null?String(prev[j].w):'',r:prev&&prev[j]&&prev[j].r!=null?String(prev[j].r):'',done:false,type:s.type||''}));delete it.rest;delete it.note},true);
+      S.gpick=null;S.grepl=null;flash('운동을 바꿨습니다');render()},
     gpsel:b=>{const x=b.dataset.x,k=S.gpsel.indexOf(x);if(k>=0)S.gpsel.splice(k,1);else S.gpsel.push(x);b.classList.toggle('on');b.querySelector('em').innerHTML=k>=0?'':icon('check');const ad=document.querySelector('[data-act="gpadd"]');if(ad){ad.disabled=!S.gpsel.length;ad.textContent='추가'+(S.gpsel.length?` (${S.gpsel.length})`:'')}},
     gpadd:()=>{const id=S.gpick,isW=id.startsWith('gw-');if(!S.gpsel.length)return;
       update(id,d=>{d.items=d.items||[];S.gpsel.forEach(x=>{const prev=isW?gPrevSets(x,d.start):null;const n=prev?prev.length:3;d.items.push({ex:x,sets:Array.from({length:Math.max(1,n)},(_,j)=>({w:prev&&prev[j]?String(prev[j].w==null?'':prev[j].w):'',r:prev&&prev[j]?String(prev[j].r==null?'':prev[j].r):'',done:false,type:prev&&prev[j]&&prev[j].type||''}))})})},true);
       S.gpick=null;S.gpsel=[];render()},
     gexv:b=>{S.gexv=b.dataset.x;S.gmenu=null;render()},gexvclose:()=>{S.gexv=null;render()},
     gexnew:b=>{const q=(document.getElementById('gpq')||document.getElementById('gexq')||{}).value||'';S.gnew={name:q,part:S.gpart||'Other',kind:'w',rest:40,from:b.dataset.from||''};render();setTimeout(()=>{const n=document.getElementById('gxName');if(n)n.focus()},30)},
-    gexedit:b=>{const x=gEx(b.dataset.x);S.gnew={id:x.id,name:x.name,part:x.part,kind:x.kind,rest:x.rest};render()},
+    gexedit:b=>{const x=gEx(b.dataset.x);S.gmenu=null;S.gsub=null;S.gnew={id:x.id,name:x.name,part:x.part,kind:x.kind,rest:x.rest};render()},
     gexnewclose:()=>{S.gnew=null;render()},
     gexsave:()=>{const n=(document.getElementById('gxName').value||'').trim();if(!n){flash('운동 이름을 적어 주세요');render();return}
       const v={name:n,part:document.getElementById('gxPart').value,kind:document.getElementById('gxKind').value,rest:Math.max(0,parseInt(document.getElementById('gxRest').value,10)||0)};
@@ -3735,6 +3948,8 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     if(t.id==='qa'){cmpSync();return}
     if(t.id==='wsearch'){S.wq=t.value;wFilterDom();return}
     if(t.dataset&&t.dataset.gs){gSetInput(t);return}
+    if(t.dataset&&t.dataset.gin){const[id,i]=t.dataset.gin.split('|');if(S.docs[id])update(id,d=>{const it=d.items[+i];if(it)it.note=t.value});return}
+    if(t.dataset&&t.dataset.gxs){const x=t.dataset.gxs;update(x,d=>{d.sticky=t.value});return}
     if(t.dataset&&t.dataset.gf){const[id,f]=t.dataset.gf.split('|');if(S.docs[id])update(id,d=>{d[f]=t.value});return}
     if(t.id==='gexq'||t.id==='gpq'){gFilter(t.id);return}
     if(t.id==='dqa'){const f=t.form;qaPreview(t.value,{due:f?f.dataset.d:'',list:'',tag:''},document.getElementById('dqprev'));return}
