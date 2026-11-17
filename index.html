@@ -108,7 +108,21 @@ svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;str
   .tab{writing-mode:horizontal-tb;border:1px solid var(--rule);border-radius:6px;padding:8px 10px;flex:0 0 auto}
   .tab.end{margin-top:0}
   .ttl h2{font-size:1.5rem}
+  .rail{display:none}
+  .mtab{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid var(--rule);
+    padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+  .mtab button{position:relative;display:grid;justify-items:center;gap:3px;padding:5px 0 3px;color:var(--ink-3);font-size:.66rem;font-weight:600;border-radius:10px}
+  .mtab button .ic{width:23px;height:23px}
+  .mtab button.on{color:var(--ac)}
+  .mtab button.on .ic{stroke-width:2.1}
+  .mdot{position:absolute;top:4px;left:calc(50% + 8px);width:8px;height:8px;border-radius:50%;background:#2bb565;box-shadow:0 0 0 2px #fff}
+  .mmore-bg{position:fixed;inset:0;z-index:19;background:rgba(20,28,40,.25)}
+  .mmore{position:fixed;left:10px;right:10px;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:21;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:10px;border-radius:18px;background:var(--page);box-shadow:0 16px 40px rgba(20,30,50,.22)}
+  .mmore button{display:grid;justify-items:center;gap:5px;padding:12px 4px;border-radius:12px;font-size:.74rem;font-weight:600;color:var(--ink-2);background:var(--fill)}
+  .mmore button .ic{width:22px;height:22px}
+  .mmore button.on{background:var(--ac-soft);color:var(--ac)}
 }
+@media (min-width:900px){.mtab,.mmore,.mmore-bg{display:none}}
 
 /* shared atoms */
 .lab{margin:0;font-family:var(--f-disp);font-weight:600;font-size:.62rem;letter-spacing:.16em;color:var(--ink-2);text-transform:uppercase}
@@ -1337,6 +1351,7 @@ label.tsi{cursor:pointer}
     trophy:'<path d="M7.5 4.5h9v4a4.5 4.5 0 0 1-9 0zM7.5 6H4.75v1.5A2.75 2.75 0 0 0 7.5 10.25M16.5 6h2.75v1.5a2.75 2.75 0 0 1-2.75 2.75M12 13v3.5M8.5 19.75h7M9.5 16.5h5v3.25h-5z"/>',
     folder2:'<path d="M3.75 7.5c0-1 .8-1.75 1.75-1.75h4l2 2.25h7c1 0 1.75.8 1.75 1.75v7.5c0 1-.8 1.75-1.75 1.75h-13c-1 0-1.75-.8-1.75-1.75z"/>',
     panel:'<rect x="3.75" y="4.75" width="16.5" height="14.5" rx="2.75"/><path d="M9.25 4.75v14.5"/>',
+    gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3.75v2M12 18.25v2M3.75 12h2M18.25 12h2M6.2 6.2l1.4 1.4M16.4 16.4l1.4 1.4M6.2 17.8l1.4-1.4M16.4 7.6l1.4-1.4"/>',
     gantt:'<path d="M4 6.5h8.5M8 12h11.5M6 17.5h7"/>',
     sync:'<path d="M19.5 12a7.5 7.5 0 0 1-12.9 5.2M4.5 12A7.5 7.5 0 0 1 17.4 6.8M17.75 3.5v3.6h-3.6M6.25 20.5v-3.6h3.6"/>',
     upload:'<path d="M12 15.5V4.5M7.75 8.5L12 4.25l4.25 4.25M4.75 15v3.25c0 .97.78 1.75 1.75 1.75h11c.97 0 1.75-.78 1.75-1.75V15"/>',
@@ -2097,6 +2112,14 @@ label.tsi{cursor:pointer}
   function pushBar(){const o=overdueList();return o.length?`<div class="pushbar"><span>기한 지난 할 일 <b>${o.length}</b>개</span><button class="btn sm" data-act="tpushall">오늘로 연기</button></div>`:''}
   function msBar(){if(!S.msel.size||S.view!=='tasks')return'';const n=[...S.msel].filter(id=>S.docs[id]).length;if(!n){S.msel.clear();return''}
     return `<div class="mbar" role="toolbar" aria-label="선택한 할 일"><b>${n}개 선택</b><button data-act="mmove" data-v="${TODAY}">오늘</button><button data-act="mmove" data-v="${addD(TODAY,1)}">내일</button><button data-act="mmove" data-v="${addD(wkStart(TODAY),8)}">다음 주 월</button><button data-act="mmove" data-v="">날짜 없음</button><button data-act="mdone">완료</button><button class="warn" data-act="mdel">삭제</button><button data-act="mclear">선택 해제</button><span class="mhint">끌어서 날짜·목록으로 옮기기 · Esc 해제</span></div>`}
+  /* 모바일 하단 탭 (아이콘 + 글자) */
+  S.mmore=false;
+  function mtabHtml(){
+    const tl=S.tl||'',cur=S.view==='tasks'?(tl==='gym'?'gym':isCalK(tl)?'cal':(tl==='dash'||tl==='work')?'more':'todo'):S.view==='day'?'diary':'more';
+    const T=[['todo','list','할 일'],['cal','cal','캘린더'],['gym','gym','운동'],['diary','pen','일기'],['more','more','더보기']];
+    const more=S.mmore?`<div class="mmore-bg" data-act="mt" data-v="close"></div><div class="mmore" role="menu">${[['dash','dash','대시보드'],['work','brief','포트폴리오'],['year','cald','YEAR'],['month','cal','MONTH'],['week','calw','WEEK'],['notes','book','NOTES'],['habit','donebox','HABIT'],['goal','flag','GOAL'],['setting','gear','설정']].map(([k,ic,n])=>`<button data-act="mgo" data-v="${k}" class="${(S.view===k)||(S.view==='tasks'&&S.tl===k)?'on':''}">${icon(ic)}<span>${n}</span></button>`).join('')}</div>`:'';
+    return `${more}<nav class="mtab" aria-label="모바일 메뉴">${T.map(([k,ic,n])=>`<button data-act="mt" data-v="${k}" class="${cur===k||(k==='more'&&S.mmore)?'on':''}" aria-current="${cur===k?'page':'false'}">${icon(ic)}<span>${n}</span>${k==='gym'&&gActive()?'<i class="mdot"></i>':''}</button>`).join('')}</nav>`;
+  }
   function toggleDone(id){if(!S.docs[id])return;update(id,d=>{d.done=!d.done;d.doneAt=d.done?Date.now():0},true);scheduleAlarm(id,300);render()}
   S.undo=null;let undoT=null;
   /* Ctrl+Space 빠른 추가 팝업 (할 일 · 일정) */
@@ -2894,7 +2917,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
         <div class="tlist">${r.body}</div>
       </section>
       ${inlineD?`<aside class="tdetail">${det==='t'?taskDetail(S.tsel):workDetail(S.wsel)}</aside>`:''}
-      <nav class="rail" aria-label="다이어리 탭">${VIEWS.map(v=>`<button class="tab ${v===S.view?'on':''} ${v==='setting'?'end':''}" data-act="tab" data-v="${v}" aria-current="${v===S.view?'page':'false'}">${v.toUpperCase()}</button>`).join('')}</nav>
+      <nav class="rail" aria-label="다이어리 탭">${VIEWS.map(v=>`<button class="tab ${v===S.view?'on':''} ${v==='setting'?'end':''}" data-act="tab" data-v="${v}" aria-current="${v===S.view?'page':'false'}">${v.toUpperCase()}</button>`).join('')}</nav>${mtabHtml()}
     </div>${!showSide&&S.side?`<div class="sheet-bg" data-act="side"></div><aside class="drawer" aria-label="목록">${sideHtml()}</aside>`:''}`;
   }
   function taskDetail(id){
@@ -3267,7 +3290,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
       <div class="book">
         <section class="pg left"><header class="ph"><div class="ttl"><h2>${r.title}</h2><span class="sub">${r.sub||''}</span></div>${navHtml(r,'n-narrow')}</header><div class="pc">${r.left}</div><footer class="pf"><span>${r.footL||''}</span></footer></section>
         <section class="pg right"><header class="ph">${r.tools||''}${navHtml(r,'n-wide')}</header><div class="pc">${r.right}</div><footer class="pf"><span></span><span>${r.footR||''}</span></footer></section>
-        <nav class="rail" aria-label="다이어리 탭">${VIEWS.map(v=>`<button class="tab ${v===S.view?'on':''} ${v==='setting'?'end':''}" data-act="tab" data-v="${v}" aria-current="${v===S.view?'page':'false'}">${v.toUpperCase()}</button>`).join('')}</nav>
+        <nav class="rail" aria-label="다이어리 탭">${VIEWS.map(v=>`<button class="tab ${v===S.view?'on':''} ${v==='setting'?'end':''}" data-act="tab" data-v="${v}" aria-current="${v===S.view?'page':'false'}">${v.toUpperCase()}</button>`).join('')}</nav>${mtabHtml()}
       </div>${sheet}${toast}${qpHtml()}${gymOverlay()}`;
     gScrollRestore(gss);
     app.querySelectorAll('textarea.ta').forEach(autosize);
@@ -3286,6 +3309,12 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     else if(v==='tasks'){const k=S.tl;if(k==='cal:w'||k==='cal:a')S.cur=addD(S.cur,7*dir);else if(k==='cal:3')S.cur=addD(S.cur,3*dir);else if(k==='cal:d')S.cur=addD(S.cur,dir);else if(k==='cal:y')S.cur=addM(S.cur,12*dir);else S.cur=addM(S.cur,dir);if(!S.qa.pick)S.qa.due=S.cur}
   }
   const ACT={
+    mt:b=>{const v=b.dataset.v;flushAll();S.tsel=null;S.wsel=null;S.side=false;S.dp=null;S.mm=false;S.confirm=null;
+      if(v==='close'){S.mmore=false;render();return}if(v==='more'){S.mmore=!S.mmore;render();return}S.mmore=false;
+      if(v==='diary'){S.view='day';S.cur=TODAY}
+      else{S.view='tasks';S.cur=TODAY;const ll=S.lastList;S.tl=v==='gym'?'gym':v==='cal'?(S.lastCal||'cal:m'):(ll&&!isCalK(ll)&&!['gym','dash','work'].includes(ll)?ll:'today')}
+      try{localStorage.setItem(LSV,S.view);localStorage.setItem('diarybook-tl',S.tl)}catch(e){}render();window.scrollTo(0,0)},
+    mgo:b=>{const v=b.dataset.v;S.mmore=false;if(v==='dash'||v==='work'){flushAll();S.view='tasks';S.tl=v;S.tsel=null;S.wsel=null;try{localStorage.setItem(LSV,'tasks');localStorage.setItem('diarybook-tl',v)}catch(e){}render();window.scrollTo(0,0);return}ACT.tab({dataset:{v}})},
     tab:b=>{flushAll();S.view=b.dataset.v;S.confirm=null;S.tsel=null;S.wsel=null;S.dp=null;S.mm=false;S.tp=null;if(S.view==='tasks'){S.cur=TODAY;S.side=false;S.qa.pick=false;S.qa.due=qaCtx().due}try{localStorage.setItem(LSV,S.view)}catch(e){}render();window.scrollTo(0,0)},
     prev:()=>{flushAll();S.tp=null;shift(-1);render()},
     next:()=>{flushAll();S.tp=null;shift(1);render()},
