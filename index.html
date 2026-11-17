@@ -682,6 +682,13 @@ a.tci{text-decoration:none}
 .tcal td.dim .dn{opacity:.35}
 .tcal td.sel{box-shadow:inset 0 0 0 2px var(--ac);background:var(--ac-soft)}
 .tcal td.over{background:var(--fill)}
+.tcal td.pic{background:center/cover no-repeat}
+.tcal td.pic .tcell{background:linear-gradient(180deg,rgba(0,0,0,.28),transparent 45%,rgba(0,0,0,.2))}
+.tcal td.pic .tcell:hover{background-color:transparent}
+.tcal td.pic.sel{box-shadow:inset 0 0 0 3px var(--ac)}
+.tcal td.pic .pcnt{margin-top:auto;align-self:flex-end;font-size:.62rem;font-weight:700;color:#fff;background:rgba(0,0,0,.45);border-radius:99px;padding:0 6px}
+.tcbar{display:flex;justify-content:flex-end;margin:0 0 6px}
+.tcbar .seg button{font-size:.74rem;padding:3px 10px}
 .tcell{display:flex;flex-direction:column;gap:2px;height:100%;padding:4px 5px;cursor:pointer;overflow:hidden}
 .tcell:hover{background:var(--fill)}
 .tci{display:block;width:100%;font-size:.66rem;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;border-left:2px solid var(--ink-3);padding-left:4px;color:var(--ink)}
@@ -2333,18 +2340,20 @@ label.tsi{cursor:pointer}
   function calMonth(){
     const d0=parse(S.cur),y=d0.getFullYear(),m=d0.getMonth(),end=new Date(y,m+1,0),weeks=[];
     for(let s=wkStart(ymd(new Date(y,m,1)));parse(s)<=end;s=addD(s,7))weeks.push(s);
-    const by=byDue(),W=wideSide.matches,lim=W?3:2;
+    const by=byDue(),W=wideSide.matches,lim=W?3:2,photo=!!cfg().photoMode;
     const cell=id=>{
-      const dt=parse(id),out=dt.getMonth()!==m,ts=by[id]||[];
+      const dt=parse(id),out=dt.getMonth()!==m,ts=by[id]||[],ph=photo&&!out?(D(id).photos||[]):[],pic=ph.length?src(ph[0]):'';
       const items=ts.map(t=>chipFor(t,W));
       gDay(id).forEach(e=>items.push(`<span class="tci g" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}">${esc(e.title)}</span>`));
       const more=items.length>lim?`<span class="tci more">+${items.length-lim}</span>`:'';
-      return `<td class="${id===TODAY?'today':''} ${id===S.cur?'sel':''} ${out?'dim':''}" data-drop="${id}"><div class="tcell" data-act="tday" data-d="${id}" role="button" tabindex="0" aria-label="${dt.getMonth()+1}월 ${dt.getDate()}일 · 할 일 ${ts.filter(t=>!t.done).length}개"><span class="dn">${dt.getDate()}</span>${items.slice(0,lim).join('')}${more}</div></td>`;
+      const open=ts.filter(t=>!t.done).length;
+      return `<td class="${id===TODAY?'today':''} ${id===S.cur?'sel':''} ${out?'dim':''} ${pic?'pic':''}" data-drop="${id}"${pic?` style="background-image:url('${esc(pic)}')"`:''}><div class="tcell" data-act="tday" data-d="${id}" role="button" tabindex="0" aria-label="${dt.getMonth()+1}월 ${dt.getDate()}일 · 할 일 ${open}개${ph.length?' · 사진 '+ph.length+'장':''}"><span class="dn">${dt.getDate()}</span>${pic?(items.length?`<span class="pcnt">${items.length}</span>`:''):items.slice(0,lim).join('')+more}</div></td>`;
     };
     const grid=`<table class="cal tcal"><thead><tr>${WDC.map(w=>`<th>${W?w:w.slice(0,2)}</th>`).join('')}</tr></thead><tbody>${weeks.map(s=>`<tr>${[0,1,2,3,4,5,6].map(i=>cell(addD(s,i))).join('')}</tr>`).join('')}</tbody></table>`;
     const sel=S.cur,diff=Math.round((parse(sel)-parse(TODAY))/864e5),rel=diff===0?'오늘':diff===1?'내일':diff===-1?'어제':'';
     const agenda=`<div class="agenda"><div class="agh"><h3>${md(sel)} ${WDK[parse(sel).getDay()]}요일</h3>${rel?`<span class="sub">${rel}</span>`:''}<button class="lnk" data-act="tl" data-k="cal:d">일 보기 →</button></div><div class="agcols"><div class="agc">${dayTasks(sel,true)}</div><div class="agc agev">${evCol(sel)}</div></div></div>`;
-    return{title:`${y}년 ${m+1}월`,nav:true,body:`${pushBar()}${grid}${W?'<span class="gnote">할 일을 다른 날짜 칸으로 끌어다 놓으면 날짜가 바뀝니다.</span>':''}${agenda}`};
+    const pbar=`<div class="tcbar"><div class="seg" role="group" aria-label="달력 보기"><button data-act="mode" data-m="0" aria-pressed="${!photo}">글자</button><button data-act="mode" data-m="1" aria-pressed="${photo}">사진</button></div></div>`;
+    return{title:`${y}년 ${m+1}월`,nav:true,body:`${pushBar()}${pbar}${grid}${W?'<span class="gnote">할 일을 다른 날짜 칸으로 끌어다 놓으면 날짜가 바뀝니다.</span>':''}${agenda}`};
   }
   function calWeek(n){
     n=n||7;const s=n===7?wkStart(S.cur):S.cur,by=byDue();
