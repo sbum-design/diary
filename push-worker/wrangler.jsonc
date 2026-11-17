@@ -1,0 +1,14 @@
+{
+  // Diary Book 휴식 타이머 푸시 알림 서버 (Cloudflare Workers 무료 플랜)
+  "name": "diary-push",
+  "main": "src/index.js",
+  "compatibility_date": "2025-06-01",
+  "vars": {
+    // 이 주소에서 오는 요청만 받습니다 (쉼표로 여러 개)
+    "ALLOWED_ORIGINS": "https://sbum-design.github.io"
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "TIMER", "class_name": "Timer" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Timer"] }]
+}
