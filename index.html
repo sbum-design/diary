@@ -2448,7 +2448,6 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
       return `<button class="gtc" data-act="gtpl" data-t="${t.id}"><b>${esc(t.name||'(이름 없음)')}</b><span class="gts">${esc(sum)||'운동 없음'}</span><span class="gtl">${icon('clock')}${gAgo(last[t.id]||last['n:'+(t.name||'')])}</span></button>`};
     const fl=Object.keys(folders).sort((x,y)=>x==='내 템플릿'?1:y==='내 템플릿'?-1:x.localeCompare(y));
     return `${a?`<button class="gact" data-act="gresume"><span><small>진행 중</small><b>${esc(a.name||'워크아웃')}</b></span><span class="gacr"><span data-gt="el">${gElapsed(Date.now()-a.start)}</span>${S.grest?` · 휴식 <span data-gt="rest">${mmss((S.grest.end-Date.now())/1000)}</span>`:''}<em>이어하기 →</em></span></button>`:''}
-      ${gPushCard()}
       <section class="gsec"><h3>빠른 시작</h3><button class="gbig" data-act="gstart">비어 있는 워크아웃 시작</button></section>
       <section class="gsec"><div class="gsh2"><h3>템플릿</h3><span class="gsp"></span><button class="gpill" data-act="gtnew">${icon('plus')}템플릿</button><label class="gpill" title="Strong 앱에서 내보낸 CSV 가져오기">${icon('upload')}Strong 가져오기<input class="sr" type="file" accept=".csv,text/csv" data-gimport="1"></label></div>
       ${ts.length?fl.map(f=>`<div class="gfold"><h4>${icon('folder2')}${esc(f)} <small>(${folders[f].length})</small></h4><div class="gtgrid">${folders[f].sort((x,y)=>(x.ord||0)-(y.ord||0)||String(x.name).localeCompare(String(y.name))).map(card).join('')}</div></div>`).join('')
@@ -3230,6 +3229,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
         <div class="li"><span>알림 시점</span><select class="sel" data-b="cfg|alarmMin">${[0,5,10,15,30,60].map(m=>`<option value="${m}" ${c.alarmMin===m?'selected':''}>${m?m+'분 전':'정시'}</option>`).join('')}</select></div>
         <span class="gnote">알림은 구글 캘린더 일정의 알림으로 옵니다. 폰의 구글 캘린더 앱 알림이 켜져 있어야 합니다.</span></div>
       <div class="set-row"><span class="lab">앱 아이콘 뱃지</span>${badgeRow()}</div>
+      <div class="set-row"><span class="lab">운동 휴식 알림</span>${gPushCard()}<span class="gnote">휴식 타이머가 끝나면 화면이 꺼져 있어도 이 기기로 알림을 보냅니다. 기기마다 한 번씩 켜 주세요.</span></div>
       <div class="set-row"><span class="lab">기록 현황</span><div class="kv"><span>기록한 날</span><span class="mono">${dayKeys.filter(dayHas).length}일</span><span>노트</span><span class="mono">${keys.filter(k=>k.startsWith('note-')).length}편</span><span>습관</span><span class="mono">${c.habits.length}개</span><span>사진</span><span class="mono">${photos}장</span></div></div></div>`;
     const right=`<ul class="tips">
       <li><b>TASKS</b> 입력칸에 한 줄로 적으면 날짜·시간·우선순위·목록을 알아서 나눕니다.<br>날짜: 오늘 · 내일 · 모레 · 금요일 · 다음주 화요일 · 11월 3일 · 11/3 · 3일 후<br>시간: 3시 · 오전 9시 · 오후 2시 반 · 14:30<br>우선순위: !높음 · !중간 · !낮음 (또는 !1 · !2 · !3)<br>목록·태그: #업무 (목록 이름이면 목록, 아니면 태그)</li>
