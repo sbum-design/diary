@@ -534,6 +534,8 @@ a.tci{text-decoration:none}
 .dc.s7{grid-column:span 7}.dc.s5{grid-column:span 5}
 .dcol{display:grid;gap:14px;align-content:start;min-width:0;grid-template-columns:minmax(0,1fr)}.dcol.s7{grid-column:span 7}.dcol.s5{grid-column:span 5}.dcol>.dc{grid-column:auto}
 .trow.msel{background:var(--ac-soft) !important;box-shadow:inset 3px 0 0 var(--ac)}
+.marq{position:fixed;z-index:190;pointer-events:none;border:1px solid var(--ac);background:color-mix(in srgb,var(--ac) 14%,transparent);border-radius:3px}
+body.mqing,body.mqing *{user-select:none!important;-webkit-user-select:none!important;cursor:default}
 .mbar{position:fixed;z-index:56;left:50%;bottom:22px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;flex-wrap:wrap;max-width:calc(100vw - 24px);padding:9px 12px;border-radius:14px;background:var(--tbg);color:#fff;box-shadow:0 12px 30px rgba(20,30,50,.3);font-size:.84rem}
 .mbar b{margin-right:4px}
 .mbar button{padding:5px 10px;border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font-size:.8rem}
@@ -4202,7 +4204,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
         st=s0;if(el)fire(el,'drop',s0.x,s0.y);fire(s0.src.isConnected?s0.src:app,'dragend',s0.x,s0.y);st=null;
         if(s0.ghost)s0.ghost.remove();document.body.classList.remove('pdrag');eatClick=true;setTimeout(()=>{eatClick=false},0)}};
     app.addEventListener('pointerdown',e=>{
-      if(e.pointerType!=='mouse'||e.button!==0)return;const src=e.target.closest&&e.target.closest('[draggable="true"]');if(!src)return;
+      if(e.pointerType!=='mouse'||e.button!==0)return;if(e.target.closest&&e.target.closest('.tchk'))return;const src=e.target.closest&&e.target.closest('[draggable="true"]');if(!src)return;
       if(e.target.closest('input,textarea,select'))return;
       st={src,x0:e.clientX,y0:e.clientY,x:e.clientX,y:e.clientY,started:false};
     });
@@ -4223,6 +4225,29 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     // 휠로 스크롤하면 마우스 아래 칸이 바뀌므로 다시 계산
     document.addEventListener('scroll',()=>{if(st&&st.started)over(st.x,st.y)},true);
     app.addEventListener('click',e=>{if(eatClick){eatClick=false;e.preventDefault();e.stopImmediatePropagation()}},true);
+  })();
+  /* 드래그로 여러 할 일 선택 (노션처럼): 빈 곳이나 체크박스에서 시작해 끌면 사각형 안의 할 일이 선택됨 */
+  (function marquee(){
+    let m=null,eat=false;
+    const okStart=e=>{if(e.pointerType==='touch'||e.button!==0||S.view!=='tasks')return false;const t=e.target;if(!t.closest)return false;
+      if(t.closest('.tchk'))return true;
+      if(t.closest('[draggable="true"],input,textarea,select,button,a,label,.mbar,.cmp2,.mtab,.rail,.side,.tcal,.lvx,[data-act],[contenteditable]'))return false;
+      return !!t.closest('.tmain,.tbook')};
+    const rows=()=>[...app.querySelectorAll('.trow-w[data-sw]')].filter(w=>isTask(w.dataset.sw));
+    app.addEventListener('pointerdown',e=>{if(!okStart(e))return;m={x0:e.clientX,y0:e.clientY,sx:scrollX,sy:scrollY,on:false,add:e.ctrlKey||e.metaKey||e.shiftKey,base:new Set(S.msel),chk:!!e.target.closest('.tchk')}});
+    const paint=(x,y)=>{const ax=m.x0+m.sx-scrollX,ay=m.y0+m.sy-scrollY,l=Math.min(ax,x),r=Math.max(ax,x),t=Math.min(ay,y),b=Math.max(ay,y);
+      Object.assign(m.box.style,{left:l+'px',top:t+'px',width:(r-l)+'px',height:(b-t)+'px'});
+      const sel=new Set(m.add?m.base:[]);rows().forEach(w=>{const rc=w.getBoundingClientRect();if(rc.bottom>t&&rc.top<b&&rc.right>l&&rc.left<r)sel.add(w.dataset.sw)});
+      S.msel=sel;app.querySelectorAll('.trow-w[data-sw]').forEach(w=>{const rw=w.querySelector('.trow');if(rw)rw.classList.toggle('msel',sel.has(w.dataset.sw))})};
+    document.addEventListener('pointermove',e=>{if(!m)return;if(!(e.buttons&1)){end();return}
+      if(!m.on){if(Math.hypot(e.clientX-m.x0,e.clientY-m.y0)<(m.chk?8:6))return;m.on=true;m.box=document.createElement('div');m.box.className='marq';document.body.appendChild(m.box);document.body.classList.add('mqing');window.getSelection&&window.getSelection().removeAllRanges()}
+      e.preventDefault();m.x=e.clientX;m.y=e.clientY;paint(e.clientX,e.clientY);
+      const E=36;if(e.clientY<E)window.scrollBy(0,-12);else if(e.clientY>innerHeight-E)window.scrollBy(0,12)},{passive:false});
+    document.addEventListener('scroll',()=>{if(m&&m.on)paint(m.x,m.y)},true);
+    const end=()=>{if(!m)return;const was=m.on;if(m.box)m.box.remove();document.body.classList.remove('mqing');m=null;
+      if(was){eat=true;setTimeout(()=>{eat=false},0);const ids=[...S.msel];if(ids.length)S.mlast=ids[ids.length-1];render()}};
+    document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);
+    document.addEventListener('click',e=>{if(eat){eat=false;e.preventDefault();e.stopImmediatePropagation()}},true);
   })();
   /* 끄는 동안 화면 위·아래 가장자리에 가면 자동으로 스크롤 (체크리스트·할 일 끌기 공통) */
   (function dragAutoScroll(){
