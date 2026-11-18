@@ -4204,7 +4204,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
         st=s0;if(el)fire(el,'drop',s0.x,s0.y);fire(s0.src.isConnected?s0.src:app,'dragend',s0.x,s0.y);st=null;
         if(s0.ghost)s0.ghost.remove();document.body.classList.remove('pdrag');eatClick=true;setTimeout(()=>{eatClick=false},0)}};
     app.addEventListener('pointerdown',e=>{
-      if(e.pointerType!=='mouse'||e.button!==0)return;if(e.target.closest&&e.target.closest('.tchk'))return;const src=e.target.closest&&e.target.closest('[draggable="true"]');if(!src)return;
+      if(e.pointerType!=='mouse'||e.button!==0)return;if(e.target.closest&&e.target.closest('.tchk'))return;if(S.view==='tasks'&&rowEmptySpot(e.target,e.clientX,e.clientY))return;const src=e.target.closest&&e.target.closest('[draggable="true"]');if(!src)return;
       if(e.target.closest('input,textarea,select'))return;
       st={src,x0:e.clientX,y0:e.clientY,x:e.clientX,y:e.clientY,started:false};
     });
@@ -4226,11 +4226,19 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     document.addEventListener('scroll',()=>{if(st&&st.started)over(st.x,st.y)},true);
     app.addEventListener('click',e=>{if(eatClick){eatClick=false;e.preventDefault();e.stopImmediatePropagation()}},true);
   })();
+  /* 할 일 줄의 '빈 곳'인지 (제목 글자·칩 위가 아니면 빈 곳) — 빈 곳에서 끌면 여러 개 선택, 글자 위에서 끌면 그 할 일 옮기기 */
+  function rowEmptySpot(t,x,y){const row=t.closest&&t.closest('.trow');if(!row)return false;
+    const w=row.closest('[data-sw]');if(w&&S.msel.has(w.dataset.sw)&&S.msel.size>1)return false;
+    if(t.closest('.tchk,input,textarea,.tact'))return false;
+    const tr=t.closest('.tr');if(tr&&t!==tr)return false;
+    const tt=row.querySelector('.tt');if(tt){try{const r=document.createRange();r.selectNodeContents(tt);for(const rc of r.getClientRects())if(x>=rc.left-3&&x<=rc.right+3&&y>=rc.top-2&&y<=rc.bottom+2)return false}catch(e){}}
+    return true}
   /* 드래그로 여러 할 일 선택 (노션처럼): 빈 곳이나 체크박스에서 시작해 끌면 사각형 안의 할 일이 선택됨 */
   (function marquee(){
     let m=null,eat=false;
     const okStart=e=>{if(e.pointerType==='touch'||e.button!==0||S.view!=='tasks')return false;const t=e.target;if(!t.closest)return false;
       if(t.closest('.tchk'))return true;
+      if(rowEmptySpot(t,e.clientX,e.clientY))return true;
       if(t.closest('[draggable="true"],input,textarea,select,button,a,label,.mbar,.cmp2,.mtab,.rail,.side,.tcal,.lvx,[data-act],[contenteditable]'))return false;
       return !!t.closest('.tmain,.tbook')};
     const rows=()=>[...app.querySelectorAll('.trow-w[data-sw]')].filter(w=>isTask(w.dataset.sw));
