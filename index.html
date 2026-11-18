@@ -974,6 +974,7 @@ button.tci:hover{background:var(--page)}
 .lvqi .qs:hover{background:rgba(255,255,255,.1)}
 .lvempty{margin:0;padding:26px 18px;color:#a39b8a;font-family:var(--fx);font-size:1.05rem;text-align:center;border:1px dashed rgba(255,255,255,.15);border-radius:6px}
 .lvform{position:relative;z-index:3;display:flex;gap:8px;padding:0 12px 12px;background:#07080b}
+.lvform select{border:2px solid rgba(233,225,207,.35);background:#0d0f13;color:var(--lt);padding:0 8px;font-size:.88rem}
 .lvform input{flex:1;min-width:0;border:2px solid rgba(233,225,207,.35);background:#0d0f13;color:var(--lt);padding:10px 12px;font-size:.95rem;outline:0}
 .lvform input:focus{border-color:var(--lg)}
 .lvform button{padding:8px 16px;background:var(--lg);color:#121317;font-family:var(--fx);font-size:1rem;box-shadow:3px 3px 0 #000}
@@ -983,7 +984,9 @@ button.tci:hover{background:var(--page)}
 .lvlr b{flex:1;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lvlr em{font-style:normal;font-family:"Lilita One",var(--f-disp);color:#c98a00;font-size:.95rem;font-variant-numeric:tabular-nums}
 .lvlr u{text-decoration:none;font-size:.7rem;color:var(--ink-3);width:34px;flex:none}
-.lvrule{display:grid;grid-template-columns:auto 1fr auto;gap:6px 12px;font-size:.84rem;margin:0}
+.lvlog .dcol.s5{order:0}
+.lvrule dd,.lvrule dt{white-space:nowrap}
+.lvrule{display:grid;grid-template-columns:1fr auto auto;gap:6px 12px;font-size:.84rem;margin:0}
 .lvrule dt{color:var(--ink-2)}.lvrule dd{margin:0}.lvrule .x{color:#c98a00;font-weight:800;text-align:right}
 @media (max-width:640px){
   .lvhero{grid-template-columns:minmax(0,1fr) 38%;min-height:300px}
@@ -996,6 +999,7 @@ button.tci:hover{background:var(--page)}
   .lvav .pic{left:-25%;right:-8%;top:4%}
   .lvemb{width:66px;right:6%}
   .lvtop b{font-size:2.3rem}.lvtop .up{font-size:1.25rem}.lvtop .wm{font-size:5rem}
+  .lvseason{font-size:.78rem;gap:6px}.lvseason::before,.lvseason::after{display:none}
   .lvtabs{gap:7px;padding:12px 10px 14px}
   .lvtabs button{font-size:.98rem;padding:9px 11px 8px}
   .lvqi{min-height:108px;padding:14px 12px 12px 14px}
@@ -2353,9 +2357,9 @@ label.tsi{cursor:pointer}
   /* 모바일 하단 탭 (아이콘 + 글자) */
   S.mmore=false;
   function mtabHtml(){
-    const tl=S.tl||'',cur=S.view==='tasks'?(tl==='review'?'review':isCalK(tl)?'cal':(tl==='dash'||tl==='work')?'more':'todo'):S.view==='day'?'diary':'more';
-    const T=[['todo','list','할 일'],['cal','cal','캘린더'],['review','review','주간회고'],['diary','pen','일기'],['more','more','더보기']];
-    const more=S.mmore?`<div class="mmore-bg" data-act="mt" data-v="close"></div><div class="mmore" role="menu">${[['quest','trophy','레벨'],['dash','dash','대시보드'],['work','brief','포트폴리오'],['year','cald','YEAR'],['month','cal','MONTH'],['week','calw','WEEK'],['notes','book','NOTES'],['habit','donebox','HABIT'],['goal','flag','GOAL'],['setting','gear','설정']].map(([k,ic,n])=>`<button data-act="mgo" data-v="${k}" class="${(S.view===k)||(S.view==='tasks'&&S.tl===k)?'on':''}">${icon(ic)}<span>${n}</span></button>`).join('')}</div>`:'';
+    const tl=S.tl||'',cur=S.view==='tasks'?(tl==='quest'?'quest':isCalK(tl)?'cal':(tl==='dash'||tl==='work'||tl==='review')?'more':'todo'):S.view==='day'?'diary':'more';
+    const T=[['todo','list','할 일'],['cal','cal','캘린더'],['quest','trophy','레벨'],['diary','pen','일기'],['more','more','더보기']];
+    const more=S.mmore?`<div class="mmore-bg" data-act="mt" data-v="close"></div><div class="mmore" role="menu">${[['review','review','주간회고'],['dash','dash','대시보드'],['work','brief','포트폴리오'],['year','cald','YEAR'],['month','cal','MONTH'],['week','calw','WEEK'],['notes','book','NOTES'],['habit','donebox','HABIT'],['goal','flag','GOAL'],['setting','gear','설정']].map(([k,ic,n])=>`<button data-act="mgo" data-v="${k}" class="${(S.view===k)||(S.view==='tasks'&&S.tl===k)?'on':''}">${icon(ic)}<span>${n}</span></button>`).join('')}</div>`:'';
     return `${more}<nav class="mtab" aria-label="모바일 메뉴">${T.map(([k,ic,n])=>`<button data-act="mt" data-v="${k}" class="${cur===k||(k==='more'&&S.mmore)?'on':''}" aria-current="${cur===k?'page':'false'}">${icon(ic)}<span>${n}</span></button>`).join('')}</nav>`;
   }
   function toggleDone(id){if(!S.docs[id])return;update(id,d=>{d.done=!d.done;d.doneAt=d.done?Date.now():0},true);scheduleAlarm(id,300);render()}
@@ -2469,9 +2473,9 @@ label.tsi{cursor:pointer}
         ${it('work',icon('brief'),'포트폴리오',wN)}
         ${it('review',icon('review'),'회고')}
         ${it('quest',icon('trophy'),'레벨')}
+        ${calIt}
         ${it('today',dayIc(+TODAY.slice(8)),'오늘',by('today'))}
         ${it('week',dayIc(WDK[parse(TODAY).getDay()]),'7일',by('week'))}
-        ${calIt}
         ${it('all',icon('stack'),'전체',by('all'))}
         ${it('inbox',icon('inbox'),'받은함',by('inbox'))}
       </div><div class="sdiv"></div>
@@ -2614,26 +2618,27 @@ label.tsi{cursor:pointer}
   function lvOf(xp){let n=1,r=xp;while(r>=LV_NEED(n)){r-=LV_NEED(n);n++}return{lv:n,cur:r,need:LV_NEED(n)}}
   const RANKS=[[80,'SS'],[60,'S'],[45,'A'],[30,'B'],[20,'C'],[10,'D'],[1,'E']];
   const rankOf=lv=>RANKS.find(r=>lv>=r[0])[1];
-  const XST={int:['지능','#5ab0ff'],agi:['민첩','#3ddc97'],vit:['체력','#ff6b5a'],sen:['감각','#c38bff'],wil:['의지','#f2b234']};
+  /* 자기계발 능력치 (나 혼자만 레벨업의 5가지 스탯) */
+  const XST={str:['힘','#ff6b5a'],agi:['민첩','#3ddc97'],vit:['체력','#ffb02e'],int:['지능','#5ab0ff'],sen:['감각','#c38bff']};
+  const HSTAT=[[/헬스|근력|스쿼트|푸시|웨이트|턱걸이|플랭크|^운동$|운동하기|헬스장/,'str'],[/걷기|러닝|달리|산책|스트레칭|골프|요가|수영|자전거|줄넘기|등산|만보/,'agi'],
+    [/독서|책|페이지|공부|영어|자격|강의|재무|신문|경제|투자|코딩|외국어|단어/,'int'],[/일기|기록|글|명상|감사|그림|사진|블로그|유튜브|악기|피아노|기타/,'sen']];
+  const hStat=h=>h.stat&&XST[h.stat]?h.stat:((HSTAT.find(([re])=>re.test(h.name||''))||[])[1]||'vit');
   const DIARY_F=['morning','joy','reset','tomorrow','comment','body','title','notes'];
+  const lvStart=()=>D('cfg').lvStart||TODAY;
   function xpCalc(){
     if(xpMemo)return xpMemo;
-    const L=[],add=(day,xp,st,lab)=>{if(day)L.push({day,xp,st,lab})};
-    tasks().forEach(t=>{if(!t.done||!t.doneAt)return;const day=ymd(new Date(t.doneAt));add(day,10+((t.pri||0)>=3?5:0),'int',t.title);if(t.due&&day<=t.due)add(day,5,'agi','기한 안에 완료');});
-    works().forEach(w=>{if(wStat(w)==='done')add(w.end||(w.updatedAt?ymd(new Date(w.updatedAt)):''),100,'int','업무 완료 · '+(w.title||''))});
-    Object.keys(S.docs).forEach(k=>{const d=S.docs[k];if(!d)return;
-      if(/^\d{4}-\d\d-\d\d$/.test(k)){
-        if(DIARY_F.some(f=>d[f]&&String(d[f]).trim())||['events','logs','todos'].some(f=>(d[f]||[]).some(x=>x&&x.text&&x.text.trim())))add(k,15,'sen','일기 기록');
-        if((d.photos||[]).length)add(k,5,'sen','사진 기록');
-        const hs=cfg().habits;Object.keys(d.habits||{}).forEach(h=>{if(d.habits[h]){const x=hs.find(z=>z.id===h);add(k,5,'vit',(x?x.name:'습관')+' 달성')}});
-      }else if(k.startsWith('rv-')&&((d.plan||'').trim()||(d.note||'').trim()))add(addD(k.slice(3),5),30,'int','주간 회고 작성');
-      else if(k.startsWith('gw-')&&!d.active&&d.end&&d.start)add(ymd(new Date(d.start)),15,'vit','운동 · '+(d.name||'워크아웃'));
+    const L=[],st0=lvStart(),add=(day,xp,st,lab)=>{if(day&&day>=st0&&day<=TODAY)L.push({day,xp,st,lab})};
+    const hs=cfg().habits;
+    Object.keys(S.docs).forEach(k=>{const d=S.docs[k];if(!d||!/^\d{4}-\d\d-\d\d$/.test(k)||k<st0||k>TODAY)return;
+      let n=0;Object.keys(d.habits||{}).forEach(h=>{if(!d.habits[h])return;const x=hs.find(z=>z.id===h);if(!x)return;n++;add(k,10,hStat(x),x.name)});
+      const act=hs.filter(h=>h.on&&(!h.since||h.since<=k));if(act.length>=3&&act.every(h=>(d.habits||{})[h.id]))add(k,20,'',`일일 퀘스트 전부 클리어`);
+      if(DIARY_F.some(f=>d[f]&&String(d[f]).trim())||['events','logs','todos'].some(f=>(d[f]||[]).some(x=>x&&x.text&&x.text.trim())))add(k,10,'sen','일기 쓰기');
     });
-    const days=[...new Set(L.map(x=>x.day))].filter(d=>d<=TODAY).sort();let st=0,prev='';
-    days.forEach(d=>{st=prev&&addD(prev,1)===d?st+1:1;prev=d;add(d,Math.min(st,10)*2,'wil',`연속 ${st}일 기록`);if(st%7===0)add(d,50,'wil',`${st}일 연속 달성 보너스`)});
-    const tot=L.reduce((a,x)=>a+x.xp,0),stat={int:0,agi:0,vit:0,sen:0,wil:0};L.forEach(x=>stat[x.st]+=x.xp);
+    const days=[...new Set(L.map(x=>x.day))].sort();let sk=0,prev='';
+    days.forEach(d=>{sk=prev&&addD(prev,1)===d?sk+1:1;prev=d;if(sk>1)add(d,Math.min(sk,10)*2,'',`연속 ${sk}일`);if(sk%7===0)add(d,50,'',`${sk}일 연속 보너스`)});
+    const tot=L.reduce((a,x)=>a+x.xp,0),stat={str:0,agi:0,vit:0,int:0,sen:0};L.forEach(x=>{if(x.st in stat)stat[x.st]+=x.xp});
     const today=L.filter(x=>x.day===TODAY),mon=TODAY.slice(0,7);
-    return xpMemo={L,tot,stat,today,todayXp:today.reduce((a,x)=>a+x.xp,0),monXp:L.filter(x=>x.day.slice(0,7)===mon).reduce((a,x)=>a+x.xp,0),streak:prev===TODAY||prev===addD(TODAY,-1)?st:0,...lvOf(tot)}}
+    return xpMemo={L,tot,stat,today,todayXp:today.reduce((a,x)=>a+x.xp,0),monXp:L.filter(x=>x.day.slice(0,7)===mon).reduce((a,x)=>a+x.xp,0),streak:prev===TODAY||prev===addD(TODAY,-1)?sk:0,start:st0,...lvOf(tot)}}
   const lvChip=()=>{const x=xpCalc();return `<button class="lvchip" data-act="lvopen" title="레벨 ${x.lv} · ${x.tot.toLocaleString()} XP" aria-label="레벨 ${x.lv}">Lv.<em>${x.lv}</em><i><b style="width:${Math.round(x.cur/x.need*100)}%"></b></i></button>`};
   /* 퀘스트 장면: 퀘스트 이름으로 색·그림을 골라 카드 배경을 그림 (원본 일러스트 아님, 직접 그린 추상 장면) */
   const QTHEME=[[/독서|책|페이지|공부|영어|자격/,['#0d4a3e','#3dffc6','book']],[/운동|헬스|걷기|러닝|달리|스트레칭|스쿼트|푸시|골프|산책/,['#4a160d','#ff6b3d','run']],
@@ -2660,11 +2665,10 @@ label.tsi{cursor:pointer}
     const x=xpCalc(),c=D('cfg'),name=c.pname||cfg().title||'Player',rank=rankOf(x.lv),sk=D(TODAY).qskip||{};
     const segs=Array.from({length:10},(_,i)=>{const p=x.cur/x.need*10-i;return p>=1?'<i class="on"></i>':p>0?`<i class="half" style="--p:${Math.round(p*100)}%"></i>`:'<i></i>'}).join('');
     const smax=Math.max(1,...Object.values(x.stat));
-    const stats=Object.entries(XST).map(([k,[n,col]])=>`<div style="--sc:${col}"><span>${n}<b>${Math.floor(x.stat[k]/100)}</b></span><i><u style="width:${Math.max(4,Math.round(x.stat[k]/smax*100))}%"></u></i></div>`).join('');
+    const stats=Object.entries(XST).map(([k,[n,col]])=>`<div style="--sc:${col}"><span>${n}<b>${1+Math.floor(x.stat[k]/30)}</b></span><i><u style="width:${Math.max(4,Math.round(x.stat[k]/smax*100))}%"></u></i></div>`).join('');
     const d0=parse(TODAY),left=new Date(d0.getFullYear(),d0.getMonth()+1,0).getDate()-d0.getDate();
     const hs=cfg().habits.filter(h=>h.on),Q=[];
-    hs.forEach(h=>Q.push({k:h.id,kind:'h',title:h.name,meta:`${icon('sync')}매일<i></i>일일 퀘스트`,xp:5,st:'vit',done:habitDone(TODAY,h.id),th:qTheme(h.name,'h',h.icon)}));
-    tasks().filter(t=>t.due&&(t.done?ymd(new Date(t.doneAt||0))===TODAY:t.due<=TODAY)).sort(tsort).forEach(t=>Q.push({k:t.id,kind:'t',title:t.title,meta:t.due<TODAY&&!t.done?`${icon('clock')}기한 지남<i></i>${md(t.due)}`:`${icon('brief')}오늘 마감<i></i>할 일`,xp:10+((t.pri||0)>=3?5:0)+(t.done?(ymd(new Date(t.doneAt))<=t.due?5:0):5),st:'int',done:!!t.done,th:qTheme(t.title,'t')}));
+    hs.forEach(h=>Q.push({k:h.id,kind:'h',title:h.name,meta:`${icon('sync')}매일<i></i>일일 퀘스트`,xp:10,st:hStat(h),done:habitDone(TODAY,h.id),th:qTheme(h.name,'h',h.icon)}));
     const skip=Q.filter(q=>!q.done&&sk[q.k]),todo=Q.filter(q=>!q.done&&!sk[q.k]),done=Q.filter(q=>q.done);
     const tab=S.qtab||'todo',list={todo,done,skip}[tab];
     const num=t=>{const m=/^(\d+)\s*(.*)$/.exec(t);return m?`<small>${m[1]}</small>${esc(m[2])}`:esc(t)};
@@ -2679,31 +2683,31 @@ label.tsi{cursor:pointer}
           <div class="lvseg">${segs}</div>
           <div class="lvnext">레벨 ${x.lv+1}까지 <b>${x.need-x.cur}</b> XP</div>
           <div class="lvst">${stats}</div>
-          <div class="lvseason">SEASON ${d0.getMonth()+1} · ${left}일 남음 · +${x.monXp.toLocaleString()}${x.streak?` · <em>🔥${x.streak}</em>`:''}</div>
+          <div class="lvseason">SEASON ${d0.getMonth()+1} · ${left}일 남음 · +${x.monXp.toLocaleString()}${x.streak>1?` · <em>🔥${x.streak}일</em>`:''}</div>
         </div>
         <div class="lvav"><div class="aura">${LV_AURA}</div><div class="pic">${c.avatar?`<img src="${esc(c.avatar)}" alt="">`:LV_SIL}</div>${LV_EMB(rank)}<label title="사진 바꾸기">${icon('pen')}<input type="file" accept="image/*" data-lvav></label></div>
       </div>
       <div class="lvtabs">${[['todo','해야 할 일',todo.length],['done','완료',done.length],['skip','건너뜀',skip.length]].map(([k,n,v])=>`<button class="${tab===k?'on':''}" data-act="qtab" data-v="${k}">${n}<b>${v}</b></button>`).join('')}<button class="lvadd" data-act="qaddtog" aria-label="일일 퀘스트 추가">${icon('plus')}</button></div>
-      ${S.qadd?`<form class="lvform" id="qadd"><input id="qName" placeholder="매일 할 퀘스트 (예: 50페이지 독서)" autocomplete="off"><button>추가</button></form>`:''}
+      ${S.qadd?`<form class="lvform" id="qadd"><input id="qName" placeholder="매일 할 퀘스트 (예: 50페이지 독서)" autocomplete="off"><select id="qStat" aria-label="능력치"><option value="">능력치 자동</option>${Object.entries(XST).map(([k,[n]])=>`<option value="${k}">${n}</option>`).join('')}</select><button>추가</button></form>`:''}
       <div class="lvq">${list.length?list.map(qi).join(''):`<p class="lvempty">${tab==='todo'?(Q.length?'오늘 퀘스트 클리어! 🔥':'오늘 퀘스트가 없습니다. + 로 매일 할 퀘스트를 추가해 보세요.'):tab==='done'?'아직 완료한 퀘스트가 없습니다.':'건너뛴 퀘스트가 없습니다.'}</p>`}</div>
     </section>`;
     const recent=x.L.filter(e=>e.day<=TODAY).sort((a,b)=>b.day.localeCompare(a.day)).slice(0,12);
     const log=`<section class="dc"><div class="dch"><h3>최근 획득 XP</h3></div>${recent.length?recent.map(e=>`<div class="lvlr"><u>${md(e.day)}</u><b>${esc(e.lab)}</b><em>+${e.xp}</em></div>`).join(''):'<p class="empty">아직 기록이 없습니다.</p>'}</section>`;
-    const rule=`<section class="dc"><div class="dch"><h3>XP 얻는 법</h3></div><dl class="lvrule">
-      <dt>할 일 완료</dt><dd>지능</dd><dd class="x">+10 (중요 +5)</dd>
-      <dt>기한 안에 완료</dt><dd>민첩</dd><dd class="x">+5</dd>
-      <dt>업무(포트폴리오) 완료</dt><dd>지능</dd><dd class="x">+100</dd>
-      <dt>주간 회고 작성</dt><dd>지능</dd><dd class="x">+30</dd>
-      <dt>일일 퀘스트·습관</dt><dd>체력</dd><dd class="x">+5</dd>
-      <dt>일기 쓰기 / 사진</dt><dd>감각</dd><dd class="x">+15 / +5</dd>
-      <dt>매일 기록 (연속)</dt><dd>의지</dd><dd class="x">+2×연속일 (최대 20)</dd>
-      <dt>7일 연속 보너스</dt><dd>의지</dd><dd class="x">+50</dd></dl>
-      <p class="gnote">랭크: E(1) → D(10) → C(20) → B(30) → A(45) → S(60) → SS(80)</p></section>`;
+    const rule=`<section class="dc"><div class="dch"><h3>XP 얻는 법 · 자기계발</h3></div><dl class="lvrule">
+      <dt>일일 퀘스트 완료</dt><dd>퀘스트별</dd><dd class="x">+10</dd>
+      <dt>오늘 퀘스트 전부 클리어</dt><dd>—</dd><dd class="x">+20</dd>
+      <dt>일기 쓰기</dt><dd>감각</dd><dd class="x">+10</dd>
+      <dt>매일 연속</dt><dd>—</dd><dd class="x">+2×연속일 (최대 20)</dd>
+      <dt>7일 연속 보너스</dt><dd>—</dd><dd class="x">+50</dd></dl>
+      <p class="gnote">능력치는 퀘스트 이름으로 정해집니다 — 힘(헬스·근력) · 민첩(걷기·러닝·골프) · 체력(물·영양제·수면) · 지능(독서·공부·재무제표) · 감각(일기·명상·글쓰기). 업무 할 일은 XP에 들어가지 않습니다.</p>
+      <p class="gnote">랭크: E(1) → D(10) → C(20) → B(30) → A(45) → S(60) → SS(80) · ${md(x.start)}부터 시작</p>
+      <button class="lnk" data-act="lvreset" style="margin-top:6px;font-size:.8rem;color:${S.lvReset?'var(--p3)':'var(--ink-3)'}">${S.lvReset?'한 번 더 누르면 오늘부터 레벨 1로 다시 시작합니다':'레벨 처음부터 다시 시작'}</button></section>`;
     return{title:'레벨',nav:false,noAdd:true,noSeg:true,fold:false,body:`${card}<div class="lvlog dgrid"><div class="dcol s7">${log}</div><div class="dcol s5">${rule}</div></div>`};
   }
   /* XP 획득 알림 · 레벨업 */
   let xpSeen=null;
   function xpCheck(){
+    if(!D('cfg').lvStart){update('cfg',d=>{d.lvStart=TODAY},true);xpMemo=null}
     const x=xpCalc();if(xpSeen==null){xpSeen=x.tot;let st=0;try{st=+localStorage.getItem('diarybook-lv')||0}catch(e){}if(!st)try{localStorage.setItem('diarybook-lv',x.lv)}catch(e){}return}
     const d=x.tot-xpSeen;xpSeen=x.tot;
     let last=0;try{last=+localStorage.getItem('diarybook-lv')||0}catch(e){}
@@ -2711,7 +2715,7 @@ label.tsi{cursor:pointer}
     if(d<=0||Date.now()-(S.lastAct||0)>2500)return;
     const f=document.createElement('div');f.className='xpf';f.textContent=`+${d} XP`;document.body.appendChild(f);setTimeout(()=>f.remove(),2000);
     if(last&&x.lv>last){const m=document.createElement('div');m.className='lvup';const up=rankOf(x.lv)!==rankOf(last);
-      m.innerHTML=`<div class="lvupb" role="dialog" aria-label="레벨 업"><p>SYSTEM</p><h3>LEVEL UP!</h3><strong>${x.lv}</strong><span>${up?`${rankOf(x.lv)}급 헌터로 승급했습니다!`:`다음 레벨까지 ${x.need-x.cur} XP`}</span><button>확인</button></div>`;
+      m.innerHTML=`<div class="lvupb" role="dialog" aria-label="레벨 업"><p>SYSTEM</p><h3>LEVEL UP!</h3><strong>${x.lv}</strong><span>${up?`${rankOf(x.lv)} RANK 승급!`:`다음 레벨까지 ${x.need-x.cur} XP`}</span><button>확인</button></div>`;
       const close=()=>m.remove();m.addEventListener('click',e=>{if(e.target===m||e.target.tagName==='BUTTON')close()});document.body.appendChild(m);try{navigator.vibrate&&navigator.vibrate([60,40,120])}catch(e){}}
   }
   async function lvAvatar(input){const f=input.files&&input.files[0];if(!f)return;
@@ -3222,6 +3226,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   const GPUSH={
     lvopen:()=>{flushAll();S.view='tasks';S.tl='quest';S.tsel=null;S.wsel=null;S.mmore=false;S.side=false;try{localStorage.setItem(LSV,'tasks');localStorage.setItem('diarybook-tl','quest')}catch(e){}render();window.scrollTo(0,0)},
     qtab:b=>{S.qtab=b.dataset.v;render()},
+    lvreset:()=>{if(!S.lvReset){S.lvReset=true;render();setTimeout(()=>{S.lvReset=false;requestRender()},4000);return}S.lvReset=false;update('cfg',d=>{d.lvStart=TODAY},true);try{localStorage.setItem('diarybook-lv','1')}catch(e){}xpSeen=null;flash('레벨 1부터 다시 시작합니다');render()},
     qaddtog:()=>{S.qadd=!S.qadd;render();if(S.qadd)setTimeout(()=>{const n=document.getElementById('qName');n&&n.focus()},30)},
     qskip:b=>{const k=b.dataset.k;update(TODAY,d=>{d.qskip=d.qskip||{};if(d.qskip[k])delete d.qskip[k];else d.qskip[k]=true},true);render()},
     qdone:b=>{const{k,kind}=b.dataset;if(kind==='t'){toggleDone(k);return}update(TODAY,d=>{d.habits=d.habits||{};d.habits[k]=!d.habits[k];if(d.qskip)delete d.qskip[k]},true);render()},
@@ -3893,9 +3898,9 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     mt:b=>{const v=b.dataset.v;flushAll();S.tsel=null;S.wsel=null;S.side=false;S.dp=null;S.mm=false;S.confirm=null;
       if(v==='close'){S.mmore=false;render();return}if(v==='more'){S.mmore=!S.mmore;render();return}S.mmore=false;
       if(v==='diary'){S.view='day';S.cur=TODAY}
-      else{S.view='tasks';S.cur=TODAY;const ll=S.lastList;S.tl=v==='review'?'review':v==='cal'?(S.lastCal||'cal:m'):(ll&&!isCalK(ll)&&!['gym','dash','work','review','quest'].includes(ll)?ll:'today')}
+      else{S.view='tasks';S.cur=TODAY;const ll=S.lastList;S.tl=v==='quest'?'quest':v==='cal'?(S.lastCal||'cal:m'):(ll&&!isCalK(ll)&&!['gym','dash','work','review','quest'].includes(ll)?ll:'today')}
       try{localStorage.setItem(LSV,S.view);localStorage.setItem('diarybook-tl',S.tl)}catch(e){}render();window.scrollTo(0,0)},
-    mgo:b=>{const v=b.dataset.v;S.mmore=false;if(v==='dash'||v==='work'||v==='quest'){flushAll();S.view='tasks';S.tl=v;S.tsel=null;S.wsel=null;try{localStorage.setItem(LSV,'tasks');localStorage.setItem('diarybook-tl',v)}catch(e){}render();window.scrollTo(0,0);return}ACT.tab({dataset:{v}})},
+    mgo:b=>{const v=b.dataset.v;S.mmore=false;if(v==='dash'||v==='work'||v==='quest'||v==='review'){flushAll();S.view='tasks';S.tl=v;S.tsel=null;S.wsel=null;try{localStorage.setItem(LSV,'tasks');localStorage.setItem('diarybook-tl',v)}catch(e){}render();window.scrollTo(0,0);return}ACT.tab({dataset:{v}})},
     tab:b=>{flushAll();S.view=b.dataset.v;S.confirm=null;S.tsel=null;S.wsel=null;S.dp=null;S.mm=false;S.tp=null;if(S.view==='tasks'){S.cur=TODAY;S.side=false;S.qa.pick=false;S.qa.due=qaCtx().due}try{localStorage.setItem(LSV,S.view)}catch(e){}render();window.scrollTo(0,0)},
     prev:()=>{flushAll();S.tp=null;shift(-1);render()},
     next:()=>{flushAll();S.tp=null;shift(1);render()},
@@ -4370,8 +4375,8 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
       addTask(v,{due:'',list:'',tag:'',work:wid});inp.value='';render();const n=document.getElementById('wtqa');if(n)n.focus();return}
     if(e.target.id==='listForm'){e.preventDefault();const name=document.getElementById('listName').value.trim();if(!name)return;const id='l'+Date.now().toString(36);
       update('cfg',d=>{d.lists.push({id,name,cal:''})},true);S.addingList=false;S.tl='l:'+id;render();return}
-    if(e.target.id==='qadd'){e.preventDefault();const name=document.getElementById('qName').value.trim();if(!name)return;
-      update('cfg',d=>{d.habits=d.habits||DEFAULT_HABITS.map(h=>Object.assign({},h));d.habits.push({id:'h'+Date.now().toString(36),name,cat:'퀘스트',icon:'star',on:true,since:TODAY})},true);S.qadd=false;S.qtab='todo';flash('일일 퀘스트를 추가했습니다');render();return}
+    if(e.target.id==='qadd'){e.preventDefault();const name=document.getElementById('qName').value.trim(),qs=(document.getElementById('qStat')||{}).value||'';if(!name)return;
+      update('cfg',d=>{d.habits=d.habits||DEFAULT_HABITS.map(h=>Object.assign({},h));d.habits.push(Object.assign({id:'h'+Date.now().toString(36),name,cat:'퀘스트',icon:'star',on:true,since:TODAY},qs?{stat:qs}:{}))},true);S.qadd=false;S.qtab='todo';flash('일일 퀘스트를 추가했습니다');render();return}
     if(e.target.id!=='hadd')return;e.preventDefault();
     const name=document.getElementById('hName').value.trim();if(!name)return;
     const cat=document.getElementById('hCat').value.trim()||'기타';
