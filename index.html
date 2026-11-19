@@ -1673,7 +1673,7 @@ label.tsi{cursor:pointer}
     {id:'h1',name:'숙면',cat:'건강관리',icon:'bed'},{id:'h2',name:'걷기',cat:'건강관리',icon:'walk'},
     {id:'h3',name:'운동',cat:'건강관리',icon:'gym'},{id:'h4',name:'물 마시기',cat:'건강관리',icon:'drop'},
     {id:'h5',name:'영양제',cat:'건강관리',icon:'pill'},{id:'h6',name:'독서',cat:'생활',icon:'book'},
-    {id:'h7',name:'일기',cat:'생활',icon:'pen'},{id:'h8',name:'저녁 정리',cat:'생활',icon:'moon'}
+    {id:'h7',name:'일기',cat:'생활',icon:'pen'},{id:'h8',name:'내일 준비',cat:'생활',icon:'moon'}
   ].map(h=>Object.assign(h,{on:true,since:`${TY}-01-01`}));
   const VIEWS=['tasks','year','month','week','day','notes','habit','goal','setting'];
 
@@ -2725,7 +2725,7 @@ label.tsi{cursor:pointer}
   /* 퀘스트 장면: 퀘스트 이름으로 색·그림을 골라 카드 배경을 그림 (원본 일러스트 아님, 직접 그린 추상 장면) */
   const QTHEME=[[/독서|책|페이지|공부|영어|자격/,['#0d4a3e','#3dffc6','book']],[/운동|헬스|걷기|러닝|달리|스트레칭|스쿼트|푸시|골프|산책/,['#4a160d','#ff6b3d','run']],
     [/물|수분/,['#0b2f52','#5ab0ff','drop']],[/영양제|비타민|약/,['#3a1452','#d58bff','pill']],[/일기|기록|글|쓰기/,['#4a330b','#ffc65a','pen']],
-    [/정리|저녁|수면|숙면|명상|잠/,['#1a1a52','#8b8bff','moon']],[/샤워|찬물|세수/,['#0b3a4a','#5ae3ff','drop']]];
+    [/정리|저녁|수면|숙면|명상|잠|내일|준비/,['#1a1a52','#8b8bff','moon']],[/샤워|찬물|세수/,['#0b3a4a','#5ae3ff','drop']]];
   function qTheme(title,kind,hic){if(kind==='t')return['#16263d','#f2b234','brief'];for(const[re,t]of QTHEME)if(re.test(title))return hic&&IC[hic]?[t[0],t[1],hic]:t;return['#0f3b37','#3dffc6',hic&&IC[hic]?hic:'star']}
   function qScene(q,i){const[c1,c2,ic]=q.th,id='qs'+i,rnd=n=>{let h=0;for(const ch of q.k+n)h=(h*31+ch.charCodeAt(0))>>>0;return h%1000/1000};
     const run=ic==='run',big=run?gPoseSvg('run').replace('<svg viewBox="0 0 48 48" aria-hidden="true">','').replace('</svg>',''):(IC[ic]||'');
@@ -2816,6 +2816,7 @@ label.tsi{cursor:pointer}
   /* XP 획득 알림 · 레벨업 */
   let xpSeen=null;
   function xpCheck(){
+    {const h8=(D('cfg').habits||[]).find(h=>h.id==='h8'&&h.name==='저녁 정리');if(h8){update('cfg',d=>{const h=(d.habits||[]).find(z=>z.id==='h8');if(h)h.name='내일 준비'},true);requestRender()}}
     if(!D('cfg').lvStart){update('cfg',d=>{d.lvStart=TODAY},true);xpMemo=null}
     const x=xpCalc();if(xpSeen==null){xpSeen=x.tot;let st=0;try{st=+localStorage.getItem('diarybook-lv')||0}catch(e){}if(!st)try{localStorage.setItem('diarybook-lv',x.lv)}catch(e){}return}
     const d=x.tot-xpSeen;xpSeen=x.tot;
@@ -4347,7 +4348,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   /* 할 일 줄의 '빈 곳'인지 (제목 글자·칩 위가 아니면 빈 곳) — 빈 곳에서 끌면 여러 개 선택, 글자 위에서 끌면 그 할 일 옮기기 */
   function rowEmptySpot(t,x,y){const row=t.closest&&t.closest('.trow');if(!row)return false;
     const w=row.closest('[data-sw]');if(w&&S.msel.has(w.dataset.sw)&&S.msel.size>1)return false;
-    if(t.closest('.tchk,input,textarea,.tact'))return false;
+    if(t.closest('.tchk,input,textarea'))return false;if(t.closest('.tact')&&t.closest('button'))return false;
     const tr=t.closest('.tr');if(tr&&t!==tr)return false;
     const tt=row.querySelector('.tt');if(tt){try{const r=document.createRange();r.selectNodeContents(tt);for(const rc of r.getClientRects())if(x>=rc.left-3&&x<=rc.right+3&&y>=rc.top-2&&y<=rc.bottom+2)return false}catch(e){}}
     return true}
@@ -4439,6 +4440,12 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     ids.forEach((id,i)=>{const t=S.docs[id];if(!t)return;if(id===src||t.ord!==i)update(id,d=>{d.ord=i;if(id===src&&(d.due||'')!==due)d.due=due},true)});
     if((s0.due||'')!==due)scheduleAlarm(src,400);render();
   }
+  /* 여러 할 일을 한 할 일의 체크리스트 맨 아래로 (보이는 순서 그대로) */
+  function nestMany(ids,dst){const d0=S.docs[dst];if(!d0)return;const items=[],gone=[];
+    ids.forEach(src=>{const s0=S.docs[src];if(!s0||src===dst)return;items.push({text:s0.title||'(제목 없음)',done:!!s0.done},...(s0.sub||[]).filter(x=>x&&(x.text||'').trim()).map(x=>({text:x.text,done:!!x.done})));gone.push(Object.assign({id:src},s0))});
+    if(!items.length)return;update(dst,d=>{d.sub=(d.sub||[]).concat(items);d.subHide=false},true);
+    gone.forEach(s0=>{const g=s0.gcal;clearTimeout(alarmT[s0.id]);remove(s0.id);if(S.tsel===s0.id)S.tsel=null;if(g&&authed())gDel(g).catch(()=>{})});if(authed())setTimeout(()=>syncWatches(true).catch(()=>{}),800);
+    S.subPeek.add(dst);flash(`할 일 ${gone.length}개를 '${(d0.title||'').slice(0,20)}' 체크리스트 아래로 넣었습니다 · Ctrl+Z로 취소`);render()}
   function nestTask(src,dst){
     const s0=S.docs[src],d0=S.docs[dst];if(!s0||!d0||src===dst)return;
     const items=[{text:s0.title||'(제목 없음)',done:!!s0.done}].concat((s0.sub||[]).filter(x=>x&&(x.text||'').trim()).map(x=>({text:x.text,done:!!x.done})));
@@ -4456,7 +4463,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   app.addEventListener('dragleave',e=>{const c=e.target.closest&&e.target.closest('[data-drop]');if(c&&!c.contains(e.relatedTarget))c.classList.remove('over')});
   app.addEventListener('drop',e=>{const n=e.target.closest&&e.target.closest('[data-into]');const id0=dragId||(e.dataTransfer&&e.dataTransfer.getData(DT));
     if(n&&id0&&n.dataset.into!==id0&&isTask(id0)){e.preventDefault();dragId=null;const z=zoneOf(n,e);clearDz();
-      if(S.msel.has(id0)&&S.msel.size>1){const dst=n.dataset.into;const grp=[...S.msel].filter(x=>S.docs[x]&&isTask(x)&&x!==dst).sort((a,b)=>tsort(Object.assign({id:a},S.docs[a]),Object.assign({id:b},S.docs[b])));let prev=dst,aft=z!=='before';grp.forEach((x,k)=>{reorderTask(x,prev,k?true:aft);prev=x});S.msel.clear();flash(`할 일 ${grp.length}개를 옮겼습니다`);render();return}
+      if(S.msel.has(id0)&&S.msel.size>1){const dst=n.dataset.into;const grp=[...S.msel].filter(x=>S.docs[x]&&isTask(x)&&x!==dst).sort((a,b)=>tsort(Object.assign({id:a},S.docs[a]),Object.assign({id:b},S.docs[b])));if(z==='in'){nestMany(grp,dst);S.msel.clear();return}let prev=dst,aft=z!=='before';grp.forEach((x,k)=>{reorderTask(x,prev,k?true:aft);prev=x});S.msel.clear();flash(`할 일 ${grp.length}개를 옮겼습니다`);render();return}
       if(z==='in')nestTask(id0,n.dataset.into);else reorderTask(id0,n.dataset.into,z==='after');return}
     const c=e.target.closest&&e.target.closest('[data-drop]');const id=dragId||(e.dataTransfer&&e.dataTransfer.getData(DT));dragId=null;
     if(id&&id.startsWith('ev:')){e.preventDefault();clearDz();if(!c)return;const[cal,eid]=id.slice(3).split('|'),ev=findEv(cal,eid),day=c.dataset.drop;if(!ev||ev.day===day)return;
