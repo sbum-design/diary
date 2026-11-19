@@ -2886,7 +2886,12 @@ label.tsi{cursor:pointer}
   const SHOP_DEF=[{id:'s1',e:'☕',n:'좋아하는 커피 한 잔',p:300},{id:'s2',e:'🎮',n:'게임 2시간',p:800},{id:'s3',e:'🍗',n:'치킨 시켜먹기',p:1000},{id:'s4',e:'⛳',n:'스크린골프',p:2000},{id:'s5',e:'🎁',n:'사고 싶던 물건',p:10000}];
   const shopItems=()=>{const d=D('shop');return Array.isArray(d.items)?d.items:SHOP_DEF};
   /* 긴급 퀘스트: 오늘의 데이터(빈 시간·보스·메인 퀘스트·쉬고 있는 퀘스트·바쁜 정도)로 하루 한 번 생성 */
-  const EQ_POOL=[['재무제표 주석 한 꼭지 읽고 한 줄 요약','int'],['책 10쪽 읽기','int'],['영어 단어 10개 외우기','int'],['엘리베이터 대신 계단 3층','str'],['스쿼트 30개','str'],['팔굽혀펴기 20개','str'],['점심 먹고 10분 산책','agi'],['스트레칭 5분','agi'],['물 2L 마시기','vit'],['오늘 자정 전에 잠들기','vit'],['감사한 일 3가지 적기','sen'],['오늘 배운 것 한 줄 기록','sen'],['10분 명상','sen']];
+  /* 쉽게 할 수 있는 긴급 미션 — 몸 · 지식 · 마음 */
+  const EQ_POOL={body:[['엘리베이터 대신 계단으로 5층 오르기','str'],['팔굽혀펴기 20개','str'],['스쿼트 30개','str'],['플랭크 1분 버티기','str'],['런지 좌우 15개씩','str'],['점심 먹고 10분 걷기','agi'],['한 정거장 먼저 내려서 걷기','agi'],['일어나서 목·어깨 스트레칭 5분','agi'],['오늘 7,000보 걷기','agi'],['물 2L 마시기','vit'],['커피 한 잔을 물이나 차로 바꾸기','vit'],['오늘은 자정 전에 잠들기','vit']],
+    mind:[['경제 기사 1개 읽고 한 줄 요약','int'],['부동산 기사 1개 읽고 한 줄 요약','int'],['책 10쪽 읽기','int'],['재무제표 주석 한 꼭지 읽기','int'],['모르는 용어 1개 찾아보고 뜻 적어 두기','int'],['영어 단어 10개 외우기','int'],['15분 이하 강의·강연 영상 1편 보기','int'],['신문 사설·칼럼 1편 읽기','int'],['우리 회사 보도자료·공시 1개 읽기','int']],
+    heart:[['감사한 일 3가지 적기','sen'],['오늘 배운 것 한 줄 기록하기','sen'],['5분 동안 눈 감고 호흡하기','sen'],['오늘의 사진 한 장 찍어 일기에 올리기','sen'],['소중한 사람에게 안부 연락하기','sen']]};
+  const EQ_DAYG=['body','mind','body','mind','heart'];
+  function eqPick(day,skip){const n=Math.round(parse(day)/864e5);let g=EQ_DAYG[((n%5)+5)%5];if(skip&&skip.g===g)g=g==='body'?'mind':'body';const L=EQ_POOL[g];let it=L[hsh(day+g)%L.length];if(skip&&it[0]===skip.text)it=L[(hsh(day+g)+1)%L.length];return{g,text:it[0],st:it[1]}}
   function eqGen(){
     const now=new Date(),hm=now.getHours()*60+now.getMinutes(),c=[],evs=gDay(TODAY)||[];
     let slot='';try{const ev=evs.filter(e=>!e.allDay&&e.time).map(e=>[toMin(e.time),toMin(e.end||e.time)]).sort((a,b)=>a[0]-b[0]);let t=Math.max(hm+10,9*60);t=Math.ceil(t/30)*30;
@@ -2894,8 +2899,8 @@ label.tsi{cursor:pointer}
     const B=bossNow();if(B&&!B.dead&&bossLeft(B)){const dl=Math.round((parse(addD(B.id.slice(5),6))-parse(TODAY))/864e5)+1,n=Math.min(2,bossLeft(B));c.push({p:dl<=2?10:6,kind:'boss',ref:B.id,n,text:`보스 「${B.title}」에게 ${n}번 공격하기`,why:dl<=2?`보스 도망까지 ${dl}일!`:'이번 주 보스가 아직 살아 있어요',st:B.stat||'str'})}
     mqList().filter(q=>!q.done).slice(0,2).forEach(q=>{for(const ch of q.chapters||[])for(const z of ch.steps||[])if(!z.done){c.push({p:7,kind:'mq',ref:q.id,step:z.t,text:`「${z.t}」 끝내기`,why:`메인 퀘스트 「${q.title}」 한 걸음 전진`,st:q.stat||'int'});return}});
     cfg().habits.filter(h=>h.on).forEach(h=>{let n=0;for(let i=1;i<=14;i++){if(habitDone(addD(TODAY,-i),h.id))break;n++}if(n>=3&&n<14&&(!h.since||h.since<=addD(TODAY,-3)))c.push({p:5,kind:'h',ref:h.id,text:`「${h.name}」 오늘 다시 시작하기`,why:`${n}일째 쉬고 있어요`,st:hStat(h)})});
-    const busy=evs.length>=5,pl=EQ_POOL[hsh(TODAY)%EQ_POOL.length];
-    c.push({p:busy?8:3,kind:'free',text:pl[0],why:busy?`오늘 일정 ${evs.length}개 — 가볍게 하나만`:'시스템이 고른 오늘의 미션',st:pl[1]});
+    const busy=evs.length>=5,pl=eqPick(TODAY),GN={body:'몸',mind:'지식',heart:'마음'};
+    c.push({p:busy?9:(hsh(TODAY+'x')%3?8:4),kind:'free',g:pl.g,text:pl.text,why:busy?`오늘 일정 ${evs.length}개 — 가볍게 하나만`:`오늘의 ${GN[pl.g]} 미션 · 10분이면 충분해요`,st:pl.st});
     c.sort((a,b)=>b.p-a.p||hsh(TODAY+a.text)%7-hsh(TODAY+b.text)%7);
     const q=c[0];return Object.assign({},q,{xp:q.kind==='boss'?80:q.kind==='mq'?70:50,slot,status:'offer',at:Date.now()})}
   function eqAuto(){const d=D(TODAY),q=d.eq;if(!q||q.status!=='on')return;let ok=false;
@@ -2949,7 +2954,7 @@ label.tsi{cursor:pointer}
       eqB=`<div class="lveq ${eq.status}"><div class="eqh"><span>⚠ 긴급 퀘스트</span><em>${eq.status==='done'?'CLEAR':eq.status==='on'?`남은 시간 ${hh}시간 ${mi}분`:'오늘 자정까지'}</em></div>
         <b>${esc(eq.text)}</b><p>${esc(eq.why||'')}${eq.slot&&eq.status!=='done'?` · ⏰ ${eq.slot} 비어 있어요`:''}</p>
         <div class="eqf"><span>보상 <em>+${eq.xp} XP · +${eq.xp} G</em> · <i style="color:${XST[eq.st]?XST[eq.st][1]:'#aaa'}">${XST[eq.st]?XST[eq.st][0]:''}</i></span>
-        ${eq.status==='offer'?`<button class="no" data-act="eqno">거절</button><button data-act="eqok">수락</button>`:eq.status==='on'?(eq.kind==='free'?`<button data-act="eqdone">완료!</button>`:`<span class="eqa">완료하면 자동으로 확인됩니다</span><button class="no" data-act="eqdone">직접 완료</button>`):'<span class="eqa">🎉 클리어!</span>'}</div></div>`}
+        ${eq.status==='offer'?`${eq.re?'':'<button class="no" data-act="eqre">다른 미션</button>'}<button class="no" data-act="eqno">거절</button><button data-act="eqok">수락</button>`:eq.status==='on'?(eq.kind==='free'?`<button data-act="eqdone">완료!</button>`:`<span class="eqa">완료하면 자동으로 확인됩니다</span><button class="no" data-act="eqdone">직접 완료</button>`):'<span class="eqa">🎉 클리어!</span>'}</div></div>`}
     const MODES=[['daily','⚔️','일일 퀘스트'],['main','📜','메인 퀘스트'],['boss','💀','보스전'],['shop','🪙','상점']];
     const modeBar=`<div class="lvmode">${MODES.map(([k,e,n])=>`<button class="${mode===k?'on':''}" data-act="qmode" data-v="${k}"><span>${e}</span>${n}${k==='boss'&&bossNow()&&!bossNow().dead?'<i></i>':''}</button>`).join('')}</div>`;
     /* 메인 퀘스트 */
@@ -3572,6 +3577,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     qtab:b=>{S.qtab=b.dataset.v;render()},
     qmode:b=>{S.qmode=b.dataset.v;S.mqEdit=null;S.shopCf=null;render()},
     eqok:()=>{update(TODAY,d=>{if(d.eq)d.eq.status='on'},true);flash('긴급 퀘스트 수락! 자정까지입니다');render();eqAuto()},
+    eqre:()=>{const q=D(TODAY).eq;if(!q||q.re||q.status!=='offer')return;const pl=eqPick(TODAY,{g:q.kind==='free'?q.g:'',text:q.text}),GN={body:'몸',mind:'지식',heart:'마음'};update(TODAY,d=>{d.eq=Object.assign({},d.eq,{kind:'free',g:pl.g,text:pl.text,st:pl.st,why:`다시 뽑은 ${GN[pl.g]} 미션`,xp:50,re:true,ref:'',step:'',n:0})},true);render()},
     eqno:()=>{update(TODAY,d=>{if(d.eq)d.eq.status='no'},true);render()},
     eqdone:()=>{const q=D(TODAY).eq;if(!q)return;update(TODAY,d=>{d.eq.status='done';d.eq.doneAt=Date.now()},true);flash(`🚨 긴급 퀘스트 클리어! +${q.xp} XP · +${q.xp} G`);render()},
     mqaddtog:()=>{S.mqAdd=!S.mqAdd;render()},
