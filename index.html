@@ -3024,7 +3024,7 @@ label.tsi{cursor:pointer}
       ${sheet?`<a class="pybtn" href="${esc(sheet)}" target="_blank" rel="noopener">${icon('link')}구글 시트</a>`:''}
       <button class="pybtn" data-act="payimp">${icon('upload')}가져오기</button></div>`;
     const imp=S.payImp?`<div class="pyimp"><p>구글 시트에서 <b>월(2026.05)부터 오른쪽 끝까지</b> 행을 복사해 붙여넣거나, 받은 <b>급여 파일(.json)</b>을 고르세요. 같은 달은 덮어씁니다.</p>
-      <textarea id="payPaste" rows="5" placeholder="2026.05	3,002,474	7,135,983	1,230,294	…"></textarea>
+      <textarea id="payPaste" rows="5" placeholder="시트에서 복사한 행, 또는 받은 「급여 넣기」 링크 전체를 붙여넣으세요"></textarea>
       <div class="pyib"><label class="pybtn">${icon('upload')}파일 고르기<input type="file" accept=".json,.csv,.txt,.tsv" data-payfile hidden></label><input id="paySheet" placeholder="구글 시트 주소(선택)" value="${esc(sheet)}"><button class="pybtn pri" data-act="paypaste">붙여넣은 내용 넣기</button></div></div>`:'';
     if(!all.length)return{title:'급여',nav:false,noAdd:true,noSeg:true,fold:false,body:`<div class="pyw">${head}${imp||`<div class="pyempty">${icon('wallet')}<p>아직 급여 기록이 없습니다.<br>「가져오기」로 시트 내용을 넣거나, 이번 달부터 바로 적어 보세요.</p><button class="pybtn pri" data-act="payadd">+ ${+TODAY.slice(5,7)}월 추가</button></div>`}</div>`};
     const kpis=`<div class="pyks">${kpi(`${Y}년 급여 합계`,won(sumSal),`${rows.length}개월`)}${kpi('월평균 급여',won(sumSal/n))}${kpi('월평균 카드',won(sumCard/n),`급여의 ${sumSal?Math.round(sumCard/sumSal*100):0}%`)}${kpi('적금(주담대) 누계',won(sumSav))}${kpi('월평균 잔액',won(avgBal))}</div>`;
@@ -3077,6 +3077,7 @@ label.tsi{cursor:pointer}
   }
   function payCount(){const els=[...document.querySelectorAll('.pyw [data-count]')].filter(e=>e.dataset.count!=='');const t0=performance.now(),D=850;
     const step=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);els.forEach(el=>{if(!el.isConnected)return;el.textContent=Math.round(+el.dataset.count*e).toLocaleString()});if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+  function payDecode(code){const b=String(code).replace(/-/g,'+').replace(/_/g,'/'),bin=atob(b+'==='.slice((b.length+3)%4));return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))))}
   function payImport(rows,sheet){let n=0;rows.forEach(o=>{const m=o.m;if(!/^\d{4}-\d\d$/.test(m||''))return;update('pay-'+m,d=>{PAYC.forEach(([k])=>{if(o[k]!=null&&o[k]!=='')d[k]=+o[k]})},true);n++});
     if(sheet)update('cfg',d=>{d.paySheet=sheet},true);return n}
   function payParseText(t){const out=[],keys=['bal','sal','sav','c_hd','c_sh','c_lt','c_wr','f_ins','f_club','f_live','f_cp','s_sh','s_sc',null,'d_sc','d_x'];
@@ -3931,7 +3932,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     paytbl:()=>{S.payTbl=S.payTbl===false?true:false},
     payhide:()=>{S.payHide=!S.payHide;try{localStorage.setItem('diarybook-payhide',S.payHide?'1':'')}catch(e){}render()},
     payimp:()=>{S.payImp=!S.payImp;render()},
-    paypaste:()=>{const t=(document.getElementById('payPaste')||{}).value||'',sh=((document.getElementById('paySheet')||{}).value||'').trim();const rows=payParseText(t);if(!rows.length&&!sh){flash('넣을 내용을 못 찾았습니다 — 월(2026.05)부터 복사해 주세요');return}const n=payImport(rows,sh);S.payImp=false;flash(n?`${n}개월을 넣었습니다`:'시트 주소를 저장했습니다');render()},
+    paypaste:()=>{const t=(document.getElementById('payPaste')||{}).value||'',sh=((document.getElementById('paySheet')||{}).value||'').trim();let rows;const pm=/payimport=([A-Za-z0-9_\-]+)/.exec(t);if(pm){try{rows=payDecode(pm[1]).rows||[]}catch(e){rows=[]}}else rows=payParseText(t);if(!rows.length&&!sh){flash('넣을 내용을 못 찾았습니다 — 월(2026.05)부터 복사해 주세요');return}const n=payImport(rows,sh);S.payImp=false;flash(n?`${n}개월을 넣었습니다`:'시트 주소를 저장했습니다');render()},
     payadd:()=>{const all=payRows(),l=all[all.length-1];const d=l?parse(l.m+'-01'):parse(TODAY.slice(0,8)+'01');if(l)d.setMonth(d.getMonth()+1);const m=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
       update('pay-'+m,x=>{if(l)['sav','f_ins','f_club','f_live','f_cp'].forEach(k=>{if(l[k]!=null)x[k]=l[k]});x.sal=x.sal||0},true);S.payY=m.slice(0,4);render()},
     paydel:b=>{const m=b.dataset.m;if(S.payDel!==m){S.payDel=m;render();setTimeout(()=>{if(S.payDel===m){S.payDel=null;requestRender()}},4000);return}S.payDel=null;remove('pay-'+m);flash(`${m} 기록을 지웠습니다 · Ctrl+Z로 되돌리기`);render()},
@@ -5229,11 +5230,12 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
 
   loadLocal();
   /* 급여 한 번에 넣기 링크: …/diary/#payimport=<base64url JSON> — 주소 뒤 # 부분은 서버(GitHub)로 가지 않음 */
-  (function payHash(){const m=/^#payimport=([A-Za-z0-9_\-]+)/.exec(location.hash||'');if(!m)return;
-    try{const b=m[1].replace(/-/g,'+').replace(/_/g,'/'),bin=atob(b+'==='.slice((b.length+3)%4)),j=JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))));
+  function payHash(){const m=/^#payimport=([A-Za-z0-9_\-]+)/.exec(location.hash||'');if(!m)return;
+    try{const j=payDecode(m[1]);
       const n=payImport(j.rows||[],j.sheet||'');S.view='tasks';S.tl='pay';try{localStorage.setItem(LSV,'tasks');localStorage.setItem('diarybook-tl','pay')}catch(e){}
       setTimeout(()=>flash(`급여 ${n}개월을 넣었습니다`),400)}catch(e){}
-    history.replaceState(null,'',location.pathname+location.search)})();
+    history.replaceState(null,'',location.pathname+location.search)}
+  payHash();window.addEventListener('hashchange',()=>{if(/^#payimport=/.test(location.hash)){payHash();render()}});
   if(!authed())migrateTodos();
   render();
   if(authed()){loadCals();sync()}
