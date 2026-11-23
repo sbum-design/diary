@@ -1266,6 +1266,8 @@ button.tci:hover{background:var(--page)}
 .pyt tr:hover .pyx,.pyx:focus{opacity:1}
 .pyfoot{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .pyimpl{font-size:.78rem;color:var(--ink-3)}
+.pyoff{font-size:.8rem;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px}
+.pyoff input{width:96px;padding:5px 8px;border:1px solid var(--rule);border-radius:8px;background:var(--fill);text-align:right;font-variant-numeric:tabular-nums}
 .fxm{font-style:italic;font-family:Georgia,serif;font-weight:700;color:#7c8cff;margin-right:3px}
 .pyt td.fx input::placeholder{color:#5b6be0;font-style:normal;font-weight:600;opacity:.85}
 html[data-theme=dark] .pyt td.fx input::placeholder{color:#9aa6ff}
@@ -3010,24 +3012,36 @@ label.tsi{cursor:pointer}
   /* ---------------- 급여 (월별 급여·지출) ----------------
      pay-YYYY-MM 문서. 금액은 이 기기·구글 드라이브에만 저장(코드에는 없음) */
   const PAYC=[['sal','급여','in'],['sav','적금(주담대)','sav'],['c_hd','현대카드','card'],['c_sh','신한카드','card'],['c_lt','롯데카드','card'],['c_wr','우리카드','card'],
-    ['f_ins','보험료','fix'],['f_club','동기회비','fix'],['f_live','생활비','fix'],['f_cp','쿠팡구독료','fix'],['bal','잔액','bal'],['s_sh','신한은행','split'],['s_sc','SC은행','split'],['d_sc','SC은행 입금','dep'],['d_x','기타','dep']];
-  const PAYG=[['','',1],['in','',1],['sav','',1],['card','신용카드',4],['fix','고정비',4],['bal','',1],['split','현대카드 분할',2],['dep','입금금액',2]];
+    ['f_ins','보험료','fix'],['f_club','동기회비','fix'],['f_live','생활비','fix'],['f_cp','쿠팡구독료','fix'],['bal','잔액','bal'],['s_sh','신한은행','split'],['s_sc','SC은행','split'],['d_sc','SC은행 입금','dep']];
+  const PAYG=[['','',1],['in','',1],['sav','',1],['card','신용카드',4],['fix','고정비',4],['bal','',1],['split','현대카드 분할',2],['dep','입금금액',1]];
   const PAY_EX={f_live:1};/* 잔액 계산에서 빼는 항목 (시트와 같은 방식) */
   const payRows=()=>Object.keys(S.docs).filter(k=>/^pay-\d{4}-\d\d$/.test(k)&&S.docs[k]).sort().map(k=>Object.assign({m:k.slice(4)},S.docs[k]));
   const paySum=(r,cat)=>PAYC.filter(c=>c[2]===cat).reduce((a,c)=>a+(+r[c[0]]||0),0);
   const payCalcBal=r=>(+r.sal||0)-(+r.sav||0)-paySum(r,'card')-PAYC.filter(c=>c[2]==='fix'&&!PAY_EX[c[0]]).reduce((a,c)=>a+(+r[c[0]]||0),0);
   /* 시트 수식: 칸을 비워 두면 자동 계산, 숫자를 적으면 그 값이 우선 */
-  const PAYF={bal:r=>payCalcBal(r),s_sh:r=>(+r.c_hd||0)-(+r.s_sc||0),d_sc:r=>(+r.s_sc||0)+(+r.sav||0)};
-  const PAYFT={bal:'급여 − 적금 − 카드 − 고정비(생활비 제외)',s_sh:'현대카드 − SC은행 분할',d_sc:'SC은행 분할 + 적금'};
+  const payOff=()=>{const v=D('cfg').payScOff;return v!=null&&v!==''?+v:700000};
+  const PAYF={bal:r=>payCalcBal(r),s_sh:r=>(+r.c_hd||0)-(+r.s_sc||0),d_sc:r=>(+r.s_sc||0)+(+r.sav||0)-payOff()};
+  const PAYFT={bal:'급여 − 적금 − 카드 − 고정비(생활비 제외)',s_sh:'현대카드 − SC은행 분할',d_sc:'SC은행 분할 + 적금 − 공제액'};
   const payHas=(r,k)=>r[k]!=null&&r[k]!=='';
   const payV=(r,k)=>payHas(r,k)?+r[k]:PAYF[k]?PAYF[k](r):0;
   const payBal=r=>payV(r,'bal');
+  /* 시트 정리: SC은행 입금은 '분할+적금'을 적고 옆 칸에 '−70만' 결과를 적어 둔 달이 섞여 있음 → 수식 하나로 통일 */
+  /* 입력하는 즉시 수식 칸·합계를 다시 계산 (화면 전체를 다시 그리지 않아 커서가 유지됨) */
+  function payLive(m){const r=Object.assign({m},S.docs['pay-'+m]||{});
+    Object.keys(PAYF).forEach(k=>{const el=app.querySelector(`[data-pay="${m}|${k}"]`);if(el&&!payHas(r,k))el.placeholder=won(PAYF[k](r))});
+    const ct=app.querySelector(`[data-pct="${m}"]`);if(ct)ct.textContent=won(paySum(r,'card'));
+    const rows=[...app.querySelectorAll('[data-pct]')].map(e=>Object.assign({m:e.dataset.pct},S.docs['pay-'+e.dataset.pct]||{}));
+    app.querySelectorAll('[data-ptot]').forEach(td=>{const k=td.dataset.ptot;td.textContent=won(rows.reduce((a,x)=>a+(k==='card'?paySum(x,'card'):payV(x,k)),0))})}
+  function payNorm(m){const id='pay-'+m,d=S.docs[id];if(!d)return;const r=Object.assign({m},d),f=PAYF.d_sc(r),full=(+r.s_sc||0)+(+r.sav||0),del=[];
+    if(payHas(r,'d_x')&&(+r.d_x===f)){del.push('d_x');if(payHas(r,'d_sc'))del.push('d_sc')}
+    else if(payHas(r,'d_sc')&&(+r.d_sc===f||+r.d_sc===full))del.push('d_sc');
+    if(del.length)update(id,x=>{del.forEach(k=>delete x[k])},true);payStrip(m)}
   function payStrip(m){const id='pay-'+m,d=S.docs[id];if(!d)return;const r=Object.assign({m},d),drop=Object.keys(PAYF).filter(k=>payHas(r,k)&&+r[k]===PAYF[k](r));if(drop.length)update(id,x=>{drop.forEach(k=>delete x[k])},true)}
   try{S.payHide=!!localStorage.getItem('diarybook-payhide')}catch(e){}
   const won=n=>S.payHide?'•••••':(Math.round(+n||0)).toLocaleString();
   const wonK=n=>S.payHide?'•••':((+n||0)>=1e6?((+n)/1e4).toFixed(0)+'만':Math.round((+n||0)/1e3)+'천');
   function payView(){
-    if(!D('cfg').payF1&&payRows().length)setTimeout(()=>{if(D('cfg').payF1)return;payRows().forEach(r=>payStrip(r.m));update('cfg',d=>{d.payF1=1},true);requestRender()},0);
+    if(!D('cfg').payF2&&payRows().length)setTimeout(()=>{if(D('cfg').payF2)return;payRows().forEach(r=>payNorm(r.m));update('cfg',d=>{d.payF1=1;d.payF2=1},true);requestRender()},0);
     const all=payRows(),years=[...new Set(all.map(r=>r.m.slice(0,4)))].sort(),Y=S.payY&&years.includes(S.payY)?S.payY:(years.includes(TODAY.slice(0,4))?TODAY.slice(0,4):years[years.length-1]||TODAY.slice(0,4));
     const rows=all.filter(r=>r.m.startsWith(Y)),n=rows.length||1,sheet=D('cfg').paySheet||'';
     const sumSal=rows.reduce((a,r)=>a+(+r.sal||0),0),sumSav=rows.reduce((a,r)=>a+(+r.sav||0),0),sumCard=rows.reduce((a,r)=>a+paySum(r,'card'),0),avgBal=rows.reduce((a,r)=>a+payBal(r),0)/n;
@@ -3052,11 +3066,12 @@ label.tsi{cursor:pointer}
     const cell=(r,k)=>{const v=r[k],f=!!PAYF[k],calc=f&&!payHas(r,k),ov=f&&!calc;return `<td class="${k==='sal'?'in':k==='bal'?'bl':''} ${f?'fx':''} ${ov?'ov':''}" ${f?`title="${ov?`직접 입력한 값 (수식 값 ${won(PAYF[k](r))}) — 지우면 수식으로 계산`:`자동 계산: ${PAYFT[k]}`}"`:''}><input data-pay="${r.m}|${k}" inputmode="numeric" value="${S.payHide?'':calc?'':(v==null?'':(+v).toLocaleString())}" placeholder="${calc?won(PAYF[k](r)):S.payHide?'•••':''}" ${S.payHide?'disabled':''} aria-label="${+r.m.slice(5)}월 ${PAYC.find(c=>c[0]===k)[1]}"></td>`};
     const tbl=`<div class="pyscroll pytw"><table class="pyt"><thead><tr>${PAYG.map(([,g,n])=>`<th colspan="${n}" class="g">${g}</th>`).join('')}<th class="g"></th></tr>
       <tr><th class="mo">월</th>${PAYC.map(c=>`<th class="${c[2]}" ${PAYF[c[0]]?`title="자동 계산: ${PAYFT[c[0]]}"`:''}>${PAYF[c[0]]?'<i class="fxm">ƒ</i>':''}${c[1]}${PAY_EX[c[0]]?'<sup title="잔액 계산에서 빠짐">*</sup>':''}</th>`).join('')}<th>카드 합계</th></tr></thead>
-      <tbody>${rows.map(r=>`<tr><th class="mo">${r.m.slice(2).replace('-','.')}<button class="pyx" data-act="paydel" data-m="${r.m}" aria-label="${r.m} 삭제">${S.payDel===r.m?'삭제?':'×'}</button></th>${PAYC.map(c=>cell(r,c[0])).join('')}<td class="sm">${won(paySum(r,'card'))}</td></tr>`).join('')}
-      <tr class="tot"><th class="mo">합계</th>${PAYC.map(c=>`<td>${won(rows.reduce((a,r)=>a+payV(r,c[0]),0))}</td>`).join('')}<td>${won(sumCard)}</td></tr></tbody></table></div>
+      <tbody>${rows.map(r=>`<tr><th class="mo">${r.m.slice(2).replace('-','.')}<button class="pyx" data-act="paydel" data-m="${r.m}" aria-label="${r.m} 삭제">${S.payDel===r.m?'삭제?':'×'}</button></th>${PAYC.map(c=>cell(r,c[0])).join('')}<td class="sm" data-pct="${r.m}">${won(paySum(r,'card'))}</td></tr>`).join('')}
+      <tr class="tot"><th class="mo">합계</th>${PAYC.map(c=>`<td data-ptot="${c[0]}">${won(rows.reduce((a,r)=>a+payV(r,c[0]),0))}</td>`).join('')}<td data-ptot="card">${won(sumCard)}</td></tr></tbody></table></div>
       <div class="pyfoot"><button class="pybtn" data-act="payadd">+ ${(()=>{const l=all[all.length-1];const d=l?parse(l.m+'-01'):parse(TODAY);if(l)d.setMonth(d.getMonth()+1);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}`})()} 추가</button>
+      <label class="pyoff">SC은행 입금 공제액 <input data-payoff inputmode="numeric" value="${payOff().toLocaleString()}"> 원</label>
       <button class="lnk pyimpl" data-act="payimp">시트에서 가져오기</button>
-      <p><i class="fxm">ƒ</i> 칸은 시트처럼 <b>자동 계산</b>됩니다 — 잔액 = 급여 − 적금 − 카드 − 고정비(*생활비 제외), 신한은행 분할 = 현대카드 − SC은행, SC은행 입금 = SC은행 분할 + 적금. 숫자를 직접 적으면 그 값이 우선(노란 점), 지우면 다시 수식으로 돌아갑니다.</p></div>`;
+      <p><i class="fxm">ƒ</i> 칸은 시트처럼 <b>자동 계산</b>됩니다 — 잔액 = 급여 − 적금 − 카드 − 고정비(*생활비 제외), 신한은행 분할 = 현대카드 − SC은행, SC은행 입금 = SC은행 분할 + 적금 − 공제액. 숫자를 직접 적으면 그 값이 우선(노란 점), 지우면 다시 수식으로 돌아갑니다.</p></div>`;
     /* ---- 화려한 요약: 메인 카드 · 도넛 · 추이 ---- */
     const sel=rows.find(r=>r.m===S.payM)||rows[rows.length-1],si=rows.indexOf(sel),prev=si>0?rows[si-1]:all[all.indexOf(sel)-1];
     const flow=[['sav','적금(주담대)','#7c8cff'],['card','신용카드','#ff9f45'],['fix','고정비','#b8bec8'],['bal','남은 돈','#34d399']].map(([k,l,c])=>({k,l,c,v:val(sel,k)}));
@@ -3092,7 +3107,7 @@ label.tsi{cursor:pointer}
   function payCount(){const els=[...document.querySelectorAll('.pyw [data-count]')].filter(e=>e.dataset.count!=='');const t0=performance.now(),D=850;
     const step=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);els.forEach(el=>{if(!el.isConnected)return;el.textContent=Math.round(+el.dataset.count*e).toLocaleString()});if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
   function payDecode(code){const b=String(code).replace(/-/g,'+').replace(/_/g,'/'),bin=atob(b+'==='.slice((b.length+3)%4));return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))))}
-  function payImport(rows,sheet){let n=0;rows.forEach(o=>{const m=o.m;if(!/^\d{4}-\d\d$/.test(m||''))return;update('pay-'+m,d=>{PAYC.forEach(([k])=>{if(o[k]!=null&&o[k]!=='')d[k]=+o[k]})},true);payStrip(m);n++});
+  function payImport(rows,sheet){let n=0;rows.forEach(o=>{const m=o.m;if(!/^\d{4}-\d\d$/.test(m||''))return;update('pay-'+m,d=>{[...PAYC.map(c=>c[0]),'d_x'].forEach(k=>{if(o[k]!=null&&o[k]!=='')d[k]=+o[k]})},true);payNorm(m);n++});
     if(sheet)update('cfg',d=>{d.paySheet=sheet},true);return n}
   function payParseText(t){const out=[],keys=['bal','sal','sav','c_hd','c_sh','c_lt','c_wr','f_ins','f_club','f_live','f_cp','s_sh','s_sc',null,'d_sc','d_x'];
     String(t||'').split(/\r?\n/).forEach(line=>{const cells=[];let cur='',q=false,sep=line.includes('\t')?'\t':',';for(const ch of line){if(ch==='"'){q=!q;continue}if(ch===sep&&!q){cells.push(cur);cur='';continue}cur+=ch}cells.push(cur);
@@ -5116,14 +5131,16 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   app.addEventListener('copy',e=>{if(e.target.closest&&e.target.closest('.trow,.tci,.tcell,.wkc'))e.preventDefault()});
   let gCalTouched=false;
   ['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{S.lastAct=Date.now()},true));
-  app.addEventListener('focusout',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.pay)setTimeout(()=>{const a=document.activeElement;if(!(a&&a.dataset&&a.dataset.pay))render()},0)});
+  app.addEventListener('keydown',e=>{const t=e.target;if(e.key!=='Enter'||!t.dataset||!t.dataset.pay||e.isComposing)return;e.preventDefault();const[m,k]=t.dataset.pay.split('|'),ins=[...app.querySelectorAll(`[data-pay$="|${k}"]`)],i=ins.indexOf(t),nx=ins[i+(e.shiftKey?-1:1)];if(nx){nx.focus();nx.select()}else t.blur()},true);
+  app.addEventListener('focusout',e=>{const t=e.target;if(t&&t.dataset&&(t.dataset.pay||t.dataset.payoff!=null))setTimeout(()=>{const a=document.activeElement;if(!(a&&a.dataset&&a.dataset.pay))render()},0)});
   app.addEventListener('input',e=>{
     const t=e.target;
     if(t.id==='cidInput'){lsSet(LS_CID,t.value.trim());return}
     if(t.id==='qa'){cmpSync();return}
     if(t.id==='wsearch'){S.wq=t.value;wFilterDom();return}
     if(t.dataset&&t.dataset.gs){gSetInput(t);return}
-    if(t.dataset&&t.dataset.pay){const[m,k]=t.dataset.pay.split('|'),dg=t.value.replace(/[^\d\-]/g,'');update('pay-'+m,d=>{if(dg===''||dg==='-')delete d[k];else d[k]=+dg});return}
+    if(t.dataset&&t.dataset.payoff!=null){const dg=t.value.replace(/[^\d]/g,'');update('cfg',d=>{d.payScOff=dg===''?0:+dg});[...app.querySelectorAll('[data-pct]')].forEach(e=>payLive(e.dataset.pct));return}
+    if(t.dataset&&t.dataset.pay){const[m,k]=t.dataset.pay.split('|'),dg=t.value.replace(/[^\d\-]/g,'');update('pay-'+m,d=>{if(dg===''||dg==='-')delete d[k];else d[k]=+dg});payLive(m);return}
     if(t.dataset&&t.dataset.payfile!=null&&t.files&&t.files[0]){const f=t.files[0];f.text().then(tx=>{let rows=[],sh='';try{const j=JSON.parse(tx);if(j&&j.type==='diarybook-pay'){rows=j.rows||[];sh=j.sheet||''}}catch(e){rows=payParseText(tx)}const n=payImport(rows,sh);S.payImp=false;flash(n?`${n}개월을 넣었습니다`:'넣을 내용을 못 찾았습니다');render()});return}
     if(t.dataset&&t.dataset.bk){const[id,f]=t.dataset.bk.split('|');let v=t.value;if(f==='pages')v=+v||0;
       update(id,d=>{d[f]=v;if(f==='status'){if(v==='done'){d.end=d.end||TODAY;if(+d.pages>0)d.cur=Math.max(+d.cur||0,+d.pages)}else delete d.end;if(v!=='want')d.start=d.start||TODAY}});
