@@ -5228,6 +5228,12 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   [wide,wideSide,wideDetail].forEach(q=>q.addEventListener?q.addEventListener('change',()=>requestRender()):q.addListener(()=>requestRender()));
 
   loadLocal();
+  /* 급여 한 번에 넣기 링크: …/diary/#payimport=<base64url JSON> — 주소 뒤 # 부분은 서버(GitHub)로 가지 않음 */
+  (function payHash(){const m=/^#payimport=([A-Za-z0-9_\-]+)/.exec(location.hash||'');if(!m)return;
+    try{const b=m[1].replace(/-/g,'+').replace(/_/g,'/'),bin=atob(b+'==='.slice((b.length+3)%4)),j=JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))));
+      const n=payImport(j.rows||[],j.sheet||'');S.view='tasks';S.tl='pay';try{localStorage.setItem(LSV,'tasks');localStorage.setItem('diarybook-tl','pay')}catch(e){}
+      setTimeout(()=>flash(`급여 ${n}개월을 넣었습니다`),400)}catch(e){}
+    history.replaceState(null,'',location.pathname+location.search)})();
   if(!authed())migrateTodos();
   render();
   if(authed()){loadCals();sync()}
