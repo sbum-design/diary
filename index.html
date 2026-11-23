@@ -1265,6 +1265,7 @@ button.tci:hover{background:var(--page)}
 .pyx{margin-left:6px;color:var(--ink-3);font-size:.8rem;opacity:0}
 .pyt tr:hover .pyx,.pyx:focus{opacity:1}
 .pyfoot{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.pyimpl{font-size:.78rem;color:var(--ink-3)}
 .pyfoot p{margin:0;font-size:.76rem;color:var(--ink-3);flex:1;min-width:240px}
 .pyempty{display:grid;justify-items:center;gap:10px;padding:40px 20px;border:1px dashed var(--rule);border-radius:14px;text-align:center;color:var(--ink-2)}
 .pyempty>.ic{width:36px;height:36px;color:var(--ink-3)}
@@ -3022,7 +3023,7 @@ label.tsi{cursor:pointer}
     const head=`<div class="pyhd"><div class="pyyr">${years.map(y=>`<button class="${y===Y?'on':''}" data-act="payy" data-v="${y}">${y}</button>`).join('')}</div>
       <button class="pybtn" data-act="payhide" title="금액 가리기">${icon(S.payHide?'eyeoff':'eye')}${S.payHide?'금액 보기':'금액 가리기'}</button>
       ${sheet?`<a class="pybtn" href="${esc(sheet)}" target="_blank" rel="noopener">${icon('link')}구글 시트</a>`:''}
-      <button class="pybtn" data-act="payimp">${icon('upload')}가져오기</button></div>`;
+      ${all.length?'':`<button class="pybtn" data-act="payimp">${icon('upload')}가져오기</button>`}</div>`;
     const imp=S.payImp?`<div class="pyimp"><p>구글 시트에서 <b>월(2026.05)부터 오른쪽 끝까지</b> 행을 복사해 붙여넣거나, 받은 <b>급여 파일(.json)</b>을 고르세요. 같은 달은 덮어씁니다.</p>
       <textarea id="payPaste" rows="5" placeholder="시트에서 복사한 행, 또는 받은 「급여 넣기」 링크 전체를 붙여넣으세요"></textarea>
       <div class="pyib"><label class="pybtn">${icon('upload')}파일 고르기<input type="file" accept=".json,.csv,.txt,.tsv" data-payfile hidden></label><input id="paySheet" placeholder="구글 시트 주소(선택)" value="${esc(sheet)}"><button class="pybtn pri" data-act="paypaste">붙여넣은 내용 넣기</button></div></div>`:'';
@@ -3042,6 +3043,7 @@ label.tsi{cursor:pointer}
       <tbody>${rows.map(r=>`<tr><th class="mo">${r.m.slice(2).replace('-','.')}<button class="pyx" data-act="paydel" data-m="${r.m}" aria-label="${r.m} 삭제">${S.payDel===r.m?'삭제?':'×'}</button></th>${PAYC.map(c=>cell(r,c[0])).join('')}<td class="sm">${won(paySum(r,'card'))}</td></tr>`).join('')}
       <tr class="tot"><th class="mo">합계</th>${PAYC.map(c=>`<td>${['s_sh','s_sc','d_sc','d_x'].includes(c[0])?'':won(rows.reduce((a,r)=>a+(c[0]==='bal'?payBal(r):(+r[c[0]]||0)),0))}</td>`).join('')}<td>${won(sumCard)}</td></tr></tbody></table></div>
       <div class="pyfoot"><button class="pybtn" data-act="payadd">+ ${(()=>{const l=all[all.length-1];const d=l?parse(l.m+'-01'):parse(TODAY);if(l)d.setMonth(d.getMonth()+1);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}`})()} 추가</button>
+      <button class="lnk pyimpl" data-act="payimp">시트에서 가져오기</button>
       <p>잔액 칸을 비워 두면 <b>급여 − 적금 − 카드 − 고정비</b>로 자동 계산됩니다(회색 숫자). *생활비는 시트처럼 잔액 계산에서 빠집니다. 칸을 눌러 바로 고칠 수 있어요.</p></div>`;
     /* ---- 화려한 요약: 메인 카드 · 도넛 · 추이 ---- */
     const sel=rows.find(r=>r.m===S.payM)||rows[rows.length-1],si=rows.indexOf(sel),prev=si>0?rows[si-1]:all[all.indexOf(sel)-1];
