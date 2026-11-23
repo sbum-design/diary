@@ -1221,6 +1221,210 @@ button.tci:hover{background:var(--page)}
 .rvopt{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.8rem;color:var(--ink-2)}
 .rvopt label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
 .rvcopy{padding:6px 12px;border-radius:9px;background:var(--ac);color:#fff;font-weight:700;font-size:.82rem}
+/* 급여 */
+.pyw{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;max-width:1400px;min-width:0}
+.pyhd{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pyyr{display:flex;gap:4px;margin-right:auto}
+.pyyr button{padding:6px 12px;border-radius:99px;background:var(--fill);font-weight:700;font-size:.86rem;color:var(--ink-2)}
+.pyyr button.on{background:var(--ink);color:var(--page)}
+.pybtn{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:10px;border:1px solid var(--rule);background:var(--page);font-size:.84rem;font-weight:600;color:var(--ink-2);cursor:pointer;text-decoration:none}
+.pybtn .ic{width:15px;height:15px}
+.pybtn.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+.pyimp{border:1px solid var(--hair);border-radius:14px;padding:14px;background:var(--page);display:grid;gap:8px}
+.pyimp p{margin:0;font-size:.84rem;color:var(--ink-2)}
+.pyimp textarea{width:100%;padding:10px;border:1px solid var(--rule);border-radius:10px;background:var(--fill);font-family:var(--f-mono);font-size:.8rem}
+.pyib{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pyib input{flex:1;min-width:200px;padding:8px 10px;border:1px solid var(--rule);border-radius:10px;background:var(--fill);font-size:.84rem}
+.pyks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.pyk{border:1px solid var(--hair);border-radius:14px;background:var(--page);padding:12px 14px;display:grid;gap:2px;min-width:0}
+.pyk span{font-size:.74rem;color:var(--ink-3);font-weight:600}
+.pyk b{font-family:var(--f-disp);font-size:1.3rem;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.pyk small{font-size:.72rem;color:var(--ink-3)}
+.pych{border:1px solid var(--hair);border-radius:14px;background:var(--page);padding:12px 14px}
+.pylg{display:flex;gap:12px;flex-wrap:wrap;font-size:.76rem;color:var(--ink-2);margin-bottom:6px}
+.pylg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.pylg i.ln{height:2px;border-radius:0;background:var(--ink);vertical-align:3px}
+.pych svg{width:100%;height:auto;display:block}
+.pych svg text{font-size:11px;fill:var(--ink-2)}.pych svg text.sm{font-size:10px;fill:var(--ink-3)}
+.pyscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.pytw{border:1px solid var(--hair);border-radius:14px;background:var(--page)}
+.pyt{border-collapse:separate;border-spacing:0;font-size:.8rem;font-variant-numeric:tabular-nums;width:max-content;min-width:100%}
+.pyt th,.pyt td{padding:0;border-bottom:1px solid var(--hair);white-space:nowrap}
+.pyt thead th{padding:7px 8px;font-size:.72rem;color:var(--ink-3);font-weight:700;text-align:right;background:var(--soft)}
+.pyt thead th.g{text-align:center;color:var(--ink-2);border-bottom:0;padding-bottom:0}
+.pyt thead th.in{color:#1f8a5b}.pyt thead th.card{color:#c86a1c}.pyt thead th.sav{color:#4b67d6}.pyt thead th.bal{color:#1f8a5b}
+.pyt .mo{position:sticky;left:0;z-index:1;background:var(--page);text-align:left;padding:0 6px 0 12px;font-weight:700;min-width:74px}
+.pyt thead .mo{background:var(--soft)}
+.pyt td input{width:96px;border:0;background:transparent;padding:8px 8px;text-align:right;font:inherit;color:var(--ink);outline:0}
+.pyt td input:focus{background:var(--ac-soft)}
+.pyt td input::placeholder{color:var(--ink-3);font-style:italic}
+.pyt td.in input{font-weight:700;color:#1f8a5b;width:108px}.pyt td.bl input{font-weight:700}
+.pyt td.sm{padding:0 10px;text-align:right;color:var(--ink-2)}
+.pyt tr.tot td,.pyt tr.tot th{font-weight:700;background:var(--soft);padding:8px;text-align:right}
+.pyt tr.tot th{text-align:left;padding-left:12px}
+.pyx{margin-left:6px;color:var(--ink-3);font-size:.8rem;opacity:0}
+.pyt tr:hover .pyx,.pyx:focus{opacity:1}
+.pyfoot{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.pyfoot p{margin:0;font-size:.76rem;color:var(--ink-3);flex:1;min-width:240px}
+.pyempty{display:grid;justify-items:center;gap:10px;padding:40px 20px;border:1px dashed var(--rule);border-radius:14px;text-align:center;color:var(--ink-2)}
+.pyempty>.ic{width:36px;height:36px;color:var(--ink-3)}
+@media (max-width:760px){.pyks{grid-template-columns:1fr 1fr}.pyks .pyk:first-child{grid-column:1/-1}.pyt td input{width:84px}}
+/* 급여 — 화려한 요약 */
+.pytop{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px}
+.pyhero{position:relative;overflow:hidden;border-radius:22px;padding:22px 24px 18px;color:#fff;isolation:isolate;
+  background:linear-gradient(135deg,#191c3b 0%,#2b2f7a 42%,#5b3cc4 70%,#0e8f7e 100%);box-shadow:0 20px 50px rgba(43,47,122,.35),inset 0 1px 0 rgba(255,255,255,.18)}
+.pyhero::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(60% 80% at 90% 0%,rgba(255,255,255,.22),transparent 60%),repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 9px)}
+.pyglow{position:absolute;z-index:-1;width:260px;height:260px;right:-60px;bottom:-90px;border-radius:50%;background:radial-gradient(circle,rgba(52,211,153,.55),transparent 65%);filter:blur(10px);animation:pyg 6s ease-in-out infinite}
+@keyframes pyg{50%{transform:translate(-30px,-16px) scale(1.15)}}
+.pyh1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pychip{width:36px;height:26px;border-radius:6px;background:linear-gradient(135deg,#f6d98a,#c99a3c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);position:relative}
+.pychip::after{content:"";position:absolute;inset:6px 8px;border:1px solid rgba(0,0,0,.25);border-radius:3px}
+.pyhm{font-size:.9rem;font-weight:700;letter-spacing:.02em;opacity:.9}
+.pydelta{margin-left:auto;font-size:.82rem;font-weight:800;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.14);backdrop-filter:blur(6px)}
+.pydelta.up{color:#7dffc4}.pydelta.dn{color:#ffb4b4}.pydelta small{font-weight:600;opacity:.75}
+.pyamt{margin:14px 0 16px;display:flex;align-items:baseline;gap:6px}
+.pyamt b.big{font-family:var(--f-disp);font-size:3.1rem;font-weight:800;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 6px 30px rgba(0,0,0,.3)}
+.pyamt span{font-size:1.1rem;opacity:.8;font-weight:700}
+.pyflow{display:flex;gap:3px;height:12px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.12)}
+.pyflow i{display:block;min-width:3px;transition:flex .6s cubic-bezier(.2,.8,.2,1)}
+.pyfl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.pyfl div{display:grid;gap:1px;min-width:0}
+.pyfl span{font-size:.72rem;opacity:.8;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.pyfl span i{width:8px;height:8px;border-radius:3px;flex:none}
+.pyfl b{font-size:1rem;font-weight:800;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.pyfl em{font-style:normal;font-size:.72rem;opacity:.7}
+.pymon{display:flex;gap:4px;margin-top:16px;overflow-x:auto;scrollbar-width:none}
+.pymon::-webkit-scrollbar{display:none}
+.pymon button{flex:none;padding:5px 11px;border-radius:99px;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.75);background:rgba(255,255,255,.08)}
+.pymon button.on{background:#fff;color:#2b2f7a}
+.pycard{border:1px solid var(--hair);border-radius:20px;background:var(--page);padding:16px 18px;box-shadow:0 6px 24px rgba(20,30,60,.05);min-width:0}
+.pycard h3{margin:0 0 10px;font-size:.92rem;font-weight:800;display:flex;align-items:center;gap:10px}
+.pyside{display:grid;min-width:0}
+.pydn{display:flex;gap:16px;align-items:center}
+.pydw{position:relative;width:150px;height:150px;flex:none}
+.pydw svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pydw circle{fill:none;stroke-width:16;transition:stroke-dasharray .8s cubic-bezier(.2,.8,.2,1)}
+.pydw circle.trk{stroke:var(--fill)}
+.pydc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pydc small{font-size:.7rem;color:var(--ink-3);font-weight:700}
+.pydc b{font-family:var(--f-disp);font-size:1.05rem;font-weight:800;font-variant-numeric:tabular-nums}
+.pydl{list-style:none;margin:0;padding:0;flex:1;min-width:0;display:grid;gap:6px}
+.pydl li{display:flex;align-items:center;gap:7px;font-size:.8rem}
+.pydl i{width:9px;height:9px;border-radius:3px;flex:none}
+.pydl span{flex:1;min-width:0;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pydl b{font-variant-numeric:tabular-nums;font-weight:700}
+.pydl em{font-style:normal;width:32px;text-align:right;color:var(--ink-3);font-size:.72rem}
+.pylg2{margin-left:auto;font-size:.72rem;font-weight:600;color:var(--ink-3);display:flex;align-items:center;gap:5px}
+.pylg2 i{display:inline-block;width:10px;height:10px;border-radius:3px}.pylg2 i.b{background:#7c8cff}.pylg2 i.l{height:3px;border-radius:2px;background:#34d399;margin-left:6px}
+.pytr{width:100%;height:auto;display:block}
+.pytr text{font-size:11px;fill:var(--ink-3);font-weight:600}.pytr text.v{fill:var(--ink);font-weight:800;font-size:11px}
+.pytr .gl{stroke:var(--hair);stroke-dasharray:3 4}
+.pytr .ln{fill:none;stroke:#34d399;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 3px 6px rgba(52,211,153,.45))}
+.pytr .dot{fill:var(--page);stroke:#34d399;stroke-width:2.5}
+.pybar{cursor:pointer}.pybar rect:first-child{transition:opacity .2s}.pybar:not(.on):hover rect:first-child{opacity:.75}
+.pyks2{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.pyt2{position:relative;overflow:hidden;border:1px solid var(--hair);border-radius:18px;background:var(--page);padding:14px 14px 34px;display:grid;gap:2px;min-width:0}
+.pyt2::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 100% 0%,color-mix(in srgb,var(--tc) 14%,transparent),transparent 60%);pointer-events:none}
+.pyt2 .ti{font-size:1.2rem}
+.pyt2 .tl{font-size:.74rem;color:var(--ink-3);font-weight:700}
+.pyt2 b{font-family:var(--f-disp);font-size:1.25rem;font-weight:800;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.pyt2 small{font-size:.72rem;color:var(--ink-3);min-height:1em}
+.pysp{position:absolute;left:0;right:0;bottom:6px;width:100%;height:26px}
+.pysp path{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;opacity:.8}
+.pydet{border:0}
+.pydet summary{cursor:pointer;font-weight:800;font-size:.92rem;padding:4px 2px 10px;list-style:none;display:flex;align-items:center;gap:6px}
+.pydet summary::before{content:"▸";transition:transform .2s;color:var(--ink-3)}
+.pydet[open] summary::before{transform:rotate(90deg)}
+.pydet summary::-webkit-details-marker{display:none}
+.pydet>.pyfoot{margin-top:10px}
+@media (max-width:980px){.pytop{grid-template-columns:minmax(0,1fr)}.pyks2{grid-template-columns:repeat(2,minmax(0,1fr))}.pyks2 .pyt2:first-child{grid-column:1/-1}}
+@media (max-width:560px){.pyhero{padding:18px 18px 14px;border-radius:20px}.pyamt b.big{font-size:2.4rem}.pyfl{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}.pydw{width:124px;height:124px}.pydn{gap:12px}}
+/* 서재 */
+.bkw{display:grid;gap:14px;max-width:1100px}
+.bkstat{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(3,minmax(0,1fr));gap:10px}
+.bkstat>div{border:1px solid var(--hair);border-radius:14px;background:var(--page);padding:14px 16px}
+.bkgoal{display:flex;align-items:center;gap:14px}
+.bkgoal .ring{--p:0;width:74px;height:74px;border-radius:50%;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(closest-side,var(--page) 78%,transparent 80%),conic-gradient(#e2a33b calc(var(--p)*1%),var(--fill) 0)}
+.bkgoal .ring b{font-family:var(--f-disp);font-size:1.5rem;line-height:1}
+.bkgoal .ring small{font-size:.66rem;color:var(--ink-3)}
+.bkgoal span{display:block;font-weight:700;font-size:.92rem}
+.bkgf{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:.84rem}
+.bkgf input{width:64px;padding:5px 8px;border:1px solid var(--rule);border-radius:8px;background:var(--fill)}
+.bkgf button{padding:5px 10px;border-radius:8px;background:var(--ac);color:#fff;font-weight:700}
+.bknum{display:flex;flex-direction:column;justify-content:center}
+.bknum b{font-family:var(--f-disp);font-size:1.6rem;line-height:1.1}
+.bknum span{font-size:.78rem;color:var(--ink-3)}
+.bktabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.bktabs button{padding:7px 13px;border-radius:99px;background:var(--fill);font-size:.86rem;font-weight:600;color:var(--ink-2)}
+.bktabs button b{font-weight:700;color:var(--ink-3);margin-left:2px}
+.bktabs button.on{background:var(--ink);color:var(--page)}.bktabs button.on b{color:inherit;opacity:.7}
+.bktabs .bkaddb{margin-left:auto;display:inline-flex;align-items:center;gap:4px;background:var(--ac);color:#fff}
+.bktabs .bkaddb .ic{width:15px;height:15px}
+.bkadd{border:1px solid var(--hair);border-radius:14px;background:var(--page);padding:14px;display:grid;gap:10px}
+.bksf,.bkmf{display:flex;gap:8px;flex-wrap:wrap}
+.bksf input,.bkmf input,.bkmf select{flex:1;min-width:110px;padding:9px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--fill);font-size:.92rem;outline:0}
+.bksf input:focus,.bkmf input:focus{border-color:var(--ac)}
+.bksf button,.bkmf button{padding:8px 14px;border-radius:10px;background:var(--ink);color:var(--page);font-weight:700}
+.bkmf input[name=pages]{flex:0 0 110px}.bkmf select{flex:0 0 120px}
+.bkres{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
+.bkr{display:flex;gap:10px;align-items:center;text-align:left;padding:8px;border-radius:10px;border:1px solid var(--hair)}
+.bkr:hover{background:var(--fill)}
+.bkr img,.bkr .bkgen{width:40px;height:58px;object-fit:cover;border-radius:4px;flex:none}
+.bkr b{display:block;font-size:.9rem}.bkr small{font-size:.76rem;color:var(--ink-3)}
+.bkhint{margin:0;font-size:.78rem;color:var(--ink-3)}
+.bkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:18px 14px}
+.bkc{display:flex;flex-direction:column;gap:4px;text-align:left;min-width:0}
+.bkc .cv{position:relative;display:block;aspect-ratio:2/3;border-radius:6px;overflow:hidden;box-shadow:0 6px 16px rgba(20,30,50,.18),0 0 0 1px rgba(0,0,0,.06);transition:transform .15s}
+.bkc:hover .cv{transform:translateY(-3px)}
+.bkc .cv img,.bkc .cv .bkgen{width:100%;height:100%;object-fit:cover;display:flex}
+.bkc .cv .dn{position:absolute;right:6px;top:6px;width:24px;height:24px;border-radius:50%;background:#1f8a5b;color:#fff;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800}
+.bkc>b{font-size:.9rem;line-height:1.3;margin-top:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.bkc>small{font-size:.76rem;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bkc>em{font-style:normal;font-size:.74rem;color:#c98a00}
+.bkgen{flex-direction:column;justify-content:flex-end;gap:4px;padding:10px;color:#fff;box-shadow:inset 6px 0 0 rgba(0,0,0,.18)}
+.bkgen b{font-size:.92rem;line-height:1.25;font-weight:800;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical}
+.bkgen small{font-size:.7rem;opacity:.8}
+.bkgen.sm{padding:0}
+.bkpb{display:block;height:5px;border-radius:9px;background:var(--fill);overflow:hidden}
+.bkpb u{display:block;height:100%;background:linear-gradient(90deg,#e2a33b,#f2b234)}
+.bkpb.lg{height:10px;flex:1}
+.bkd .bkback{justify-self:start;font-weight:700}
+.bkdh{display:flex;gap:20px;align-items:flex-start}
+.bkdh .cv{width:150px;flex:none;aspect-ratio:2/3;border-radius:8px;overflow:hidden;box-shadow:0 10px 24px rgba(20,30,50,.22)}
+.bkdh .cv img,.bkdh .cv .bkgen{width:100%;height:100%;object-fit:cover;display:flex}
+.bkdi{flex:1;min-width:0;display:grid;gap:8px}
+.bkti{font-family:var(--f-disp);font-size:1.6rem;font-weight:800;border:0;background:transparent;padding:2px 0;outline:0;width:100%}
+.bkau{border:0;background:transparent;color:var(--ink-2);font-size:.95rem;padding:0;outline:0}
+.bkmeta{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.bkmeta label{display:grid;gap:3px;font-size:.72rem;color:var(--ink-3);font-weight:700}
+.bkmeta input,.bkmeta select{padding:7px 9px;border:1px solid var(--rule);border-radius:9px;background:var(--fill);font-size:.88rem}
+.bkstar{display:flex;gap:2px}
+.bkstar button{font-size:1.6rem;line-height:1;color:var(--rule);padding:0 2px}
+.bkstar button.on{color:#f2b234}
+.bksec{border-top:1px solid var(--hair);padding-top:12px;display:grid;gap:8px}
+.bksec h4{margin:0;font-size:.78rem;letter-spacing:.06em;color:var(--ink-3)}
+.bkprog{display:flex;align-items:center;gap:10px}
+.bkprog b{font-family:var(--f-disp);font-size:1.2rem}.bkprog small{color:var(--ink-3);font-size:.82rem}
+.bklf{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.9rem}
+.bklf input{width:96px;padding:8px 10px;border:1px solid var(--rule);border-radius:9px;background:var(--fill);font-size:.95rem}
+.bklf button,.bkqf button{padding:8px 16px;border-radius:9px;background:var(--ac);color:#fff;font-weight:700}
+.bklogs{display:grid;gap:2px}
+.bklogs div{display:flex;gap:10px;align-items:baseline;font-size:.86rem;padding:3px 0}
+.bklogs span{width:40px;color:var(--ink-3);font-size:.76rem}
+.bklogs b{font-weight:500;flex:1}.bklogs em{font-style:normal;color:#c98a00;font-weight:700}
+.bkq{position:relative;margin:0;padding:10px 34px 10px 14px;border-left:3px solid #e2a33b;background:color-mix(in srgb,#e2a33b 7%,var(--page));border-radius:0 10px 10px 0}
+.bkq p{margin:0;font-size:.95rem;line-height:1.6}
+.bkq small{font-size:.74rem;color:var(--ink-3)}
+.bkw .x{position:absolute;right:8px;top:8px;color:var(--ink-3);font-size:1rem}
+.bklogs .x{position:static}
+.bkqf{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.bkqf textarea{flex:1;min-width:200px;padding:8px 10px;border:1px solid var(--rule);border-radius:9px;background:var(--fill);font-size:.92rem;resize:vertical}
+.bkqf input{width:64px;padding:8px;border:1px solid var(--rule);border-radius:9px;background:var(--fill)}
+.bkline,.bkmemo{width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--fill);font-size:.94rem;outline:0}
+.bkmemo{resize:vertical;line-height:1.6}
+.bkline:focus,.bkmemo:focus{border-color:var(--ac)}
+.bkdel{justify-self:start;color:var(--ink-3);font-size:.8rem}
+@media (max-width:760px){.bkstat{grid-template-columns:1fr 1fr 1fr}.bkgoal{grid-column:1/-1}.bkgrid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:14px 10px}.bkdh .cv{width:104px}.bkti{font-size:1.3rem}.bkdh{gap:14px}}
 /* 운동 그림 */
 .gav{width:38px;height:38px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:var(--gc);background:color-mix(in srgb,var(--gc) 11%,var(--page))}
 .gav svg{width:88%;height:88%;display:block}
@@ -1768,6 +1972,10 @@ label.tsi{cursor:pointer}
     gup:'<path d="M12 19V5M6 11l6-6 6 6"/>',
     gdown:'<path d="M12 5v14M6 13l6 6 6-6"/>',
     gx:'<path d="M6 6l12 12M18 6L6 18"/>',
+    link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    wallet:'<path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3"/><rect x="4" y="8" width="16" height="11" rx="2.5"/><path d="M16 13.5h2"/>',
+    eye:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+    eyeoff:'<path d="M3 3l18 18M10.6 6.1A9.6 9.6 0 0 1 12 6c6 0 9.5 6 9.5 6a17 17 0 0 1-3 3.6M6.4 7.6A16.6 16.6 0 0 0 2.5 12s3.5 6 9.5 6a9 9 0 0 0 3.5-.7M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
     review:'<rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4V2.8h6V4M8.5 12l2.3 2.3 4.7-4.8M8.5 17.5h7"/>',
     gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3.75v2M12 18.25v2M3.75 12h2M18.25 12h2M6.2 6.2l1.4 1.4M16.4 16.4l1.4 1.4M6.2 17.8l1.4-1.4M16.4 7.6l1.4-1.4"/>',
     gantt:'<path d="M4 6.5h8.5M8 12h11.5M6 17.5h7"/>',
@@ -2535,9 +2743,9 @@ label.tsi{cursor:pointer}
   /* 모바일 하단 탭 (아이콘 + 글자) */
   S.mmore=false;
   function mtabHtml(){
-    const tl=S.tl||'',cur=S.view==='tasks'?(tl==='quest'?'quest':isCalK(tl)?'cal':(tl==='dash'||tl==='work'||tl==='review')?'more':'todo'):S.view==='day'?'diary':'more';
+    const tl=S.tl||'',cur=S.view==='tasks'?(tl==='quest'?'quest':isCalK(tl)?'cal':(tl==='dash'||tl==='work'||tl==='review'||tl==='books'||tl==='pay')?'more':'todo'):S.view==='day'?'diary':'more';
     const T=[['todo','list','할 일'],['cal','cal','캘린더'],['quest','trophy','레벨'],['diary','pen','일기'],['more','more','더보기']];
-    const more=S.mmore?`<div class="mmore-bg" data-act="mt" data-v="close"></div><div class="mmore" role="menu">${[['review','review','주간회고'],['dash','dash','대시보드'],['work','brief','포트폴리오'],['year','cald','YEAR'],['month','cal','MONTH'],['week','calw','WEEK'],['notes','book','NOTES'],['habit','donebox','HABIT'],['goal','flag','GOAL'],['setting','gear','설정']].map(([k,ic,n])=>`<button data-act="mgo" data-v="${k}" class="${(S.view===k)||(S.view==='tasks'&&S.tl===k)?'on':''}">${icon(ic)}<span>${n}</span></button>`).join('')}</div>`:'';
+    const more=S.mmore?`<div class="mmore-bg" data-act="mt" data-v="close"></div><div class="mmore" role="menu">${[['review','review','주간회고'],['books','book','서재'],['pay','wallet','급여'],['dash','dash','대시보드'],['work','brief','포트폴리오'],['year','cald','YEAR'],['month','cal','MONTH'],['week','calw','WEEK'],['notes','book','NOTES'],['habit','donebox','HABIT'],['goal','flag','GOAL'],['setting','gear','설정']].map(([k,ic,n])=>`<button data-act="mgo" data-v="${k}" class="${(S.view===k)||(S.view==='tasks'&&S.tl===k)?'on':''}">${icon(ic)}<span>${n}</span></button>`).join('')}</div>`:'';
     return `${more}<nav class="mtab" aria-label="모바일 메뉴">${T.map(([k,ic,n])=>`<button data-act="mt" data-v="${k}" class="${cur===k||(k==='more'&&S.mmore)?'on':''}" aria-current="${cur===k?'page':'false'}">${icon(ic)}<span>${n}</span></button>`).join('')}</nav>`;
   }
   function toggleDone(id){if(!S.docs[id])return;update(id,d=>{d.done=!d.done;d.doneAt=d.done?Date.now():0},true);scheduleAlarm(id,300);render()}
@@ -2651,6 +2859,8 @@ label.tsi{cursor:pointer}
         ${it('work',icon('brief'),'포트폴리오',wN)}
         ${it('review',icon('review'),'회고')}
         ${it('quest',icon('trophy'),'레벨')}
+        ${it('books',icon('book'),'서재')}
+        ${it('pay',icon('wallet'),'급여')}
         ${calIt}
         ${it('today',dayIc(+TODAY.slice(8)),'오늘',by('today'))}
         ${it('week',dayIc(WDK[parse(TODAY).getDay()]),'7일',by('week'))}
@@ -2665,6 +2875,8 @@ label.tsi{cursor:pointer}
         ${it('work',icon('brief'),'업무 포트폴리오',wN)}
         ${it('review',icon('review'),'주간 회고')}
         ${it('quest',icon('trophy'),'레벨')}
+        ${it('books',icon('book'),'서재')}
+        ${it('pay',icon('wallet'),'급여')}
         ${it('all',icon('stack'),'전체',by('all'))}
         ${it('today',dayIc(+TODAY.slice(8)),'오늘',by('today'))}
         ${it('week',dayIc(WDK[parse(TODAY).getDay()]),'다음 7일',by('week'))}
@@ -2789,6 +3001,142 @@ label.tsi{cursor:pointer}
     const wkcard=card('s12','진행 중 업무',wsD.length?wsD.slice(0,8).map(w=>{const p=workProg(w.id),nx=p.all.filter(t=>!t.done).sort(tsort)[0];return `<button class="dl dw" data-act="wopen" data-w="${w.id}"><span class="n">${esc(w.title||'(제목 없음)')}</span><span class="bar"><u style="width:${p.n?Math.round(p.d/p.n*100):0}%;background:var(--ac)"></u></span><span class="c">할 일 ${p.d}/${p.n}${w.area?' · '+esc(w.area):''}${nx?' · 다음: '+esc(nx.title||''):''}</span></button>`}).join(''):'<p class="empty">진행 중인 업무가 없습니다.</p>',`<button class="lnk" data-act="tl" data-k="work">포트폴리오 →</button>`);
     return{title:`대시보드 <small>${dt.getMonth()+1}월 ${dt.getDate()}일 ${WDK[dt.getDay()]}요일</small>`,nav:false,noAdd:fineP.matches,fold:true,body:`<div class="dgrid"><div class="dcol s7">${kpis}${tcard}${ncard}${lcard}</div><div class="dcol s5">${mcard}${ecard}${hcard}</div>${wkcard}</div>`};
   }
+  /* ---------------- 급여 (월별 급여·지출) ----------------
+     pay-YYYY-MM 문서. 금액은 이 기기·구글 드라이브에만 저장(코드에는 없음) */
+  const PAYC=[['sal','급여','in'],['sav','적금(주담대)','sav'],['c_hd','현대카드','card'],['c_sh','신한카드','card'],['c_lt','롯데카드','card'],['c_wr','우리카드','card'],
+    ['f_ins','보험료','fix'],['f_club','동기회비','fix'],['f_live','생활비','fix'],['f_cp','쿠팡구독료','fix'],['bal','잔액','bal'],['s_sh','신한은행','split'],['s_sc','SC은행','split'],['d_sc','SC은행 입금','dep'],['d_x','기타','dep']];
+  const PAYG=[['','',1],['in','',1],['sav','',1],['card','신용카드',4],['fix','고정비',4],['bal','',1],['split','현대카드 분할',2],['dep','입금금액',2]];
+  const PAY_EX={f_live:1};/* 잔액 계산에서 빼는 항목 (시트와 같은 방식) */
+  const payRows=()=>Object.keys(S.docs).filter(k=>/^pay-\d{4}-\d\d$/.test(k)&&S.docs[k]).sort().map(k=>Object.assign({m:k.slice(4)},S.docs[k]));
+  const paySum=(r,cat)=>PAYC.filter(c=>c[2]===cat).reduce((a,c)=>a+(+r[c[0]]||0),0);
+  const payCalcBal=r=>(+r.sal||0)-(+r.sav||0)-paySum(r,'card')-PAYC.filter(c=>c[2]==='fix'&&!PAY_EX[c[0]]).reduce((a,c)=>a+(+r[c[0]]||0),0);
+  const payBal=r=>r.bal!=null&&r.bal!==''?+r.bal:payCalcBal(r);
+  try{S.payHide=!!localStorage.getItem('diarybook-payhide')}catch(e){}
+  const won=n=>S.payHide?'•••••':(Math.round(+n||0)).toLocaleString();
+  const wonK=n=>S.payHide?'•••':((+n||0)>=1e6?((+n)/1e4).toFixed(0)+'만':Math.round((+n||0)/1e3)+'천');
+  function payView(){
+    const all=payRows(),years=[...new Set(all.map(r=>r.m.slice(0,4)))].sort(),Y=S.payY&&years.includes(S.payY)?S.payY:(years.includes(TODAY.slice(0,4))?TODAY.slice(0,4):years[years.length-1]||TODAY.slice(0,4));
+    const rows=all.filter(r=>r.m.startsWith(Y)),n=rows.length||1,sheet=D('cfg').paySheet||'';
+    const sumSal=rows.reduce((a,r)=>a+(+r.sal||0),0),sumSav=rows.reduce((a,r)=>a+(+r.sav||0),0),sumCard=rows.reduce((a,r)=>a+paySum(r,'card'),0),avgBal=rows.reduce((a,r)=>a+payBal(r),0)/n;
+    const kpi=(l,v,sub)=>`<div class="pyk"><span>${l}</span><b>${v}</b>${sub?`<small>${sub}</small>`:''}</div>`;
+    const head=`<div class="pyhd"><div class="pyyr">${years.map(y=>`<button class="${y===Y?'on':''}" data-act="payy" data-v="${y}">${y}</button>`).join('')}</div>
+      <button class="pybtn" data-act="payhide" title="금액 가리기">${icon(S.payHide?'eyeoff':'eye')}${S.payHide?'금액 보기':'금액 가리기'}</button>
+      ${sheet?`<a class="pybtn" href="${esc(sheet)}" target="_blank" rel="noopener">${icon('link')}구글 시트</a>`:''}
+      <button class="pybtn" data-act="payimp">${icon('upload')}가져오기</button></div>`;
+    const imp=S.payImp?`<div class="pyimp"><p>구글 시트에서 <b>월(2026.05)부터 오른쪽 끝까지</b> 행을 복사해 붙여넣거나, 받은 <b>급여 파일(.json)</b>을 고르세요. 같은 달은 덮어씁니다.</p>
+      <textarea id="payPaste" rows="5" placeholder="2026.05	3,002,474	7,135,983	1,230,294	…"></textarea>
+      <div class="pyib"><label class="pybtn">${icon('upload')}파일 고르기<input type="file" accept=".json,.csv,.txt,.tsv" data-payfile hidden></label><input id="paySheet" placeholder="구글 시트 주소(선택)" value="${esc(sheet)}"><button class="pybtn pri" data-act="paypaste">붙여넣은 내용 넣기</button></div></div>`:'';
+    if(!all.length)return{title:'급여',nav:false,noAdd:true,noSeg:true,fold:false,body:`<div class="pyw">${head}${imp||`<div class="pyempty">${icon('wallet')}<p>아직 급여 기록이 없습니다.<br>「가져오기」로 시트 내용을 넣거나, 이번 달부터 바로 적어 보세요.</p><button class="pybtn pri" data-act="payadd">+ ${+TODAY.slice(5,7)}월 추가</button></div>`}</div>`};
+    const kpis=`<div class="pyks">${kpi(`${Y}년 급여 합계`,won(sumSal),`${rows.length}개월`)}${kpi('월평균 급여',won(sumSal/n))}${kpi('월평균 카드',won(sumCard/n),`급여의 ${sumSal?Math.round(sumCard/sumSal*100):0}%`)}${kpi('적금(주담대) 누계',won(sumSav))}${kpi('월평균 잔액',won(avgBal))}</div>`;
+    /* 차트: 급여가 어디로 갔는지 — 적금·카드·고정비·잔액 */
+    const segs=[['sav','적금','#5b7cfa'],['card','카드','#f08a3c'],['fix','고정비','#a3a9b3'],['bal','잔액','#2fb37a']];
+    const val=(r,k)=>k==='sav'?(+r.sav||0):k==='bal'?Math.max(0,payBal(r)):k==='fix'?PAYC.filter(c=>c[2]==='fix'&&!PAY_EX[c[0]]).reduce((a,c)=>a+(+r[c[0]]||0),0):paySum(r,k);
+    const mx=Math.max(1,...rows.map(r=>Math.max(+r.sal||0,segs.reduce((a,[k])=>a+val(r,k),0)))),W=56,H=180;
+    const chart=`<div class="pych"><div class="pylg">${segs.map(([,l,c])=>`<span><i style="background:${c}"></i>${l}</span>`).join('')}<span><i class="ln"></i>급여</span></div><div class="pyscroll"><svg viewBox="0 0 ${rows.length*W+20} ${H+34}" style="min-width:${rows.length*44}px;max-width:${rows.length*W+20}px" aria-label="월별 급여 사용 내역">
+      ${rows.map((r,i)=>{let y=H;const x=10+i*W+10;return segs.map(([k,,c])=>{const h=val(r,k)/mx*H;y-=h;return h>0?`<rect x="${x}" y="${y.toFixed(1)}" width="${W-20}" height="${h.toFixed(1)}" fill="${c}" rx="2"><title>${+r.m.slice(5)}월 ${k} ${won(val(r,k))}</title></rect>`:''}).join('')+
+        `<line x1="${x-4}" x2="${x+W-16}" y1="${(H-(+r.sal||0)/mx*H).toFixed(1)}" y2="${(H-(+r.sal||0)/mx*H).toFixed(1)}" stroke="var(--ink)" stroke-width="2"/><text x="${x+(W-20)/2}" y="${H+16}" text-anchor="middle">${+r.m.slice(5)}월</text><text x="${x+(W-20)/2}" y="${H+30}" text-anchor="middle" class="sm">${wonK(r.sal)}</text>`}).join('')}</svg></div></div>`;
+    /* 표 */
+    const cell=(r,k)=>{const v=r[k],calc=k==='bal'&&(v==null||v==='');return `<td class="${k==='sal'?'in':k==='bal'?'bl':''}"><input data-pay="${r.m}|${k}" inputmode="numeric" value="${S.payHide?'':calc?'':(v==null?'':(+v).toLocaleString())}" placeholder="${calc?won(payCalcBal(r)):S.payHide?'•••':''}" ${S.payHide?'disabled':''} aria-label="${+r.m.slice(5)}월 ${PAYC.find(c=>c[0]===k)[1]}"></td>`};
+    const tbl=`<div class="pyscroll pytw"><table class="pyt"><thead><tr>${PAYG.map(([,g,n])=>`<th colspan="${n}" class="g">${g}</th>`).join('')}<th class="g"></th></tr>
+      <tr><th class="mo">월</th>${PAYC.map(c=>`<th class="${c[2]}">${c[1]}${PAY_EX[c[0]]?'<sup title="잔액 계산에서 빠짐">*</sup>':''}</th>`).join('')}<th>카드 합계</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr><th class="mo">${r.m.slice(2).replace('-','.')}<button class="pyx" data-act="paydel" data-m="${r.m}" aria-label="${r.m} 삭제">${S.payDel===r.m?'삭제?':'×'}</button></th>${PAYC.map(c=>cell(r,c[0])).join('')}<td class="sm">${won(paySum(r,'card'))}</td></tr>`).join('')}
+      <tr class="tot"><th class="mo">합계</th>${PAYC.map(c=>`<td>${['s_sh','s_sc','d_sc','d_x'].includes(c[0])?'':won(rows.reduce((a,r)=>a+(c[0]==='bal'?payBal(r):(+r[c[0]]||0)),0))}</td>`).join('')}<td>${won(sumCard)}</td></tr></tbody></table></div>
+      <div class="pyfoot"><button class="pybtn" data-act="payadd">+ ${(()=>{const l=all[all.length-1];const d=l?parse(l.m+'-01'):parse(TODAY);if(l)d.setMonth(d.getMonth()+1);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}`})()} 추가</button>
+      <p>잔액 칸을 비워 두면 <b>급여 − 적금 − 카드 − 고정비</b>로 자동 계산됩니다(회색 숫자). *생활비는 시트처럼 잔액 계산에서 빠집니다. 칸을 눌러 바로 고칠 수 있어요.</p></div>`;
+    /* ---- 화려한 요약: 메인 카드 · 도넛 · 추이 ---- */
+    const sel=rows.find(r=>r.m===S.payM)||rows[rows.length-1],si=rows.indexOf(sel),prev=si>0?rows[si-1]:all[all.indexOf(sel)-1];
+    const flow=[['sav','적금(주담대)','#7c8cff'],['card','신용카드','#ff9f45'],['fix','고정비','#b8bec8'],['bal','남은 돈','#34d399']].map(([k,l,c])=>({k,l,c,v:val(sel,k)}));
+    const ftot=Math.max(1,flow.reduce((a,f)=>a+f.v,0)),dSal=prev&&+prev.sal?((+sel.sal-+prev.sal)/+prev.sal*100):null;
+    const cnt=(v,cls)=>`<b class="${cls||''}" data-count="${S.payHide?'':Math.round(+v||0)}">${won(v)}</b>`;
+    const hero=`<div class="pyhero"><div class="pyglow"></div>
+      <div class="pyh1"><span class="pychip"></span><span class="pyhm">${sel.m.slice(0,4)}. ${+sel.m.slice(5)}월 급여</span>${dSal!=null&&!S.payHide?`<span class="pydelta ${dSal>=0?'up':'dn'}">${dSal>=0?'▲':'▼'} ${Math.abs(dSal).toFixed(1)}%<small> 전월 대비</small></span>`:''}</div>
+      <div class="pyamt">${cnt(sel.sal,'big')}<span>원</span></div>
+      <div class="pyflow">${flow.map(f=>`<i style="flex:${f.v||0.0001};background:${f.c}" title="${f.l} ${won(f.v)}"></i>`).join('')}</div>
+      <div class="pyfl">${flow.map(f=>`<div><span><i style="background:${f.c}"></i>${f.l}</span>${cnt(f.v)}<em>${S.payHide?'':Math.round(f.v/ftot*100)+'%'}</em></div>`).join('')}</div>
+      <div class="pymon">${rows.map(r=>`<button class="${r===sel?'on':''}" data-act="paym" data-v="${r.m}">${+r.m.slice(5)}월</button>`).join('')}</div></div>`;
+    /* 도넛: 카드·고정비 세부 */
+    const parts=PAYC.filter(c=>['sav','card','fix'].includes(c[2])).map(c=>({l:c[1],v:+sel[c[0]]||0,g:c[2]})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+    const PCOL={sav:['#7c8cff'],card:['#ff9f45','#ffb877','#ffd0a3','#ffe4c9'],fix:['#9aa3ae','#b8bec8','#d3d7dd','#e4e7eb']},gi={sav:0,card:0,fix:0};parts.forEach(x=>{x.c=PCOL[x.g][Math.min(gi[x.g]++,PCOL[x.g].length-1)]});
+    const ptot=Math.max(1,parts.reduce((a,x)=>a+x.v,0)),R=54,C=2*Math.PI*R;let off=0;
+    const donut=`<section class="pycard"><h3>${+sel.m.slice(5)}월 지출 구성</h3><div class="pydn"><div class="pydw"><svg viewBox="0 0 140 140" aria-hidden="true"><circle cx="70" cy="70" r="${R}" class="trk"/>${parts.map(x=>{const len=x.v/ptot*C,el=`<circle cx="70" cy="70" r="${R}" stroke="${x.c}" stroke-dasharray="${Math.max(0,len-2).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}"/>`;off+=len;return el}).join('')}</svg>
+      <div class="pydc"><small>총 지출</small>${cnt(ptot)}</div></div>
+      <ul class="pydl">${parts.map(x=>`<li><i style="background:${x.c}"></i><span>${x.l}</span><b>${won(x.v)}</b><em>${S.payHide?'':Math.round(x.v/ptot*100)+'%'}</em></li>`).join('')}</ul></div></section>`;
+    /* 추이: 급여 막대 + 남은 돈 선 */
+    const TW=Math.max(rows.length*64,320),TH=190,pad=24,mxT=Math.max(1,...rows.map(r=>+r.sal||0)),bw=Math.min(34,TW/rows.length*0.5),xs=i=>pad+(i+.5)*((TW-pad*2)/rows.length),ys=v=>TH-8-(v/mxT)*(TH-36);
+    const pts=rows.map((r,i)=>[xs(i),ys(Math.max(0,payBal(r)))]),line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(''),area=line+`L${pts[pts.length-1][0].toFixed(1)} ${TH-8}L${pts[0][0].toFixed(1)} ${TH-8}Z`;
+    const trend=`<section class="pycard"><h3>월별 흐름 <span class="pylg2"><i class="b"></i>급여 <i class="l"></i>남은 돈</span></h3><div class="pyscroll"><svg class="pytr" viewBox="0 0 ${TW} ${TH+22}" style="min-width:${rows.length*40}px" aria-label="월별 급여와 남은 돈">
+      <defs><linearGradient id="pyb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c8cff"/><stop offset="1" stop-color="#7c8cff" stop-opacity=".25"/></linearGradient><linearGradient id="pyba" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b5bf0"/><stop offset="1" stop-color="#22c3a6"/></linearGradient><linearGradient id="pya" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399" stop-opacity=".35"/><stop offset="1" stop-color="#34d399" stop-opacity="0"/></linearGradient></defs>
+      ${[.25,.5,.75,1].map(f=>`<line x1="${pad}" x2="${TW-pad}" y1="${ys(mxT*f).toFixed(1)}" y2="${ys(mxT*f).toFixed(1)}" class="gl"/>`).join('')}
+      ${rows.map((r,i)=>`<g class="pybar ${r===sel?'on':''}" data-act="paym" data-v="${r.m}"><rect x="${(xs(i)-bw/2).toFixed(1)}" y="${ys(+r.sal||0).toFixed(1)}" width="${bw.toFixed(1)}" height="${(TH-8-ys(+r.sal||0)).toFixed(1)}" rx="6" fill="url(#${r===sel?'pyba':'pyb'})"/><rect x="${(xs(i)-((TW-pad*2)/rows.length)/2).toFixed(1)}" y="0" width="${((TW-pad*2)/rows.length).toFixed(1)}" height="${TH}" fill="transparent"/><text x="${xs(i).toFixed(1)}" y="${TH+14}" text-anchor="middle">${+r.m.slice(5)}월</text>${r===sel&&!S.payHide?`<text x="${xs(i).toFixed(1)}" y="${(ys(+r.sal||0)-6).toFixed(1)}" text-anchor="middle" class="v">${wonK(r.sal)}</text>`:''}</g>`).join('')}
+      <path d="${area}" fill="url(#pya)"/><path d="${line}" class="ln"/>${pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" class="dot"/>`).join('')}</svg></div></section>`;
+    const spark=(get,c)=>{const v=rows.map(get),m=Math.max(1,...v),mn=Math.min(...v);return `<svg class="pysp" viewBox="0 0 100 28" preserveAspectRatio="none"><path d="${v.map((x,i)=>(i?'L':'M')+(i/(Math.max(1,v.length-1))*100).toFixed(1)+' '+(26-(x-mn)/Math.max(1,m-mn)*22).toFixed(1)).join('')}" stroke="${c}"/></svg>`};
+    const tile=(ic,l,v,sub,sp,c)=>`<div class="pyt2" style="--tc:${c}"><span class="ti">${ic}</span><span class="tl">${l}</span>${cnt(v)}<small>${sub||''}</small>${sp}</div>`;
+    const tiles=`<div class="pyks2">${tile('💼',`${Y}년 급여 합계`,sumSal,`${rows.length}개월`,spark(r=>+r.sal||0,'#7c8cff'),'#7c8cff')}${tile('📈','월평균 급여',sumSal/n,'',spark(r=>+r.sal||0,'#5b5bf0'),'#5b5bf0')}${tile('💳','월평균 카드',sumCard/n,`급여의 ${sumSal?Math.round(sumCard/sumSal*100):0}%`,spark(r=>paySum(r,'card'),'#ff9f45'),'#ff9f45')}${tile('🏦','적금(주담대) 누계',sumSav,'',spark(r=>+r.sav||0,'#22c3a6'),'#22c3a6')}${tile('🌱','월평균 남은 돈',avgBal,'',spark(r=>payBal(r),'#34d399'),'#34d399')}</div>`;
+    const key=sel.m+'|'+S.payHide+'|'+rows.length;if(S.payAnim!==key){S.payAnim=key;setTimeout(payCount,30)}
+    return{title:'급여',nav:false,noAdd:true,noSeg:true,fold:false,body:`<div class="pyw">${head}${imp}<div class="pytop">${hero}<div class="pyside">${donut}</div></div>${trend}${tiles}<details class="pydet" ${S.payTbl===false?'':'open'}><summary data-act="paytbl">월별 상세 표</summary>${tbl}</details></div>`};
+  }
+  function payCount(){const els=[...document.querySelectorAll('.pyw [data-count]')].filter(e=>e.dataset.count!=='');const t0=performance.now(),D=850;
+    const step=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);els.forEach(el=>{if(!el.isConnected)return;el.textContent=Math.round(+el.dataset.count*e).toLocaleString()});if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+  function payImport(rows,sheet){let n=0;rows.forEach(o=>{const m=o.m;if(!/^\d{4}-\d\d$/.test(m||''))return;update('pay-'+m,d=>{PAYC.forEach(([k])=>{if(o[k]!=null&&o[k]!=='')d[k]=+o[k]})},true);n++});
+    if(sheet)update('cfg',d=>{d.paySheet=sheet},true);return n}
+  function payParseText(t){const out=[],keys=['bal','sal','sav','c_hd','c_sh','c_lt','c_wr','f_ins','f_club','f_live','f_cp','s_sh','s_sc',null,'d_sc','d_x'];
+    String(t||'').split(/\r?\n/).forEach(line=>{const cells=[];let cur='',q=false,sep=line.includes('\t')?'\t':',';for(const ch of line){if(ch==='"'){q=!q;continue}if(ch===sep&&!q){cells.push(cur);cur='';continue}cur+=ch}cells.push(cur);
+      while(cells.length&&!cells[0].trim())cells.shift();const m=/^(\d{4})[.\-/](\d{1,2})/.exec((cells[0]||'').trim());if(!m)return;const o={m:`${m[1]}-${m[2].padStart(2,'0')}`};
+      cells.slice(1).forEach((c,i)=>{const k=keys[i];if(!k)return;const d=c.replace(/[^\d\-]/g,'');if(d&&d!=='-')o[k]=+d});if(o.sal)out.push(o)});return out}
+  /* ---------------- 서재 (독서 기록) ----------------
+     bk-<id>: title·author·cover·pages·status(want|reading|done)·start·end·cur·logs[{day,from,to}]·quotes[{t,p,day}]·memo·review·rating */
+  const books=()=>Object.keys(S.docs).filter(k=>k.startsWith('bk-')&&S.docs[k]).map(k=>Object.assign({id:k},S.docs[k]));
+  const BKST={reading:'읽는 중',done:'다 읽음',want:'읽고 싶은'};
+  const bkCover=(b,cls)=>b.cover?`<img class="${cls||''}" src="${esc(b.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:(()=>{const h=hsh(b.title||'');const c1=`hsl(${h%360} 45% 38%)`,c2=`hsl(${(h+40)%360} 50% 22%)`;
+    return `<span class="bkgen ${cls||''}" style="background:linear-gradient(160deg,${c1},${c2})"><b>${esc(b.title||'')}</b><small>${esc(b.author||'')}</small></span>`})();
+  const bkPct=b=>b.status==='done'?100:+b.pages>0?Math.min(100,Math.round((+b.cur||0)/+b.pages*100)):0;
+  function bkSyncHabit(){/* 오늘 읽은 쪽수를 '독서' 퀘스트에 반영 */
+    const tot=books().reduce((a,b)=>a+(b.logs||[]).filter(l=>l.day===TODAY).reduce((x,l)=>x+Math.max(0,(+l.to||0)-(+l.from||0)),0),0);
+    const hs=cfg().habits.filter(h=>h.on&&/독서|책|읽기/.test(h.name||''));if(!hs.length)return;
+    update(TODAY,d=>{d.habits=d.habits||{};hs.forEach(h=>{if(+h.target>0&&/페이지|쪽|p/i.test(h.unit||'')){d.hq=d.hq||{};d.hq[h.id]=Math.max(+d.hq[h.id]||0,tot);d.habits[h.id]=d.hq[h.id]>=hTarget(h,TODAY)}else if(tot>0)d.habits[h.id]=true})},true)}
+  function booksView(){
+    const all=books(),Y=TODAY.slice(0,4),M=TODAY.slice(0,7),goal=+D('cfg').bookGoal||12;
+    const doneY=all.filter(b=>b.status==='done'&&(b.end||'').startsWith(Y));
+    const pagesM=all.reduce((a,b)=>a+(b.logs||[]).filter(l=>(l.day||'').startsWith(M)).reduce((x,l)=>x+Math.max(0,(+l.to||0)-(+l.from||0)),0),0);
+    const pagesY=all.reduce((a,b)=>a+(b.logs||[]).filter(l=>(l.day||'').startsWith(Y)).reduce((x,l)=>x+Math.max(0,(+l.to||0)-(+l.from||0)),0),0);
+    const sel=S.bkSel&&S.docs[S.bkSel]?Object.assign({id:S.bkSel},S.docs[S.bkSel]):null;
+    if(sel)return{title:'서재',nav:false,noAdd:true,noSeg:true,fold:false,body:bkDetail(sel)};
+    const tab=S.bkTab||'reading',list=(tab==='all'?all:all.filter(b=>(b.status||'want')===tab)).sort((a,b)=>tab==='done'?(b.end||'').localeCompare(a.end||''):(b.updatedAt||0)-(a.updatedAt||0));
+    const cnt=k=>k==='all'?all.length:all.filter(b=>(b.status||'want')===k).length;
+    const stat=`<div class="bkstat"><div class="bkgoal"><div class="ring" style="--p:${Math.min(100,Math.round(doneY.length/goal*100))}"><b>${doneY.length}</b><small>/ ${goal}권</small></div><div><span>${Y}년 독서 목표</span>
+      <button class="lnk" data-act="bkgoal">${S.bkGoalEd?'':'목표 바꾸기'}</button>${S.bkGoalEd?`<form id="bkgoalf" class="bkgf"><input id="bkGoal" type="number" min="1" value="${goal}" inputmode="numeric"> 권 <button>저장</button></form>`:''}</div></div>
+      <div class="bknum"><b>${cnt('reading')}</b><span>읽는 중</span></div><div class="bknum"><b>${pagesM.toLocaleString()}</b><span>이번 달 쪽수</span></div><div class="bknum"><b>${pagesY.toLocaleString()}</b><span>올해 쪽수</span></div></div>`;
+    const tabs=`<div class="bktabs">${[['reading','읽는 중'],['done','다 읽음'],['want','읽고 싶은'],['all','전체']].map(([k,n])=>`<button class="${tab===k?'on':''}" data-act="bktab" data-v="${k}">${n} <b>${cnt(k)}</b></button>`).join('')}<button class="bkaddb" data-act="bkaddtog">${icon('plus')} 책 추가</button></div>`;
+    const add=S.bkAdd?`<div class="bkadd"><form id="bksrch" class="bksf"><input id="bkQ" placeholder="책 제목·저자로 검색" value="${esc(S.bkQ||'')}" autocomplete="off"><button>검색</button></form>
+      ${S.bkRes==='loading'?'<p class="bkhint">찾는 중…</p>':Array.isArray(S.bkRes)?(S.bkRes.length?`<div class="bkres">${S.bkRes.map((r,i)=>`<button class="bkr" data-act="bkpick" data-i="${i}">${r.cover?`<img src="${esc(r.cover)}" alt="" referrerpolicy="no-referrer">`:'<span class="bkgen sm"></span>'}<span><b>${esc(r.title)}</b><small>${esc(r.author||'')}${r.pages?` · ${r.pages}쪽`:''}${r.year?` · ${r.year}`:''}</small></span></button>`).join('')}</div>`:'<p class="bkhint">검색 결과가 없습니다. 아래에 직접 입력하세요.</p>'):S.bkRes==='err'?'<p class="bkhint">검색이 안 됩니다(인터넷 연결 확인). 아래에 직접 입력하세요.</p>':''}
+      <form id="bkman" class="bkmf"><input name="title" placeholder="제목" required><input name="author" placeholder="저자"><input name="pages" type="number" min="1" inputmode="numeric" placeholder="전체 쪽수"><select name="status"><option value="reading">읽는 중</option><option value="want">읽고 싶은</option><option value="done">다 읽음</option></select><button>직접 추가</button></form></div>`:'';
+    const card=b=>`<button class="bkc" data-act="bkopen" data-b="${b.id}"><span class="cv">${bkCover(b)}${b.status==='done'?'<i class="dn">✓</i>':''}</span><b>${esc(b.title)}</b><small>${esc(b.author||'')}</small>
+      ${b.status==='reading'?`<span class="bkpb"><u style="width:${bkPct(b)}%"></u></span><em>${+b.cur||0}${+b.pages?` / ${b.pages}쪽 · ${bkPct(b)}%`:'쪽'}</em>`:b.status==='done'?`<em>${b.rating?'★'.repeat(b.rating):''} ${b.end?md(b.end)+' 완독':''}</em>`:'<em>읽고 싶은 책</em>'}</button>`;
+    const grid=list.length?`<div class="bkgrid">${list.map(card).join('')}</div>`:`<p class="empty" style="padding:24px 4px">${tab==='reading'?'읽고 있는 책이 없습니다. 「책 추가」로 시작해 보세요.':tab==='done'?'아직 다 읽은 책이 없습니다.':'목록이 비어 있습니다.'}</p>`;
+    return{title:'서재',nav:false,noAdd:true,noSeg:true,fold:false,body:`<div class="bkw">${stat}${tabs}${add}${grid}<p class="bkhint">읽은 쪽수를 기록하면 레벨의 「독서」 퀘스트에 자동으로 들어가고, 완독하면 +100 XP · +100 G (지능)를 받습니다.</p></div>`};
+  }
+  function bkDetail(b){
+    const logs=(b.logs||[]).slice().sort((x,y)=>(y.day||'').localeCompare(x.day||'')),qs=b.quotes||[],a=`data-b="${b.id}"`;
+    return `<div class="bkw bkd"><button class="lnk bkback" data-act="bkclose">← 서재</button>
+      <div class="bkdh"><span class="cv lg">${bkCover(b)}</span><div class="bkdi">
+        <input class="bkti" data-bk="${b.id}|title" value="${esc(b.title||'')}" aria-label="제목"><input class="bkau" data-bk="${b.id}|author" value="${esc(b.author||'')}" placeholder="저자" aria-label="저자">
+        <div class="bkmeta"><label>상태<select data-bk="${b.id}|status">${Object.entries(BKST).map(([k,n])=>`<option value="${k}" ${(b.status||'want')===k?'selected':''}>${n}</option>`).join('')}</select></label>
+          <label>전체 쪽수<input type="number" min="0" inputmode="numeric" data-bk="${b.id}|pages" value="${+b.pages||''}"></label>
+          <label>시작<input type="date" data-bk="${b.id}|start" value="${b.start||''}"></label><label>완독<input type="date" data-bk="${b.id}|end" value="${b.end||''}"></label></div>
+        <div class="bkstar" role="radiogroup" aria-label="별점">${[1,2,3,4,5].map(n=>`<button class="${(b.rating||0)>=n?'on':''}" data-act="bkrate" ${a} data-v="${n}" aria-label="${n}점">★</button>`).join('')}</div>
+      </div></div>
+      <section class="bksec"><h4>진행</h4><div class="bkprog"><span class="bkpb lg"><u style="width:${bkPct(b)}%"></u></span><b>${bkPct(b)}%</b><small>${+b.cur||0}${+b.pages?` / ${b.pages}쪽`:'쪽'}</small></div>
+        <form id="bklog" class="bklf" data-b="${b.id}"><span>오늘</span><input id="bkTo" type="number" min="0" inputmode="numeric" placeholder="${(+b.cur||0)+20}"><span>쪽까지 읽었어요</span><button>기록</button></form>
+        ${logs.length?`<div class="bklogs">${logs.slice(0,12).map((l,i)=>`<div><span>${md(l.day)}</span><b>${l.from}→${l.to}쪽</b><em>+${Math.max(0,l.to-l.from)}쪽</em><button class="x" data-act="bklogdel" ${a} data-i="${(b.logs||[]).indexOf(l)}" aria-label="삭제">×</button></div>`).join('')}</div>`:''}</section>
+      <section class="bksec"><h4>밑줄 그은 문장</h4>${qs.map((q,i)=>`<blockquote class="bkq"><p>${esc(q.t)}</p><small>${q.p?`p.${esc(q.p)} · `:''}${md(q.day||TODAY)}</small><button class="x" data-act="bkqdel" ${a} data-i="${i}" aria-label="삭제">×</button></blockquote>`).join('')}
+        <form id="bkqf" class="bkqf" data-b="${b.id}"><textarea id="bkQt" rows="2" placeholder="마음에 남는 문장"></textarea><input id="bkQp" placeholder="쪽" inputmode="numeric"><button>추가</button></form></section>
+      <section class="bksec"><h4>한 줄 평</h4><input class="bkline" data-bk="${b.id}|review" value="${esc(b.review||'')}" placeholder="이 책을 한 줄로 말하면?"></section>
+      <section class="bksec"><h4>메모</h4><textarea class="bkmemo" data-bk="${b.id}|memo" rows="5" placeholder="생각, 배운 점, 적용할 것">${esc(b.memo||'')}</textarea></section>
+      <button class="lnk bkdel" data-act="bkdel" ${a}>${S.bkDel===b.id?'한 번 더 누르면 이 책을 지웁니다':'이 책 지우기'}</button></div>`;
+  }
+  async function bkSearch(q){S.bkQ=q;S.bkRes='loading';render();
+    try{const r=await fetch('https://www.googleapis.com/books/v1/volumes?maxResults=8&printType=books&q='+encodeURIComponent(q));const j=await r.json();
+      S.bkRes=(j.items||[]).map(it=>{const v=it.volumeInfo||{};return{title:v.title+(v.subtitle?': '+v.subtitle:''),author:(v.authors||[]).join(', '),pages:v.pageCount||0,year:(v.publishedDate||'').slice(0,4),cover:((v.imageLinks||{}).thumbnail||'').replace(/^http:/,'https:')}})}catch(e){S.bkRes='err'}render()}
   /* ---------------- 레벨업 ----------------
      XP는 저장하지 않고 기록에서 매번 계산 → 기기 간 항상 같고, 지난 기록도 반영 */
   var xpMemo=null;
@@ -2816,16 +3164,18 @@ label.tsi{cursor:pointer}
     ['s3','불씨','🔥','3일 연속 기록',s=>s.st>=3],['s7','일주일의 불꽃','☄️','7일 연속 기록',s=>s.st>=7],['s21','습관의 문턱','💎','21일 연속 기록',s=>s.st>=21],['s66','66일의 각성','🐉','66일 연속 기록',s=>s.st>=66],
     ['a7','챌린지 7일','🥉','66일 챌린지 7일 성공',s=>s.arcOk>=7],['a30','챌린지 30일','🥈','66일 챌린지 30일 성공',s=>s.arcOk>=30],['a66','아크 클리어','🥇','66일 챌린지 완주',s=>s.arcOk>=66||s.arcDone>=1],
     ['b1','보스 슬레이어','💀','주간 보스 첫 처치',s=>s.boss>=1],['b4','사냥꾼','🐺','주간 보스 4마리 처치',s=>s.boss>=4],['m1','첫 챕터','📜','메인 퀘스트 챕터 클리어',s=>s.chap>=1],['m9','정복자','🏰','메인 퀘스트 완주',s=>s.mq>=1],['e5','긴급 대응','🚨','긴급 퀘스트 5번 성공',s=>s.eq>=5],
+    ['k1','첫 완독','📕','책 1권 완독',s=>s.book>=1],['k10','다독가','📚','책 10권 완독',s=>s.book>=10],
     ['d10','기록가','📔','일기 10일',s=>s.diary>=10],['d50','작가','✒️','일기 50일',s=>s.diary>=50],['n1k','천 단위','📚','수치형 퀘스트 누적 1,000',s=>s.amt>=1000]];
   const ACH_LV=[['lv5','각성','⚡','레벨 5 달성',5],['lv10','D급 헌터','🛡️','레벨 10 달성',10],['lv20','C급 헌터','⚔️','레벨 20 달성',20],['lv30','B급 헌터','🏹','레벨 30 달성',30],['lv45','A급 헌터','🌋','레벨 45 달성',45]];
   function xpCalc(){
     if(xpMemo)return xpMemo;
     const L=[],st0=lvStart(),arc=arcOf(),add=(day,xp,st,lab,g)=>{if(day)L.push({day,xp,st,lab,g:g==null?Math.round(xp/2):g})};
-    const hs=cfg().habits,ST={q:0,perfect:0,st:0,diary:0,amt:0,arcOk:0,arcDone:arc.done,boss:0,chap:0,mq:0,eq:0},unl={},days={};
+    const hs=cfg().habits,ST={q:0,perfect:0,st:0,diary:0,amt:0,arcOk:0,arcDone:arc.done,boss:0,chap:0,mq:0,eq:0,book:0},unl={},days={};
     /* 메인 퀘스트·보스·긴급 퀘스트 기록을 날짜별로 모음 */
     const ext={},ex=(day,o)=>{if(!day||day<st0||day>TODAY)return;(ext[day]=ext[day]||[]).push(o)};
     Object.keys(S.docs).forEach(k=>{const d=S.docs[k];if(!d)return;
       if(k.startsWith('mq-')){const st=d.stat||'int';(d.chapters||[]).forEach(c=>{(c.steps||[]).forEach(z=>{if(z.done&&z.day)ex(z.day,{xp:15,g:15,st,lab:`${d.title} · ${z.t}`,type:'mstep'})});if(c.day)ex(c.day,{xp:200,g:200,st:'',lab:`챕터 클리어 · ${c.t}`,type:'chap'})});if(d.done)ex(d.done,{xp:500,g:500,st:'',lab:`메인 퀘스트 완주 · ${d.title}`,type:'mq'})}
+      else if(k.startsWith('bk-')){if(d.status==='done'&&d.end)ex(d.end,{xp:100,g:100,st:'int',lab:`완독 · ${d.title}`,type:'book'})}
       else if(k.startsWith('boss-')){const st=d.stat||'str';(d.steps||[]).forEach(z=>{if(z.done&&z.day)ex(z.day,{xp:20,g:20,st,lab:`보스 공격 · ${z.t}`,type:'hit'})});if(d.dead)ex(d.dead,{xp:300,g:300,st:'',lab:`보스 처치 · ${d.title}`,type:'boss'})}
       else if(/^\d{4}-\d\d-\d\d$/.test(k)&&d.eq&&d.eq.status==='done')ex(k,{xp:d.eq.xp||60,g:d.eq.xp||60,st:d.eq.st||'',lab:`긴급 퀘스트 · ${d.eq.text}`,type:'eq'})});
     let prevOn=false,streak=0;
@@ -2836,7 +3186,7 @@ label.tsi{cursor:pointer}
       if(perfect){ST.perfect++;if(act.length>=2)add(k,20,'','오늘 퀘스트 전부 클리어')}
       const diary=DIARY_F.some(f=>d[f]&&String(d[f]).trim())||['events','logs','todos'].some(f=>(d[f]||[]).some(x=>x&&x.text&&x.text.trim()));
       if(diary){ST.diary++;add(k,10,'sen','일기 쓰기')}
-      const xs=ext[k]||[];xs.forEach(o=>{L.push(Object.assign({day:k},o));if(o.type==='boss')ST.boss++;if(o.type==='chap')ST.chap++;if(o.type==='mq')ST.mq++;if(o.type==='eq')ST.eq++});
+      const xs=ext[k]||[];xs.forEach(o=>{L.push(Object.assign({day:k},o));if(o.type==='boss')ST.boss++;if(o.type==='chap')ST.chap++;if(o.type==='mq')ST.mq++;if(o.type==='eq')ST.eq++;if(o.type==='book')ST.book++});
       const on=n>0||diary||xs.length>0;
       if(on){streak=prevOn?streak+1:1;if(streak>1)add(k,Math.min(streak,10)*2,'',`연속 ${streak}일`);if(streak%7===0)add(k,50,'',`${streak}일 연속 보너스`)}
       else if(k<TODAY)streak=0;
@@ -3575,6 +3925,25 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   const GPUSH={
     lvopen:()=>{flushAll();S.view='tasks';S.tl='quest';S.tsel=null;S.wsel=null;S.mmore=false;S.side=false;try{localStorage.setItem(LSV,'tasks');localStorage.setItem('diarybook-tl','quest')}catch(e){}render();window.scrollTo(0,0)},
     qtab:b=>{S.qtab=b.dataset.v;render()},
+    bktab:b=>{S.bkTab=b.dataset.v;render()},
+    payy:b=>{S.payY=b.dataset.v;S.payM=null;render()},
+    paym:b=>{S.payM=b.dataset.v;render()},
+    paytbl:()=>{S.payTbl=S.payTbl===false?true:false},
+    payhide:()=>{S.payHide=!S.payHide;try{localStorage.setItem('diarybook-payhide',S.payHide?'1':'')}catch(e){}render()},
+    payimp:()=>{S.payImp=!S.payImp;render()},
+    paypaste:()=>{const t=(document.getElementById('payPaste')||{}).value||'',sh=((document.getElementById('paySheet')||{}).value||'').trim();const rows=payParseText(t);if(!rows.length&&!sh){flash('넣을 내용을 못 찾았습니다 — 월(2026.05)부터 복사해 주세요');return}const n=payImport(rows,sh);S.payImp=false;flash(n?`${n}개월을 넣었습니다`:'시트 주소를 저장했습니다');render()},
+    payadd:()=>{const all=payRows(),l=all[all.length-1];const d=l?parse(l.m+'-01'):parse(TODAY.slice(0,8)+'01');if(l)d.setMonth(d.getMonth()+1);const m=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      update('pay-'+m,x=>{if(l)['sav','f_ins','f_club','f_live','f_cp'].forEach(k=>{if(l[k]!=null)x[k]=l[k]});x.sal=x.sal||0},true);S.payY=m.slice(0,4);render()},
+    paydel:b=>{const m=b.dataset.m;if(S.payDel!==m){S.payDel=m;render();setTimeout(()=>{if(S.payDel===m){S.payDel=null;requestRender()}},4000);return}S.payDel=null;remove('pay-'+m);flash(`${m} 기록을 지웠습니다 · Ctrl+Z로 되돌리기`);render()},
+    bkaddtog:()=>{S.bkAdd=!S.bkAdd;S.bkRes=null;render();if(S.bkAdd)setTimeout(()=>{const n=document.getElementById('bkQ');n&&n.focus()},30)},
+    bkpick:b=>{const r=(S.bkRes||[])[+b.dataset.i];if(!r)return;const id='bk-'+Date.now().toString(36);update(id,d=>{Object.assign(d,{title:r.title,author:r.author,pages:r.pages||0,cover:r.cover||'',status:'reading',start:TODAY,cur:0,created:Date.now()})},true);S.bkAdd=false;S.bkRes=null;S.bkSel=id;flash('📖 서재에 꽂았습니다');render()},
+    bkopen:b=>{S.bkSel=b.dataset.b;S.bkDel=null;render();window.scrollTo(0,0)},
+    bkclose:()=>{S.bkSel=null;render()},
+    bkgoal:()=>{S.bkGoalEd=true;render()},
+    bkrate:b=>{const id=b.dataset.b,v=+b.dataset.v;update(id,d=>{d.rating=d.rating===v?0:v},true);render()},
+    bklogdel:b=>{const id=b.dataset.b,i=+b.dataset.i;update(id,d=>{(d.logs||[]).splice(i,1);d.cur=(d.logs||[]).reduce((a,l)=>Math.max(a,+l.to||0),0)},true);bkSyncHabit();render()},
+    bkqdel:b=>{const id=b.dataset.b,i=+b.dataset.i;update(id,d=>{(d.quotes||[]).splice(i,1)},true);render()},
+    bkdel:b=>{const id=b.dataset.b;if(S.bkDel!==id){S.bkDel=id;render();return}S.bkDel=null;S.bkSel=null;remove(id);flash('책을 지웠습니다 · Ctrl+Z로 되돌리기');render()},
     qmode:b=>{S.qmode=b.dataset.v;S.mqEdit=null;S.shopCf=null;render()},
     eqok:()=>{update(TODAY,d=>{if(d.eq)d.eq.status='on'},true);flash('긴급 퀘스트 수락! 자정까지입니다');render();eqAuto()},
     eqre:()=>{const q=D(TODAY).eq;if(!q||q.re||q.status!=='offer')return;const pl=eqPick(TODAY,{g:q.kind==='free'?q.g:'',text:q.text}),GN={body:'몸',mind:'지식',heart:'마음'};update(TODAY,d=>{d.eq=Object.assign({},d.eq,{kind:'free',g:pl.g,text:pl.text,st:pl.st,why:`다시 뽑은 ${GN[pl.g]} 미션`,xp:50,re:true,ref:'',step:'',n:0})},true);render()},
@@ -3851,6 +4220,8 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     else if(k==='gym')r=gymView();
     else if(k==='review')r=reviewView();
     else if(k==='quest')r=questView();
+    else if(k==='books')r=booksView();
+    else if(k==='pay')r=payView();
     else{const L=smart();let sl=L.find(x=>x.k===k);if(!sl){S.tl='today';sl=L.find(x=>x.k==='today')}
       r={title:esc(sl.n),sub:sl.done?'':String(sl.count||''),nav:false,body:listBody(sl,tasks()),noAdd:!!sl.done}}
     if(S.tsel&&!S.docs[S.tsel])S.tsel=null;
@@ -4269,9 +4640,9 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     mt:b=>{const v=b.dataset.v;flushAll();S.tsel=null;S.wsel=null;S.side=false;S.dp=null;S.mm=false;S.confirm=null;
       if(v==='close'){S.mmore=false;render();return}if(v==='more'){S.mmore=!S.mmore;render();return}S.mmore=false;
       if(v==='diary'){S.view='day';S.cur=TODAY}
-      else{S.view='tasks';S.cur=TODAY;const ll=S.lastList;S.tl=v==='quest'?'quest':v==='cal'?(S.lastCal||'cal:m'):(ll&&!isCalK(ll)&&!['gym','dash','work','review','quest'].includes(ll)?ll:'today')}
+      else{S.view='tasks';S.cur=TODAY;const ll=S.lastList;S.tl=v==='quest'?'quest':v==='cal'?(S.lastCal||'cal:m'):(ll&&!isCalK(ll)&&!['gym','dash','work','review','quest','books','pay'].includes(ll)?ll:'today')}
       try{localStorage.setItem(LSV,S.view);localStorage.setItem('diarybook-tl',S.tl)}catch(e){}render();window.scrollTo(0,0)},
-    mgo:b=>{const v=b.dataset.v;S.mmore=false;if(v==='dash'||v==='work'||v==='quest'||v==='review'){flushAll();S.view='tasks';S.tl=v;S.tsel=null;S.wsel=null;try{localStorage.setItem(LSV,'tasks');localStorage.setItem('diarybook-tl',v)}catch(e){}render();window.scrollTo(0,0);return}ACT.tab({dataset:{v}})},
+    mgo:b=>{const v=b.dataset.v;S.mmore=false;if(v==='dash'||v==='work'||v==='quest'||v==='review'||v==='books'||v==='pay'){flushAll();S.view='tasks';S.tl=v;S.tsel=null;S.wsel=null;try{localStorage.setItem(LSV,'tasks');localStorage.setItem('diarybook-tl',v)}catch(e){}render();window.scrollTo(0,0);return}ACT.tab({dataset:{v}})},
     tab:b=>{flushAll();S.view=b.dataset.v;S.confirm=null;S.tsel=null;S.wsel=null;S.dp=null;S.mm=false;S.tp=null;if(S.view==='tasks'){S.cur=TODAY;S.side=false;S.qa.pick=false;S.qa.due=qaCtx().due}try{localStorage.setItem(LSV,S.view)}catch(e){}render();window.scrollTo(0,0)},
     prev:()=>{flushAll();S.tp=null;shift(-1);render()},
     next:()=>{flushAll();S.tp=null;shift(1);render()},
@@ -4730,12 +5101,18 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   app.addEventListener('copy',e=>{if(e.target.closest&&e.target.closest('.trow,.tci,.tcell,.wkc'))e.preventDefault()});
   let gCalTouched=false;
   ['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{S.lastAct=Date.now()},true));
+  app.addEventListener('focusout',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.pay)setTimeout(()=>{const a=document.activeElement;if(!(a&&a.dataset&&a.dataset.pay))render()},0)});
   app.addEventListener('input',e=>{
     const t=e.target;
     if(t.id==='cidInput'){lsSet(LS_CID,t.value.trim());return}
     if(t.id==='qa'){cmpSync();return}
     if(t.id==='wsearch'){S.wq=t.value;wFilterDom();return}
     if(t.dataset&&t.dataset.gs){gSetInput(t);return}
+    if(t.dataset&&t.dataset.pay){const[m,k]=t.dataset.pay.split('|'),dg=t.value.replace(/[^\d\-]/g,'');update('pay-'+m,d=>{if(dg===''||dg==='-')delete d[k];else d[k]=+dg});return}
+    if(t.dataset&&t.dataset.payfile!=null&&t.files&&t.files[0]){const f=t.files[0];f.text().then(tx=>{let rows=[],sh='';try{const j=JSON.parse(tx);if(j&&j.type==='diarybook-pay'){rows=j.rows||[];sh=j.sheet||''}}catch(e){rows=payParseText(tx)}const n=payImport(rows,sh);S.payImp=false;flash(n?`${n}개월을 넣었습니다`:'넣을 내용을 못 찾았습니다');render()});return}
+    if(t.dataset&&t.dataset.bk){const[id,f]=t.dataset.bk.split('|');let v=t.value;if(f==='pages')v=+v||0;
+      update(id,d=>{d[f]=v;if(f==='status'){if(v==='done'){d.end=d.end||TODAY;if(+d.pages>0)d.cur=Math.max(+d.cur||0,+d.pages)}else delete d.end;if(v!=='want')d.start=d.start||TODAY}});
+      if(['status','pages','start','end'].includes(f))requestRender();return}
     if(t.dataset&&t.dataset.bossfrom!=null){const tk=S.docs[t.value],f=t.form;if(tk&&f){f.elements.title.value=tk.title||'';f.elements.body.value=((tk.sub||[]).filter(z=>z&&(z.text||'').trim()&&!z.done).map(z=>z.text).join('\n'))||(tk.title||'')}return}
     if(t.dataset&&t.dataset.lvav!=null&&t.type==='file'){lvAvatar(t);return}
     if(t.dataset&&t.dataset.rvo){const[id,f]=t.dataset.rvo.split('|');update(id,d=>{d.opt=Object.assign({ev:true,carry:true},d.opt||{});d.opt[f]=t.checked},true);render();return}
@@ -4790,6 +5167,14 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
       addTask(v,{due:'',list:'',tag:'',work:wid});inp.value='';render();const n=document.getElementById('wtqa');if(n)n.focus();return}
     if(e.target.id==='listForm'){e.preventDefault();const name=document.getElementById('listName').value.trim();if(!name)return;const id='l'+Date.now().toString(36);
       update('cfg',d=>{d.lists.push({id,name,cal:''})},true);S.addingList=false;S.tl='l:'+id;render();return}
+    if(e.target.id==='bksrch'){e.preventDefault();const q=document.getElementById('bkQ').value.trim();if(q)bkSearch(q);return}
+    if(e.target.id==='bkman'){e.preventDefault();const f=e.target,t=f.elements.title.value.trim();if(!t)return;const st=f.elements.status.value,id='bk-'+Date.now().toString(36);
+      update(id,d=>{Object.assign(d,{title:t,author:f.elements.author.value.trim(),pages:+f.elements.pages.value||0,status:st,start:st!=='want'?TODAY:'',end:st==='done'?TODAY:'',cur:st==='done'?(+f.elements.pages.value||0):0,created:Date.now()})},true);S.bkAdd=false;S.bkSel=id;render();return}
+    if(e.target.id==='bkgoalf'){e.preventDefault();const v=+document.getElementById('bkGoal').value||12;update('cfg',d=>{d.bookGoal=v},true);S.bkGoalEd=false;render();return}
+    if(e.target.id==='bklog'){e.preventDefault();const id=e.target.dataset.b,b=S.docs[id];if(!b)return;const to=+document.getElementById('bkTo').value||0,from=+b.cur||0;if(to<=from){flash(`지금 ${from}쪽까지 읽었어요 — 그보다 큰 쪽수를 적어 주세요`);return}
+      let fin=false;update(id,d=>{d.logs=d.logs||[];d.logs.push({day:TODAY,from,to});d.cur=to;if(!d.start)d.start=TODAY;if(d.status!=='done')d.status='reading';if(+d.pages>0&&to>=+d.pages&&d.status!=='done'){d.status='done';d.end=TODAY;fin=true}},true);
+      bkSyncHabit();flash(fin?`🎉 완독! 「${(b.title||'').slice(0,20)}」 +100 XP`:`+${to-from}쪽 기록했습니다`);render();return}
+    if(e.target.id==='bkqf'){e.preventDefault();const id=e.target.dataset.b,t=document.getElementById('bkQt').value.trim(),pg=document.getElementById('bkQp').value.trim();if(!t)return;update(id,d=>{d.quotes=d.quotes||[];d.quotes.push({t,p:pg,day:TODAY})},true);render();return}
     if(e.target.id==='mqadd'||e.target.id==='mqedit'){e.preventDefault();const f=e.target,title=f.elements.title.value.trim(),body=f.elements.body.value,stat=f.elements.stat.value;if(!title){f.elements.title.focus();return}
       const ch=mqParse(body);if(!ch.length){flash('챕터를 한 줄 이상 적어 주세요');return}
       if(e.target.id==='mqadd'){const id='mq-'+Date.now().toString(36);update(id,d=>{Object.assign(d,{title,stat,chapters:ch,created:Date.now()})},true);S.mqAdd=false;flash('📜 메인 퀘스트를 받았습니다!')}
