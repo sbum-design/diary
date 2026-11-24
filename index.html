@@ -34,6 +34,8 @@ html[data-theme=dark]{color-scheme:dark;
   --gutter:rgba(255,255,255,.04); --l1:#1f2a4a; --l2:#2c4185; --l3:#4865cc; --l4:#6d8dff;
   --gblue:#3d9ff0; --ggreen:#34c071; --ggsoft:#17301f; --tbg:#30343d; --note:#3a3216; --note-ink:#ecd58c}
 html[data-theme=dark] img{opacity:.94}
+select option,select optgroup{background:var(--page);color:var(--ink)}
+html[data-theme=dark] select option:checked{background:var(--ac-soft);color:#fff}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{-webkit-text-size-adjust:100%;touch-action:pan-y;overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none}
 body{touch-action:pan-y;overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;max-width:100vw}
