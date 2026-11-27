@@ -102,6 +102,10 @@ html[data-skin]:not([data-skin=""]) .pybtn.pri{color:var(--on-ac)}
 @media (max-width:560px){.pyqo{grid-template-columns:repeat(2,minmax(0,1fr))}.pybtn kbd{display:none}}
 .pyyadd{padding:5px 12px;border-radius:99px;border:1px dashed var(--rule);background:none;color:var(--ink-3);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer}.pyyadd:hover{color:var(--ac);border-color:var(--ac)}
 .pyysum{margin-left:6px;font-size:.75rem;padding:2px 8px;border-radius:99px;background:var(--ac-soft);color:var(--ac)}
+.pyqym{display:grid;gap:8px}.pyqy{display:flex;flex-wrap:wrap;gap:6px}.pyqmo{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px}.pyqmo button{padding:5px 0}@media (max-width:560px){.pyqmo{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.pyqy button,.pyqmo button{padding:5px 11px;border-radius:99px;border:1px solid var(--rule);background:var(--fill);color:var(--ink-2);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;position:relative}
+.pyqy button.on,.pyqmo button.on{background:var(--ac);border-color:var(--ac);color:var(--on-ac)}
+.pyqmo button.has::after{content:"";position:absolute;top:3px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--ac)}.pyqmo button.on.has::after{background:var(--on-ac)}
 .skins{display:flex;flex-wrap:wrap;gap:8px}.skb{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid transparent;border-radius:12px;padding:5px 6px;background:none;cursor:pointer;font-size:.74rem;color:var(--ink-2)}.skb[aria-pressed=true]{border-color:var(--ac);color:var(--ink)}.skb i{display:block;width:38px;height:28px;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:linear-gradient(90deg,var(--a) 0 32%,var(--b) 32% 78%,var(--c) 78%)}
 select option,select optgroup{background:var(--page);color:var(--ink)}
 html[data-theme=dark] select option:checked{background:var(--ac-soft);color:#fff}
@@ -3145,11 +3149,12 @@ label.tsi{cursor:pointer}
   function payQPrev(){const r=payQRow(),c=PAYF.c_hd(r),card=c+r.c_sh+r.c_lt+r.c_wr;return{c,card,bal:payCalcBal(Object.assign({c_hd:c},r)),dep:PAYF.d_sc(r)}}
   function payQLive(){const p=payQPrev();[['c',p.c],['card',p.card],['bal',p.bal],['dep',p.dep]].forEach(([k,v])=>{const e=document.querySelector(`[data-pqo="${k}"]`);if(e)e.textContent=won(v)})}
   function payQHtml(){const q=S.payQ;if(!q)return'';const p=payQPrev();
-    return `<div class="pyqbg" data-act="pyqx"></div><form class="pyq" id="payQForm" autocomplete="off"><div class="pyqh"><b>급여 빠른 입력</b><label>월 <input type="month" id="pyqm" value="${q.m}"></label>${q.exist?'<em>이미 입력된 달 · 덮어씁니다</em>':''}<button type="button" class="pyqc" data-act="pyqx" aria-label="닫기">×</button></div>
+    return `<div class="pyqbg" data-act="pyqx"></div><form class="pyq" id="payQForm" autocomplete="off"><div class="pyqh"><b>급여 빠른 입력</b>${q.exist?'<em>이미 입력된 달 · 덮어씁니다</em>':''}<button type="button" class="pyqc" data-act="pyqx" aria-label="닫기">×</button></div>
+      <div class="pyqym">${(()=>{const have=new Set(payRows().map(r=>r.m)),ys=[...new Set([...payRows().map(r=>r.m.slice(0,4)),...(D('cfg').payYears||[]),TODAY.slice(0,4),String(+TODAY.slice(0,4)+1),q.m.slice(0,4)])].sort(),qy=q.m.slice(0,4);return `<div class="pyqy">${ys.map(y=>`<button type="button" class="${y===qy?'on':''}" data-act="pyqm" data-v="${y}-${q.m.slice(5)}">${y}년</button>`).join('')}</div><div class="pyqmo">${Array.from({length:12},(_,i)=>{const m=`${qy}-${String(i+1).padStart(2,'0')}`;return `<button type="button" class="${m===q.m?'on':''} ${have.has(m)?'has':''}" data-act="pyqm" data-v="${m}">${i+1}월</button>`}).join('')}</div>`})()}</div>
       <div class="pyqg">${PQF.map(([k,n,fx])=>`<label class="${fx!=null?'fx':''}"><span>${n}${fx!=null?'<i>고정</i>':''}</span><input data-pq="${k}" inputmode="numeric" placeholder="0" value="${q.v[k]===''?'':(+q.v[k]).toLocaleString()}"></label>`).join('')}</div>
       <div class="pyqo"><div><span>현대카드</span><b data-pqo="c">${won(p.c)}</b></div><div><span>카드 합계</span><b data-pqo="card">${won(p.card)}</b></div><div><span>SC은행 입금</span><b data-pqo="dep">${won(p.dep)}</b></div><div class="big"><span>잔액</span><b data-pqo="bal">${won(p.bal)}</b></div></div>
       <p class="pyqn">빈 칸은 0원으로 저장됩니다 · Enter 다음 칸 · Ctrl+Enter 저장 · Esc 닫기</p>
-      <div class="pyqa"><button type="button" class="pybtn" data-act="pyqx">취소</button><button class="pybtn pri" type="submit">${+q.m.slice(5)}월 저장</button></div></form>`}
+      <div class="pyqa"><button type="button" class="pybtn" data-act="pyqx">취소</button><button class="pybtn pri" type="submit">${q.m.slice(0,4)}년 ${+q.m.slice(5)}월 저장</button></div></form>`}
   function payQSave(){const q=S.payQ;if(!q)return;const r=payQRow();update('pay-'+q.m,d=>{PQF.forEach(([k])=>{d[k]=r[k]});delete d.c_hd},true);payStrip(q.m);S.payM=q.m;S.payY=q.m.slice(0,4);S.payQ=null;flash(`${+q.m.slice(5)}월 급여를 저장했습니다 · 잔액 ${won(payBal(Object.assign({m:q.m},S.docs['pay-'+q.m])))}원`);render()}
   function payView(){const [PA,PB]=payPal();
     if(!D('cfg').payF2&&payRows().length)setTimeout(()=>{if(D('cfg').payF2)return;payRows().forEach(r=>payNorm(r.m));update('cfg',d=>{d.payF1=1;d.payF2=1},true);requestRender()},0);
@@ -4126,6 +4131,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     pyqo:b=>payQOpen(b&&b.dataset&&b.dataset.v||(S.payY&&S.payY!==TODAY.slice(0,4)&&!payRows().some(r=>r.m.startsWith(S.payY))?S.payY+'-01':undefined)),
     payyadd:b=>{const y=b.dataset.v;update('cfg',d=>{d.payYears=[...new Set([...(d.payYears||[]),y])]},true);S.payY=y;S.payM=null;render()},
     pyqx:()=>{S.payQ=null;render()},
+    pyqm:b=>payQOpen(b.dataset.v),
     skin:b=>{try{const dk=!!b.dataset.dk;localStorage.setItem(dk?'diarybook-skin-dark':'diarybook-skin',b.dataset.v);if((document.documentElement.dataset.theme==='dark')!==dk)localStorage.setItem('diarybook-theme',dk?'dark':'light')}catch(e){}applyTheme();render()},
     theme:b=>{try{localStorage.setItem('diarybook-theme',b.dataset.v)}catch(e){}applyTheme();render()},
     gpushedit:()=>{S.gpushEdit=!S.gpushEdit;render()},
