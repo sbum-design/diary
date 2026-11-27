@@ -535,6 +535,7 @@ a.tci{text-decoration:none}
 .dc{grid-column:span 12;border:1px solid var(--hair);border-radius:14px;padding:14px 16px;background:var(--page);min-width:0;display:grid;gap:8px;align-content:start}
 .dc.s7{grid-column:span 7}.dc.s5{grid-column:span 5}
 .dcol{display:grid;gap:14px;align-content:start;min-width:0;grid-template-columns:minmax(0,1fr)}.dcol.s7{grid-column:span 7}.dcol.s5{grid-column:span 5}.dcol>.dc{grid-column:auto}
+.wnewf{display:flex;gap:6px;margin-top:6px;width:100%}.wnewf input{flex:1;min-width:0;border:1px solid var(--rule);border-radius:8px;padding:6px 9px;background:var(--page)}
 .trow.msel{background:var(--ac-soft) !important;box-shadow:inset 3px 0 0 var(--ac)}
 .marq{position:fixed;z-index:190;pointer-events:none;border:1px solid var(--ac);background:color-mix(in srgb,var(--ac) 14%,transparent);border-radius:3px}
 body.mqing,body.mqing *{user-select:none!important;-webkit-user-select:none!important;cursor:default}
@@ -2373,6 +2374,7 @@ label.tsi{cursor:pointer}
   function matchWork(title){const t=normT(title);if(!t)return'';let best='',bl=0,tie=false;
     works().filter(w=>wStat(w)!=='done').forEach(w=>workKeys(w).forEach(k=>{const n=normT(k);if(n.length<2||!t.includes(n))return;if(n.length>bl){best=w.id;bl=n.length;tie=false}else if(n.length===bl&&best!==w.id)tie=true}));
     return tie?'':best}
+  function newWork(title){const id='w-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);update(id,d=>Object.assign(d,{title:String(title).trim(),status:'doing',area:'',start:TODAY,end:'',role:'',result:'',note:'',created:Date.now()}),true);return id}
   function findWorkByName(q){const n=normT(q);if(!n)return'';const ws=works().sort((a,b)=>(wStat(a)==='done')-(wStat(b)==='done'));
     const w=ws.find(w=>normT(w.title).startsWith(n))||ws.find(w=>normT(w.title).includes(n))||ws.find(w=>workKeys(w).some(k=>normT(k).includes(n)));return w?w.id:''}
   let EVW=null;
@@ -2546,7 +2548,7 @@ label.tsi{cursor:pointer}
   function qprevHtml(e){
     const out=e.p.tags.map(t=>`<span>#${esc(t)}</span>`);
     if(e.work&&S.docs[e.work])out.push(`<span class="qw">${icon('brief')}${esc(workName(e.work))}${e.workHow==='auto'?' · 자동 연결':e.workHow==='ctx'?' · 열어 둔 업무':''}</span>`);
-    else if(e.workHow==='miss')out.push(`<span class="qw miss">'@${esc(e.p.wq)}' 업무를 찾지 못했습니다</span>`);
+    else if(e.workHow==='miss')out.push(`<span class="qw">${icon('plus')}새 업무 '${esc(e.p.wq)}' 만들어 연결</span>`);
     return out.join('');
   }
   function composer(){
@@ -2577,6 +2579,7 @@ label.tsi{cursor:pointer}
   async function cmpSubmit(){
     const el=document.getElementById('qa');if(!el||!el.value.trim())return;
     S.qaText=el.value;const e=eff();if(!e.p.title)return;
+    if(!e.work&&e.workHow==='miss'&&e.p.wq){e.work=newWork(e.p.wq);e.workHow='new';flash(`새 업무 '${e.p.wq.slice(0,20)}'을(를) 만들고 연결했습니다`)}
     if(e.kind==='event'){
       if(!authed()||!S.gcals){flash('구글에 연결해야 일정을 추가할 수 있습니다');render();return}
       const cal=e.evCal;if(!cal){flash('일정을 넣을 캘린더가 없습니다');render();return}
@@ -2663,7 +2666,7 @@ label.tsi{cursor:pointer}
     if(!p.list&&ctx.list)p.list=ctx.list;
     if(ctx.tag&&!p.tags.includes(ctx.tag))p.tags.push(ctx.tag);
     if(p.time&&!p.due)p.due=TODAY;
-    const id=newId(),wk=ctx.work!=null?ctx.work:p.wq?findWorkByName(p.wq):matchWork(p.title);
+    const id=newId(),wk=ctx.work!=null?ctx.work:p.wq?(findWorkByName(p.wq)||newWork(p.wq)):matchWork(p.title);
     update(id,d=>Object.assign(d,{title:p.title,due:p.due,time:p.time,pri:p.pri,list:p.list||defList(),tags:p.tags,note:'',done:false,doneAt:0,created:Date.now(),alarm:!!(p.time&&cfg().autoAlarm)},wk?{work:wk}:{}),true);
     if(p.time)scheduleAlarm(id,300);
     return id;
@@ -2852,6 +2855,7 @@ label.tsi{cursor:pointer}
   /* ---------------- TASKS: sidebar + content (TickTick layout) ---------------- */
   const wideSide=matchMedia('(min-width:700px)'),wideDetail=matchMedia('(min-width:1180px)');
   S.side=false;
+  S.lfold=(()=>{try{return localStorage.getItem('diarybook-lfold')!=='0'}catch(e){return true}})();
   const isCalK=k=>typeof k==='string'&&k.startsWith('cal:');
   const CALV=[['cal:a','목록'],['cal:d','일'],['cal:3','3일'],['cal:w','주'],['cal:m','월'],['cal:y','년']];
   S.sideOff=(()=>{try{return localStorage.getItem('diarybook-sideoff')==='1'}catch(e){return false}})();
@@ -2866,41 +2870,46 @@ label.tsi{cursor:pointer}
     const tags=L.filter(x=>x.k.startsWith('g:'));
     const lform=S.addingList?`<form class="sform" id="listForm"><input id="listName" placeholder="목록 이름" maxlength="20" autocomplete="off"><button class="btn dark sm" type="submit">추가</button></form>`:'';
     const wN=works().filter(w=>wStat(w)==='doing').length;
+    const inLf=['today','week','all','inbox','done'].includes(S.tl)||/^(l|g):/.test(S.tl||'');
+    const lfBtn=`<button class="si lfb ${S.lfold&&inLf?'on':''}" data-act="lfold" aria-expanded="${!S.lfold}" title="${S.lfold?'할 일 목록 펼치기':'할 일 목록 접기'}">${icon(S.lfold?'chevr':'chev')}<span>목록</span></button>`;
     if(mini)return `${tog}<div class="sgrp">
+        ${calIt}
         ${it('dash',icon('dash'),'대시보드')}
         ${it('work',icon('brief'),'포트폴리오',wN)}
         ${it('review',icon('review'),'회고')}
         ${it('quest',icon('trophy'),'레벨')}
         ${it('books',icon('book'),'서재')}
         ${it('pay',icon('wallet'),'급여')}
-        ${calIt}
+        ${lfBtn}
+      </div>${S.lfold?'':`<div class="sgrp lfgrp">
         ${it('today',dayIc(+TODAY.slice(8)),'오늘',by('today'))}
         ${it('week',dayIc(WDK[parse(TODAY).getDay()]),'7일',by('week'))}
         ${it('all',icon('stack'),'전체',by('all'))}
         ${it('inbox',icon('inbox'),'받은함',by('inbox'))}
       </div><div class="sdiv"></div>
-      <div class="sgrp">${lists().map(l=>it('l:'+l.id,icon('list').replace('<svg','<svg style="color:'+listColor(l.id)+'"'),l.name,0)).join('')}</div>
+      <div class="sgrp lfgrp">${lists().map(l=>it('l:'+l.id,icon('list').replace('<svg','<svg style="color:'+listColor(l.id)+'"'),l.name,0)).join('')}</div>
       <div class="sdiv"></div>
-      <div class="sgrp">${it('done',icon('donebox'),'완료')}</div>`;
-    return `${tog}<div class="sgrp">
+      <div class="sgrp lfgrp">${it('done',icon('donebox'),'완료')}</div>`}`;
+    return `${tog}<div class="sgrp">${calIt}</div><div class="sdiv"></div><div class="sgrp">
         ${it('dash',icon('dash'),'대시보드')}
         ${it('work',icon('brief'),'업무 포트폴리오',wN)}
         ${it('review',icon('review'),'주간 회고')}
         ${it('quest',icon('trophy'),'레벨')}
         ${it('books',icon('book'),'서재')}
         ${it('pay',icon('wallet'),'급여')}
+      </div>
+      <div class="sgrp">${lfBtn}</div>
+      ${S.lfold&&!S.addingList?'':`<div class="sgrp lfgrp">
         ${it('all',icon('stack'),'전체',by('all'))}
         ${it('today',dayIc(+TODAY.slice(8)),'오늘',by('today'))}
         ${it('week',dayIc(WDK[parse(TODAY).getDay()]),'다음 7일',by('week'))}
         ${it('inbox',icon('inbox'),'받은함',by('inbox'))}
       </div>
-      <div class="sh">캘린더</div>
-      <div class="sgrp">${calIt}</div>
       <div class="sh">리스트<button class="sadd" data-act="list-new" aria-label="목록 추가">${icon('plus')}</button></div>
-      <div class="sgrp">${lists().map(l=>it('l:'+l.id,icon('list').replace('<svg','<svg style="color:'+listColor(l.id)+'"'),l.name,by('l:'+l.id))).join('')}${lform}</div>
-      ${tags.length?`<div class="sh">태그</div><div class="sgrp">${tags.map(x=>it(x.k,icon('hash'),x.n.slice(1),x.count)).join('')}</div>`:''}
+      <div class="sgrp lfgrp">${lists().map(l=>it('l:'+l.id,icon('list').replace('<svg','<svg style="color:'+listColor(l.id)+'"'),l.name,by('l:'+l.id))).join('')}${lform}</div>
+      ${tags.length?`<div class="sh">태그</div><div class="sgrp lfgrp">${tags.map(x=>it(x.k,icon('hash'),x.n.slice(1),x.count)).join('')}</div>`:''}
       <div class="sdiv"></div>
-      <div class="sgrp">${it('done',icon('donebox'),'완료')}</div>`;
+      <div class="sgrp lfgrp">${it('done',icon('donebox'),'완료')}</div>`}`;
   }
   function listBody(sl,all){
     const ts=all.filter(sl.f);let body='';
@@ -4292,7 +4301,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
       <div class="td-h"><button class="tchk big p${t.pri||0} ${t.done?'on':''}" data-act="tdone" data-t="${id}" aria-label="완료"></button><input class="ttl-in ${t.done?'done':''}" data-b="${id}|title" value="${esc(t.title||'')}" placeholder="할 일" autocomplete="off"><button class="del" style="opacity:1" data-act="tclose" aria-label="닫기">×</button></div>
       <div class="td-r dpw"><button class="dbtn ${overdue(t)?'late':''}" data-act="dp-open" data-for="${id}">${icon('cal')}<span>${t.due?esc(dueLabel(t))+(t.end?'–'+esc(t.end):''):'날짜 설정'}</span></button>${st.length?`<span class="gnote">${st.join(' · ')}</span>`:''}${S.dp&&S.dp.for===id?dpHtml():''}</div>
       <div class="td-r"><span class="lab">목록</span><div class="lchips">${ls.map(l=>`<button class="lchip ${t.list===l.id?'on':''}" data-act="tlist" data-t="${id}" data-l="${esc(l.id)}"><i class="ldot" style="--cc:${listColor(l.id)}"></i>${esc(l.name)}</button>`).join('')}<button class="lchip add" data-act="list-new" aria-label="목록 추가">+</button></div></div>
-      <div class="td-r"><span class="lab">업무</span><div class="li wsel"><select class="tx bl" data-b="${id}|work" aria-label="연결할 업무"><option value="">연결 안 함</option>${works().filter(w=>wStat(w)!=='done'||w.id===t.work).sort((a,b)=>(b.created||0)-(a.created||0)).map(w=>`<option value="${w.id}" ${t.work===w.id?'selected':''}>${esc(w.title||'(제목 없음)')}</option>`).join('')}</select>${t.work&&S.docs[t.work]?`<button class="lnk" data-act="wopen" data-w="${t.work}">업무 열기 →</button>`:works().length?'':'<span class="gnote">업무 포트폴리오에서 업무를 먼저 추가하세요</span>'}</div></div>
+      <div class="td-r"><span class="lab">업무</span><div class="li wsel"><select class="tx bl" data-b="${id}|work" aria-label="연결할 업무"><option value="">연결 안 함</option>${works().filter(w=>wStat(w)!=='done'||w.id===t.work).sort((a,b)=>(b.created||0)-(a.created||0)).map(w=>`<option value="${w.id}" ${t.work===w.id?'selected':''}>${esc(w.title||'(제목 없음)')}</option>`).join('')}<option value="__new">＋ 새 업무 만들기…</option></select>${S.wnewFor===id?`<form class="pfnew wnewf" id="wNewForm" data-t="${id}"><input id="wNewName" placeholder="새 업무 이름 → Enter" autocomplete="off" enterkeyhint="done"><button class="btn dark sm" type="submit">만들기</button><button class="btn sm" type="button" data-act="wnewx">취소</button></form>`:''}${t.work&&S.docs[t.work]?`<button class="lnk" data-act="wopen" data-w="${t.work}">업무 열기 →</button>`:works().length?'':'<span class="gnote">업무 포트폴리오에서 업무를 먼저 추가하세요</span>'}</div></div>
       <div class="td-r"><span class="lab">우선순위</span><div class="seg pri" role="group">${PRI.map(p=>`<button data-act="tpri" data-t="${id}" data-p="${p.v}" aria-pressed="${(t.pri||0)===p.v}">${flag(p.v)}${p.n}</button>`).join('')}</div></div>
       <div class="td-r"><span class="lab">태그</span><input class="tx bl" id="tTags" data-t="${id}" value="${esc((t.tags||[]).map(x=>'#'+x).join(' '))}" placeholder="#보고 #현장" autocomplete="off"></div>
       <div class="td-r tsub"><span class="lab">체크리스트${(t.sub||[]).length?` <b>${(t.sub||[]).filter(x=>x.done).length}/${t.sub.length}</b>`:''}</span>${checklist(id,'sub','항목 추가',true)}</div>
@@ -4819,6 +4828,8 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     'mm-list':b=>{S.qa.list=b.dataset.v;S.mm=false;render();const n=document.getElementById('qa');if(n)n.focus()},
     tpush:b=>{pushToday([b.dataset.t]);render()},
     tpushall:()=>{const o=overdueList();pushToday(o.map(t=>t.id));setSaving(`${o.length}개를 오늘로 연기했습니다`);render()},
+    wnewx:()=>{S.wnewFor=null;render()},
+    lfold:()=>{S.lfold=!S.lfold;try{localStorage.setItem('diarybook-lfold',S.lfold?'1':'0')}catch(e){}render()},
     'list-new':()=>{S.addingList=true;if(!wideSide.matches)S.side=true;render();const el=document.getElementById('listName');if(el)el.focus()},
     'list-cancel':()=>{S.addingList=false;render()},
     'list-add-set':()=>{const id='l'+Date.now().toString(36);update('cfg',d=>{d.lists.push({id,name:'새 목록',cal:''})},true);render()},
@@ -5171,6 +5182,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     const t=e.target;
     if(t.id==='gCal'){gCalTouched=true;return}
     if(t.id==='wAreaSel'){S.warea=t.value;render();return}
+    if(t.dataset&&t.dataset.b&&/\|work$/.test(t.dataset.b)&&t.value==='__new'){e.stopImmediatePropagation();S.wnewFor=t.dataset.b.split('|')[0];render();const n=document.getElementById('wNewName');if(n)n.focus();return}
     if(t.id==='gpartSel'||t.id==='gpartSel2'){S.gpart=t.value;render();return}
     if(t.id==='wLink'){if(t.value&&S.docs[t.value]){update(t.value,d=>{d.work=t.dataset.w},true);flash('할 일을 업무에 연결했습니다')}render();return}
     if(S.dp&&t.id==='dpTime'){S.dp.time=t.value;if(!t.value)S.dp.end='';else if(!S.dp.alarmTouched&&!S.dp.alarm)S.dp.alarm=cfg().autoAlarm;render();return}
@@ -5195,6 +5207,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     if(e.target.id==='qaForm'){e.preventDefault();if(composing){qaPending=true;return}cmpSubmit();return}
     if(e.target.id==='dayTaskForm'){e.preventDefault();const day=e.target.id==='dayTaskForm',inp=e.target.querySelector('input'),v=inp.value;if(!v.trim())return;
       addTask(v,day?{due:e.target.dataset.d,list:'',tag:''}:qaCtx());inp.value='';render();const n=document.getElementById(day?'dqa':'qa');if(n)n.focus();return}
+    if(e.target.id==='wNewForm'){e.preventDefault();const v=document.getElementById('wNewName').value.trim(),tid=e.target.dataset.t;if(!v)return;const wid=newWork(v);if(S.docs[tid])update(tid,d=>{d.work=wid},true);S.wnewFor=null;flash(`새 업무 '${v.slice(0,20)}'을(를) 만들고 연결했습니다`);render();return}
     if(e.target.id==='workForm'){e.preventDefault();const inp=document.getElementById('wqa'),v=inp.value.trim();if(!v)return;
       const id='w-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),st=S.wf==='plan'||S.wf==='done'?S.wf:'doing';
       update(id,d=>Object.assign(d,{title:v,status:st,area:S.warea||'',start:st==='plan'?'':TODAY,end:st==='done'?TODAY:'',role:'',result:'',note:'',created:Date.now()}),true);
