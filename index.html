@@ -122,6 +122,11 @@ html[data-skin]:not([data-skin=""]) .pybtn.pri{color:var(--on-ac)}
 kbd.kc{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:7px;font:700 .78rem/1 var(--f-body);color:var(--ink);background:linear-gradient(180deg,var(--page),var(--fill));border:1px solid var(--rule);border-bottom-width:3px;box-shadow:0 1px 0 rgba(0,0,0,.08)}
 kbd.kc.w{min-width:46px}
 @media (max-width:860px){#khelp .khcols{grid-template-columns:1fr}}@media (max-width:560px){#khelp .khr{grid-template-columns:1fr}}
+.yg.yph .ymg button,.yg.yph .ymg em{height:auto;aspect-ratio:1;border-radius:6px}
+.ymg button.ypc{background:center/cover no-repeat var(--fill);border-radius:6px;overflow:hidden}
+.ymg button.ypc i{position:absolute;top:2px;left:3px;font-style:normal;font-size:.52rem;font-weight:800;line-height:1;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.ymg button.ypc.today{box-shadow:0 0 0 2px var(--ac)}
+.ymg button.ypc:hover{filter:brightness(1.1);transform:scale(1.08);z-index:1}
 .skins{display:flex;flex-wrap:wrap;gap:8px}.skb{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid transparent;border-radius:12px;padding:5px 6px;background:none;cursor:pointer;font-size:.74rem;color:var(--ink-2)}.skb[aria-pressed=true]{border-color:var(--ac);color:var(--ink)}.skb i{display:block;width:38px;height:28px;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:linear-gradient(90deg,var(--a) 0 32%,var(--b) 32% 78%,var(--c) 78%)}
 select option,select optgroup{background:var(--page);color:var(--ink)}
 html[data-theme=dark] select option:checked{background:var(--ac-soft);color:#fff}
@@ -3073,18 +3078,20 @@ label.tsi{cursor:pointer}
     return{title:`${dt.getFullYear()}년 ${dt.getMonth()+1}월`,nav:true,body:`${weekStrip()}<div class="agday"><h3>${d.title}</h3>${d.body}</div>`};
   }
   function calYear(){
-    const y=parse(S.cur).getFullYear(),by=byDue(),cm=parse(TODAY).getMonth(),cy=parse(TODAY).getFullYear();
+    const y=parse(S.cur).getFullYear(),by=byDue(),cm=parse(TODAY).getMonth(),cy=parse(TODAY).getFullYear(),photo=cfg().tYearPhoto!==false;
     const mon=m=>{
       const first=ymd(new Date(y,m,1)),end=ymd(new Date(y,m+1,0));let cells='';
       for(let d=wkStart(first);d<=end;d=addD(d,1)){
         const dt=parse(d);
         if(dt.getMonth()!==m){cells+='<em></em>';continue}
         const ts=(by[d]||[]).filter(t=>!t.done),cls=ts.some(t=>overdue(t))?'late':ts.length||gDay(d).length?'has':'';
-        cells+=`<button class="${cls} ${d===TODAY?'today':''} ${dt.getDay()===0?'sun':''}" data-act="tdayview" data-d="${d}" aria-label="${m+1}월 ${dt.getDate()}일">${dt.getDate()}</button>`;
+        const ph=photo?(D(d).photos||[]):[],pic=ph.length?src(ph[0]):'';
+        cells+=pic?`<button class="ypc ${d===TODAY?'today':''}" style="background-image:url('${pic}')" data-act="tdayview" data-d="${d}" aria-label="${m+1}월 ${dt.getDate()}일 사진"><i>${dt.getDate()}</i></button>`:`<button class="${cls} ${d===TODAY?'today':''} ${dt.getDay()===0?'sun':''}" data-act="tdayview" data-d="${d}" aria-label="${m+1}월 ${dt.getDate()}일">${dt.getDate()}</button>`;
       }
       return `<div class="ym ${y===cy&&m===cm?'cur':''}"><h4><button data-act="tmonth" data-d="${first}">${m+1}월</button></h4><div class="ymg">${WKC.map(w=>`<span>${w}</span>`).join('')}${cells}</div></div>`;
     };
-    return{title:`${y}년`,nav:true,body:`<div class="yg">${Array.from({length:12},(_,i)=>mon(i)).join('')}</div>`,noAdd:true};
+    const pbar=`<div class="tcbar"><div class="seg" role="group" aria-label="연간 보기"><button data-act="ymode" data-m="0" aria-pressed="${!photo}">글자</button><button data-act="ymode" data-m="1" aria-pressed="${photo}">사진</button></div></div>`;
+    return{title:`${y}년`,nav:true,body:`${pbar}<div class="yg ${photo?'yph':''}">${Array.from({length:12},(_,i)=>mon(i)).join('')}</div>`,noAdd:true};
   }
   /* ---------------- 대시보드 ---------------- */
   function dashView(){
@@ -4969,6 +4976,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     tpushall:()=>{const o=overdueList();pushToday(o.map(t=>t.id));setSaving(`${o.length}개를 오늘로 연기했습니다`);render()},
     wnewx:()=>{S.wnewFor=null;render()},
     keyhelp:()=>khOpen(),
+    ymode:b=>{update('cfg',d=>{d.tYearPhoto=b.dataset.m==='1'},true);render()},
     lfold:()=>{S.lfold=!S.lfold;try{localStorage.setItem('diarybook-lfold',S.lfold?'1':'0')}catch(e){}render();const b=document.querySelector('.tside [data-act=lfold]');if(b)b.focus({preventScroll:true})},
     'list-new':()=>{S.addingList=true;if(!wideSide.matches)S.side=true;render();const el=document.getElementById('listName');if(el)el.focus()},
     'list-cancel':()=>{S.addingList=false;render()},
