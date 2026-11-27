@@ -1317,7 +1317,10 @@ button.tci:hover{background:var(--page)}
 .pyt td input{width:96px;border:0;background:transparent;padding:8px 8px;text-align:right;font:inherit;color:var(--ink);outline:0}
 .pyt td input:focus{background:var(--ac-soft)}
 .pyt td input::placeholder{color:var(--ink-3);font-style:italic}
-.pyt td.in input{font-weight:700;color:#1f8a5b;width:108px}.pyt td.bl input{font-weight:700}
+.pyt td.in input{font-weight:700;color:#1f8a5b;width:108px}.pyt td.bl input{font-weight:800;font-size:.92rem}
+.pyt td.bl,.pyt th.bal{box-shadow:inset 3px 0 0 var(--ac),inset -3px 0 0 var(--ac);background:color-mix(in srgb,var(--ac) 8%,var(--page))}
+.pyt thead tr:last-child th.bal{box-shadow:inset 3px 0 0 var(--ac),inset -3px 0 0 var(--ac),inset 0 3px 0 var(--ac)}
+.pyt tr.tot td.bl{box-shadow:inset 3px 0 0 var(--ac),inset -3px 0 0 var(--ac),inset 0 -3px 0 var(--ac);font-weight:800}
 .pyt td.sm{padding:0 10px;text-align:right;color:var(--ink-2)}
 .pyt tr.tot td,.pyt tr.tot th{font-weight:700;background:var(--soft);padding:8px;text-align:right}
 .pyt tr.tot th{text-align:left;padding-left:12px}
@@ -3085,9 +3088,9 @@ label.tsi{cursor:pointer}
   }
   /* ---------------- 급여 (월별 급여·지출) ----------------
      pay-YYYY-MM 문서. 금액은 이 기기·구글 드라이브에만 저장(코드에는 없음) */
-  const PAYC=[['sal','급여','in'],['sav','적금(주담대)','sav'],['c_hd','현대카드','card'],['c_sh','신한카드','card'],['c_lt','롯데카드','card'],['c_wr','우리카드','card'],
-    ['f_ins','보험료','fix'],['f_club','동기회비','fix'],['f_live','생활비','fix'],['f_cp','쿠팡구독료','fix'],['bal','잔액','bal'],['s_sh','신한은행','split'],['s_sc','SC은행','split'],['d_sc','SC은행 입금','dep']];
-  const PAYG=[['','',1],['in','',1],['sav','',1],['card','신용카드',4],['fix','고정비',4],['bal','',1],['split','현대카드 분할',2],['dep','입금금액',1]];
+  const PAYC=[['sal','급여','in'],['bal','잔액','bal'],['sav','적금(주담대)','sav'],['c_hd','현대카드','card'],['c_sh','신한카드','card'],['c_lt','롯데카드','card'],['c_wr','우리카드','card'],
+    ['f_ins','보험료','fix'],['f_club','동기회비','fix'],['f_live','생활비','fix'],['f_cp','쿠팡구독료','fix'],['s_sh','신한은행','split'],['s_sc','SC은행','split'],['d_sc','SC은행 입금','dep']];
+  const PAYG=[['','',1],['in','',1],['bal','',1],['sav','',1],['card','신용카드',4],['fix','고정비',4],['split','현대카드 분할',2],['dep','입금금액',1]];
   const PAY_EX={f_live:1};/* 잔액 계산에서 빼는 항목 (시트와 같은 방식) */
   const payRows=()=>Object.keys(S.docs).filter(k=>/^pay-\d{4}-\d\d$/.test(k)&&S.docs[k]).sort().map(k=>Object.assign({m:k.slice(4)},S.docs[k]));
   const paySum=(r,cat)=>PAYC.filter(c=>c[2]===cat).reduce((a,c)=>a+payV(r,c[0]),0);
@@ -3102,10 +3105,10 @@ label.tsi{cursor:pointer}
   /* 시트 정리: SC은행 입금은 '분할+적금'을 적고 옆 칸에 '−70만' 결과를 적어 둔 달이 섞여 있음 → 수식 하나로 통일 */
   /* 입력하는 즉시 수식 칸·합계를 다시 계산 (화면 전체를 다시 그리지 않아 커서가 유지됨) */
   function payLive(m){const r=Object.assign({m},S.docs['pay-'+m]||{});
-    Object.keys(PAYF).forEach(k=>{const el=app.querySelector(`[data-pay="${m}|${k}"]`);if(el&&!payHas(r,k))el.placeholder=won(PAYF[k](r))});
-    const ct=app.querySelector(`[data-pct="${m}"]`);if(ct)ct.textContent=won(paySum(r,'card'));
+    Object.keys(PAYF).forEach(k=>{const el=app.querySelector(`[data-pay="${m}|${k}"]`);if(el&&!payHas(r,k))el.placeholder=wonZ(PAYF[k](r))});
+    const ct=app.querySelector(`[data-pct="${m}"]`);if(ct)ct.textContent=wonZ(paySum(r,'card'));
     const rows=[...app.querySelectorAll('[data-pct]')].map(e=>Object.assign({m:e.dataset.pct},S.docs['pay-'+e.dataset.pct]||{}));
-    app.querySelectorAll('[data-ptot]').forEach(td=>{const k=td.dataset.ptot;td.textContent=won(rows.reduce((a,x)=>a+(k==='card'?paySum(x,'card'):payV(x,k)),0))})}
+    app.querySelectorAll('[data-ptot]').forEach(td=>{const k=td.dataset.ptot;td.textContent=wonZ(rows.reduce((a,x)=>a+(k==='card'?paySum(x,'card'):payV(x,k)),0))})}
   function payNorm(m){const id='pay-'+m,d=S.docs[id];if(!d)return;const r=Object.assign({m},d),f=PAYF.d_sc(r),full=(+r.s_sc||0)+(+r.sav||0),del=[];
     if(payHas(r,'d_x')&&(+r.d_x===f)){del.push('d_x');if(payHas(r,'d_sc'))del.push('d_sc')}
     else if(payHas(r,'d_sc')&&(+r.d_sc===f||+r.d_sc===full))del.push('d_sc');
@@ -3113,6 +3116,7 @@ label.tsi{cursor:pointer}
   function payStrip(m){const id='pay-'+m,d=S.docs[id];if(!d)return;const r=Object.assign({m},d),drop=Object.keys(PAYF).filter(k=>payHas(r,k)&&+r[k]===PAYF[k](r));if(drop.length)update(id,x=>{drop.forEach(k=>delete x[k])},true)}
   try{S.payHide=!!localStorage.getItem('diarybook-payhide')}catch(e){}
   const won=n=>S.payHide?'•••••':(Math.round(+n||0)).toLocaleString();
+  const wonZ=n=>S.payHide?'•••••':Math.round(+n||0)===0?'-':(Math.round(+n||0)).toLocaleString();
   const wonK=n=>S.payHide?'•••':((+n||0)>=1e6?((+n)/1e4).toFixed(0)+'만':Math.round((+n||0)/1e3)+'천');
   function payPal(){const r=document.documentElement;if(!r.dataset.skin)return['#34d399','#7c8cff'];
     const a=(getComputedStyle(r).getPropertyValue('--ac')||'').trim();const m=/^#([0-9a-f]{6})$/i.exec(a);if(!m)return['#34d399','#7c8cff'];
@@ -3143,15 +3147,15 @@ label.tsi{cursor:pointer}
       ${rows.map((r,i)=>{let y=H;const x=10+i*W+10;return segs.map(([k,,c])=>{const h=val(r,k)/mx*H;y-=h;return h>0?`<rect x="${x}" y="${y.toFixed(1)}" width="${W-20}" height="${h.toFixed(1)}" fill="${c}" rx="2"><title>${+r.m.slice(5)}월 ${k} ${won(val(r,k))}</title></rect>`:''}).join('')+
         `<line x1="${x-4}" x2="${x+W-16}" y1="${(H-(+r.sal||0)/mx*H).toFixed(1)}" y2="${(H-(+r.sal||0)/mx*H).toFixed(1)}" stroke="var(--ink)" stroke-width="2"/><text x="${x+(W-20)/2}" y="${H+16}" text-anchor="middle">${+r.m.slice(5)}월</text><text x="${x+(W-20)/2}" y="${H+30}" text-anchor="middle" class="sm">${wonK(r.sal)}</text>`}).join('')}</svg></div></div>`;
     /* 표 */
-    const cell=(r,k)=>{const v=r[k],f=!!PAYF[k],calc=f&&!payHas(r,k),ov=f&&!calc;return `<td class="${k==='sal'?'in':k==='bal'?'bl':''} ${f?'fx':''} ${ov?'ov':''}" ${f?`title="${ov?`직접 입력한 값 (수식 값 ${won(PAYF[k](r))}) — 지우면 수식으로 계산`:`자동 계산: ${PAYFT[k]}`}"`:''}><input data-pay="${r.m}|${k}" inputmode="numeric" value="${S.payHide?'':calc?'':(v==null?'':(+v).toLocaleString())}" placeholder="${calc?won(PAYF[k](r)):S.payHide?'•••':''}" ${S.payHide?'disabled':''} aria-label="${+r.m.slice(5)}월 ${PAYC.find(c=>c[0]===k)[1]}"></td>`};
+    const cell=(r,k)=>{const v=r[k],f=!!PAYF[k],calc=f&&!payHas(r,k),ov=f&&!calc;return `<td class="${k==='sal'?'in':k==='bal'?'bl':''} ${f?'fx':''} ${ov?'ov':''}" ${f?`title="${ov?`직접 입력한 값 (수식 값 ${won(PAYF[k](r))}) — 지우면 수식으로 계산`:`자동 계산: ${PAYFT[k]}`}"`:''}><input data-pay="${r.m}|${k}" inputmode="numeric" value="${S.payHide?'':calc?'':(v==null||+v===0?'':(+v).toLocaleString())}" placeholder="${calc?wonZ(PAYF[k](r)):S.payHide?'•••':'-'}" ${S.payHide?'disabled':''} aria-label="${+r.m.slice(5)}월 ${PAYC.find(c=>c[0]===k)[1]}"></td>`};
     const tbl=`<div class="pyscroll pytw"><table class="pyt"><thead><tr>${PAYG.map(([,g,n])=>`<th colspan="${n}" class="g">${g}</th>`).join('')}<th class="g"></th></tr>
       <tr><th class="mo">월</th>${PAYC.map(c=>`<th class="${c[2]}" ${PAYF[c[0]]?`title="자동 계산: ${PAYFT[c[0]]}"`:''}>${PAYF[c[0]]?'<i class="fxm">ƒ</i>':''}${c[1]}${PAY_EX[c[0]]?'<sup title="잔액 계산에서 빠짐">*</sup>':''}</th>`).join('')}<th>카드 합계</th></tr></thead>
-      <tbody>${rows.map(r=>`<tr><th class="mo">${r.m.slice(2).replace('-','.')}<button class="pyx" data-act="paydel" data-m="${r.m}" aria-label="${r.m} 삭제">${S.payDel===r.m?'삭제?':'×'}</button></th>${PAYC.map(c=>cell(r,c[0])).join('')}<td class="sm" data-pct="${r.m}">${won(paySum(r,'card'))}</td></tr>`).join('')}
-      <tr class="tot"><th class="mo">합계</th>${PAYC.map(c=>`<td data-ptot="${c[0]}">${won(rows.reduce((a,r)=>a+payV(r,c[0]),0))}</td>`).join('')}<td data-ptot="card">${won(sumCard)}</td></tr></tbody></table></div>
+      <tbody>${rows.map(r=>`<tr><th class="mo">${r.m.slice(2).replace('-','.')}<button class="pyx" data-act="paydel" data-m="${r.m}" aria-label="${r.m} 삭제">${S.payDel===r.m?'삭제?':'×'}</button></th>${PAYC.map(c=>cell(r,c[0])).join('')}<td class="sm" data-pct="${r.m}">${wonZ(paySum(r,'card'))}</td></tr>`).join('')}
+      <tr class="tot"><th class="mo">합계</th>${PAYC.map(c=>`<td data-ptot="${c[0]}" class="${c[0]==='bal'?'bl':''}">${wonZ(rows.reduce((a,r)=>a+payV(r,c[0]),0))}</td>`).join('')}<td data-ptot="card">${wonZ(sumCard)}</td></tr></tbody></table></div>
       <div class="pyfoot"><button class="pybtn" data-act="payadd">+ ${(()=>{const l=all[all.length-1];const d=l?parse(l.m+'-01'):parse(TODAY);if(l)d.setMonth(d.getMonth()+1);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}`})()} 추가</button>
       <label class="pyoff">SC은행 입금 공제액 <input data-payoff inputmode="numeric" value="${payOff().toLocaleString()}"> 원</label>
       <button class="lnk pyimpl" data-act="payimp">시트에서 가져오기</button>
-      <p><i class="fxm">ƒ</i> 칸은 시트처럼 <b>자동 계산</b>됩니다 — 잔액 = 급여 − 적금 − 카드 − 고정비(*생활비 제외), 신한은행 분할 = 현대카드 − SC은행, SC은행 입금 = SC은행 분할 + 적금 − 공제액. 숫자를 직접 적으면 그 값이 우선(노란 점), 지우면 다시 수식으로 돌아갑니다.</p></div>`;
+      <p><i class="fxm">ƒ</i> 칸은 시트처럼 <b>자동 계산</b>됩니다 — 잔액 = 급여 − 적금 − 카드 − 고정비(*생활비 제외), 현대카드 = 신한은행 분할 + SC은행 분할, SC은행 입금 = SC은행 분할 + 적금 − 공제액. 숫자를 직접 적으면 그 값이 우선(노란 점), 지우면 다시 수식으로 돌아갑니다.</p></div>`;
     /* ---- 화려한 요약: 메인 카드 · 도넛 · 추이 ---- */
     const sel=rows.find(r=>r.m===S.payM)||rows[rows.length-1],si=rows.indexOf(sel),prev=si>0?rows[si-1]:all[all.indexOf(sel)-1];
     const flow=[['sav','적금(주담대)',PB],['card','신용카드','#ff9f45'],['fix','고정비','#b8bec8'],['bal','남은 돈',PA]].map(([k,l,c])=>({k,l,c,v:val(sel,k)}));
