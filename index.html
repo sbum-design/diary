@@ -13,6 +13,7 @@
 <meta name="color-scheme" content="light dark">
 <script>(function(){try{var t=localStorage.getItem('diarybook-theme')||'auto',d=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);var sk=localStorage.getItem(d?'diarybook-skin-dark':'diarybook-skin')||'',DD={"graphite":"#090a0b","deepteal":"#04171c"},SD={"navy":"#eae9e6","forest":"#e7e7e1","wine":"#f0e7e3","charcoal":"#e6e6e3","cobalt":"#e8ebf9","olive":"#e7e3d6"};document.documentElement.dataset.theme=d?'dark':'light';document.documentElement.dataset.skin=sk;var m=document.querySelector('meta[name=theme-color]');if(m)m.content=d?(DD[sk]||'#0f1115'):(SD[sk]||'#f2f4f7')}catch(e){}})()</script>
 <meta name="robots" content="noindex">
+<script>(function(){try{var w=localStorage.getItem('diarybook-fw')||'600';document.documentElement.style.setProperty('--fw',w);var f=localStorage.getItem('diarybook-font')||'pretendard',U={"pretendard":"https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css","suit":"https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css","wanted":"https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.css"};document.documentElement.dataset.font=f;if(U[f]){var l=document.createElement('link');l.rel='stylesheet';l.href=U[f];l.id='fontcss';document.head.appendChild(l)}}catch(e){}})()</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Gothic+A1:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Black+Han+Sans&family=Lilita+One&display=swap">
 <style>
 /* Layout: 펼친 다이어리 — 왼쪽 쪽·오른쪽 쪽·오른쪽 끝 인덱스 탭. 폰에서는 한 쪽씩 쌓고 탭은 아래 고정 */
@@ -34,6 +35,13 @@ html[data-theme=dark]{color-scheme:dark;
   --gutter:rgba(255,255,255,.04); --l1:#1f2a4a; --l2:#2c4185; --l3:#4865cc; --l4:#6d8dff;
   --gblue:#3d9ff0; --ggreen:#34c071; --ggsoft:#17301f; --tbg:#30343d; --note:#3a3216; --note-ink:#ecd58c}
 html[data-theme=dark] img{opacity:.94}
+html[data-font=pretendard]{--f-body:"Pretendard Variable","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--f-disp:"Pretendard Variable",system-ui,sans-serif}
+html[data-font=pretendard] body{letter-spacing:-.01em}
+html[data-font=suit]{--f-body:"SUIT Variable","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--f-disp:"SUIT Variable",system-ui,sans-serif}
+html[data-font=suit] body{letter-spacing:-.01em}
+html[data-font=wanted]{--f-body:"Wanted Sans Variable","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--f-disp:"Wanted Sans Variable",system-ui,sans-serif}
+html[data-font=wanted] body{letter-spacing:-.01em}
+
 html[data-theme=light][data-skin=navy]{--desk:#eae9e6;--page:#faf8f3;--fill:#f2f0ed;--hair:#e5e5e3;--rule:#d5d6d6;--ac:#e8930c;--p1:#e8930c;--ac-soft:#f7ead3;--on-ac:#ffffff;--l1:#f6e2c0;--l2:#f1c884;--l3:#edad48;--l4:#e8930c;--gutter:#e5e5e3;--sbg:#14213d;--sink:#d9deea;--sonb:#e8930c;--soni:#ffffff;--tbg:#14213d}
 html[data-theme=light][data-skin=forest]{--desk:#e7e7e1;--page:#f6f4ee;--fill:#eeede7;--hair:#e3e3dd;--rule:#d4d6cf;--ac:#c8553d;--p1:#c8553d;--ac-soft:#f0ded5;--on-ac:#ffffff;--l1:#ecd1c7;--l2:#e0a899;--l3:#d47e6b;--l4:#c8553d;--gutter:#e3e3dd;--sbg:#1f3a2e;--sink:#d5e2da;--sonb:#c8553d;--soni:#ffffff;--tbg:#1f3a2e}
 html[data-theme=light][data-skin=wine]{--desk:#f0e7e3;--page:#fbf7f2;--fill:#f5efeb;--hair:#ede2df;--rule:#e1d2d0;--ac:#a8841c;--p1:#a8841c;--ac-soft:#efe7d4;--on-ac:#ffffff;--l1:#e9dec3;--l2:#d3c08b;--l3:#bea254;--l4:#a8841c;--gutter:#ede2df;--sbg:#5a0f1c;--sink:#f0d9dc;--sonb:#c9a227;--soni:#2a1a05;--tbg:#5a0f1c}
@@ -68,7 +76,7 @@ img{max-width:100%}
 [hidden]{display:none!important}
 .topr{display:flex;gap:8px;align-items:center}
 .btn.sm{padding:4px 10px;font-size:.72rem}
-body{background:var(--desk);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.55;
+body{background:var(--desk);color:var(--ink);font-family:var(--f-body);font-weight:var(--fw,400);font-size:14px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 28px}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:0;padding:0}
@@ -4036,6 +4044,8 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     rvcopy:()=>{const pre=document.getElementById('rvpre');if(!pre)return;const t=pre.textContent;
       const ok=()=>flash('주간보고 초안을 복사했습니다');
       if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,()=>{selPre(pre);flash('복사가 막혀 있어 글을 선택해 두었습니다 — 길게 눌러 복사하세요')});else{selPre(pre);flash('글을 선택해 두었습니다 — 복사하세요')}},
+    font:b=>{const f=b.dataset.v,U={"pretendard":"https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css","suit":"https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css","wanted":"https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.css"};try{localStorage.setItem('diarybook-font',f)}catch(e){}document.documentElement.dataset.font=f;const o=document.getElementById('fontcss');if(o)o.remove();if(U[f]){const l=document.createElement('link');l.rel='stylesheet';l.href=U[f];l.id='fontcss';document.head.appendChild(l)}render()},
+    fw:b=>{try{localStorage.setItem('diarybook-fw',b.dataset.v)}catch(e){}document.documentElement.style.setProperty('--fw',b.dataset.v);render()},
     skin:b=>{try{const dk=!!b.dataset.dk;localStorage.setItem(dk?'diarybook-skin-dark':'diarybook-skin',b.dataset.v);if((document.documentElement.dataset.theme==='dark')!==dk)localStorage.setItem('diarybook-theme',dk?'dark':'light')}catch(e){}applyTheme();render()},
     theme:b=>{try{localStorage.setItem('diarybook-theme',b.dataset.v)}catch(e){}applyTheme();render()},
     gpushedit:()=>{S.gpushEdit=!S.gpushEdit;render()},
@@ -4607,6 +4617,8 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
       <div class="set-row"><span class="lab">화면 모드</span><div class="seg">${[['light','라이트'],['dark','다크'],['auto','기기 설정 따라']].map(([k,n])=>`<button data-act="theme" data-v="${k}" aria-pressed="${themePref()===k}">${n}</button>`).join('')}</div><span class="gnote">기기마다 따로 정해집니다.</span></div>
       <div class="set-row"><span class="lab">배경 색 · 라이트</span><div class="skins">${SKINS.map(([k,n,d,sw])=>`<button class="skb" data-act="skin" data-v="${k}" aria-pressed="${skinPref()===k}"><i style="--a:${sw[0]};--b:${sw[1]};--c:${sw[2]}"></i>${n}</button>`).join('')}</div></div>
       <div class="set-row"><span class="lab">배경 색 · 다크</span><div class="skins">${DSKINS.map(([k,n,d,sw])=>`<button class="skb" data-act="skin" data-dk="1" data-v="${k}" aria-pressed="${skinPref(1)===k}"><i style="--a:${sw[0]};--b:${sw[1]};--c:${sw[2]}"></i>${n}</button>`).join('')}</div><span class="gnote">화면 모드가 라이트일 땐 위, 다크일 땐 아래 색이 쓰입니다. 기기 설정 따라로 두면 낮·밤에 자동으로 바뀝니다.</span></div>
+      <div class="set-row"><span class="lab">글꼴</span><div class="seg">${[['pretendard','프리텐다드'],['suit','SUIT'],['wanted','원티드 산스'],['gothic','고딕 A1 (이전)']].map(([k,n])=>`<button data-act="font" data-v="${k}" aria-pressed="${(document.documentElement.dataset.font||'pretendard')===k}">${n}</button>`).join('')}</div></div>
+      <div class="set-row"><span class="lab">글자 굵기</span><div class="seg">${[['400','보통'],['500','중간'],['600','세미볼드']].map(([k,n])=>`<button data-act="fw" data-v="${k}" aria-pressed="${(document.documentElement.style.getPropertyValue('--fw')||'600')===k}">${n}</button>`).join('')}</div></div>
       <div class="set-row"><span class="lab">월간 보기</span><div class="seg"><button data-act="mode" data-m="0" aria-pressed="${!c.photoMode}">TEXT</button><button data-act="mode" data-m="1" aria-pressed="${c.photoMode}">PHOTO</button></div></div>
       ${CLIENT_ID_DEFAULT?'':`<div class="set-row"><span class="lab">구글 클라이언트 ID</span><input type="text" id="cidInput" value="${esc(lsGet(LS_CID)||'')}" placeholder="0000-xxxx.apps.googleusercontent.com" autocomplete="off" spellcheck="false"><span class="gnote">Google Cloud에서 발급한 OAuth 클라이언트 ID입니다. 기기마다 한 번 입력하거나, index.html 맨 위에 넣어두면 입력할 필요가 없습니다.</span></div>`}
       <div class="set-row"><span class="lab">구글 계정</span><span>${authed()?'연결됨':'연결 안 됨'}${S.authErr?` · 로그인 실패(${esc(S.authErr)})`:''}</span><div class="li">${authed()?'<button class="btn" data-act="signout">연결 해제</button>':'<button class="btn dark" data-act="signin">구글 연결</button>'}</div></div>
