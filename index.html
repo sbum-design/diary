@@ -4036,7 +4036,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     rvcopy:()=>{const pre=document.getElementById('rvpre');if(!pre)return;const t=pre.textContent;
       const ok=()=>flash('주간보고 초안을 복사했습니다');
       if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,()=>{selPre(pre);flash('복사가 막혀 있어 글을 선택해 두었습니다 — 길게 눌러 복사하세요')});else{selPre(pre);flash('글을 선택해 두었습니다 — 복사하세요')}},
-    skin:b=>{try{localStorage.setItem(b.dataset.dk?'diarybook-skin-dark':'diarybook-skin',b.dataset.v)}catch(e){}applyTheme();render()},
+    skin:b=>{try{const dk=!!b.dataset.dk;localStorage.setItem(dk?'diarybook-skin-dark':'diarybook-skin',b.dataset.v);if((document.documentElement.dataset.theme==='dark')!==dk)localStorage.setItem('diarybook-theme',dk?'dark':'light')}catch(e){}applyTheme();render()},
     theme:b=>{try{localStorage.setItem('diarybook-theme',b.dataset.v)}catch(e){}applyTheme();render()},
     gpushedit:()=>{S.gpushEdit=!S.gpushEdit;render()},
     gpushsave:async()=>{const v=(document.getElementById('gPushUrl').value||'').trim().replace(/\/+$/,'');
