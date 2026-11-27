@@ -2748,6 +2748,8 @@ label.tsi{cursor:pointer}
   }
   const overdueList=()=>tasks().filter(overdue);
   function pushBar(){const o=overdueList();return o.length?`<div class="pushbar"><span>기한 지난 할 일 <b>${o.length}</b>개</span><button class="btn sm" data-act="tpushall">오늘로 연기</button></div>`:''}
+  /* 여러 개 옮길 때 완료된 할 일은 제외 (완료만 골랐으면 그대로 옮김) */
+  const mvIds=ids=>{const o=ids.filter(id=>S.docs[id]&&!S.docs[id].done);return o.length?o:ids};
   function msBar(){if(!S.msel.size||S.view!=='tasks')return'';const n=[...S.msel].filter(id=>S.docs[id]).length;if(!n){S.msel.clear();return''}
     return `<div class="mbar" role="toolbar" aria-label="선택한 할 일"><b>${n}개 선택</b><button data-act="mmove" data-v="${TODAY}">오늘</button><button data-act="mmove" data-v="${addD(TODAY,1)}">내일</button><button data-act="mmove" data-v="${addD(wkStart(TODAY),8)}">다음 주 월</button><button data-act="mmove" data-v="">날짜 없음</button><button data-act="mdone">완료</button><button class="warn" data-act="mdel">삭제</button><button data-act="mclear">선택 해제</button><span class="mhint">끌어서 날짜·목록으로 옮기기 · Esc 해제</span></div>`}
   /* 모바일 하단 탭 (아이콘 + 글자) */
@@ -4765,7 +4767,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     tdue:b=>{const id=b.dataset.t,v=b.dataset.v;update(id,d=>{if(v==='x'){d.due='';d.time=''}else d.due=v==='7'?addD(monday(TODAY),7):addD(TODAY,+v)},true);scheduleAlarm(id,300);render()},
     tdelx:b=>{delTask(b.dataset.t)},
     subtog:b=>{const id=b.dataset.t;if(S.subFold){S.subPeek.has(id)?S.subPeek.delete(id):S.subPeek.add(id)}else update(id,d=>{d.subHide=!d.subHide},true);render()},
-    mmove:b=>{const v=b.dataset.v,ids=[...S.msel].filter(id=>S.docs[id]);ids.forEach(id=>{update(id,d=>{d.due=v;if(!v){d.time='';d.end=''}},true);scheduleAlarm(id,400)});S.msel.clear();flash(`할 일 ${ids.length}개를 ${v?md(v)+'(으)로':'날짜 없음으로'} 옮겼습니다 · Ctrl+Z로 되돌리기`);render()},
+    mmove:b=>{const v=b.dataset.v,all=[...S.msel].filter(id=>S.docs[id]),ids=mvIds(all),sk=all.length-ids.length;ids.forEach(id=>{update(id,d=>{d.due=v;if(!v){d.time='';d.end=''}},true);scheduleAlarm(id,400)});S.msel.clear();flash(`할 일 ${ids.length}개를 ${v?md(v)+'(으)로':'날짜 없음으로'} 옮겼습니다${sk?` · 완료된 ${sk}개는 그대로`:''} · Ctrl+Z로 되돌리기`);render()},
     mdone:()=>{const ids=[...S.msel].filter(id=>S.docs[id]&&!S.docs[id].done);ids.forEach(id=>{update(id,d=>{d.done=true;d.doneAt=Date.now()},true);scheduleAlarm(id,300)});S.msel.clear();flash(`할 일 ${ids.length}개를 완료했습니다`);render()},
     mdel:()=>{const ids=[...S.msel].filter(id=>S.docs[id]);ids.forEach(id=>{const g=S.docs[id].gcal;remove(id);if(S.tsel===id)S.tsel=null;if(g&&authed())gDel(g).catch(()=>{})});S.msel.clear();flash(`할 일 ${ids.length}개를 삭제했습니다 · Ctrl+Z로 되돌리기`);render()},
     mclear:()=>{S.msel.clear();render()},
@@ -5120,13 +5122,13 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   app.addEventListener('dragleave',e=>{const c=e.target.closest&&e.target.closest('[data-drop]');if(c&&!c.contains(e.relatedTarget))c.classList.remove('over')});
   app.addEventListener('drop',e=>{const n=e.target.closest&&e.target.closest('[data-into]');const id0=dragId||(e.dataTransfer&&e.dataTransfer.getData(DT));
     if(n&&id0&&n.dataset.into!==id0&&isTask(id0)){e.preventDefault();dragId=null;const z=zoneOf(n,e);clearDz();
-      if(S.msel.has(id0)&&S.msel.size>1){const dst=n.dataset.into;const grp=[...S.msel].filter(x=>S.docs[x]&&isTask(x)&&x!==dst).sort((a,b)=>tsort(Object.assign({id:a},S.docs[a]),Object.assign({id:b},S.docs[b])));if(z==='in'){nestMany(grp,dst);S.msel.clear();return}let prev=dst,aft=z!=='before';grp.forEach((x,k)=>{reorderTask(x,prev,k?true:aft);prev=x});S.msel.clear();flash(`할 일 ${grp.length}개를 옮겼습니다`);render();return}
+      if(S.msel.has(id0)&&S.msel.size>1){const dst=n.dataset.into;const grp=mvIds([...S.msel].filter(x=>S.docs[x]&&isTask(x)&&x!==dst)).sort((a,b)=>tsort(Object.assign({id:a},S.docs[a]),Object.assign({id:b},S.docs[b])));if(z==='in'){nestMany(grp,dst);S.msel.clear();return}let prev=dst,aft=z!=='before';grp.forEach((x,k)=>{reorderTask(x,prev,k?true:aft);prev=x});S.msel.clear();flash(`할 일 ${grp.length}개를 옮겼습니다`);render();return}
       if(z==='in')nestTask(id0,n.dataset.into);else reorderTask(id0,n.dataset.into,z==='after');return}
     const c=e.target.closest&&e.target.closest('[data-drop]');const id=dragId||(e.dataTransfer&&e.dataTransfer.getData(DT));dragId=null;
     if(id&&id.startsWith('ev:')){e.preventDefault();clearDz();if(!c)return;const[cal,eid]=id.slice(3).split('|'),ev=findEv(cal,eid),day=c.dataset.drop;if(!ev||ev.day===day)return;
       flash(`'${ev.title.slice(0,20)}' 일정을 옮기는 중…`);evDo(cal,eid,()=>api(evUrl(cal,eid),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(evShiftBody(ev,day))}),`'${ev.title.slice(0,20)}' 일정을 ${md(day)}(으)로 옮겼습니다`);return}
     if(!c||!id){if(id)e.preventDefault();return}e.preventDefault();
-    const grp=S.msel.has(id)&&S.msel.size>1?[...S.msel].filter(x=>S.docs[x]&&isTask(x)):[id];
+    const grp=S.msel.has(id)&&S.msel.size>1?mvIds([...S.msel].filter(x=>S.docs[x]&&isTask(x))):[id];
     grp.forEach(x=>{if(S.docs[x]&&isTask(x)&&S.docs[x].due!==c.dataset.drop){update(x,d=>{d.due=c.dataset.drop},true);scheduleAlarm(x,400)}});if(grp.length>1){flash(`할 일 ${grp.length}개를 ${md(c.dataset.drop)}(으)로 옮겼습니다 · Ctrl+Z로 되돌리기`);S.msel.clear()}S.cur=c.dataset.drop;render()});
   /* never paste dragged/copied task text into inputs */
   app.addEventListener('drop',e=>{if(e.target.matches&&e.target.matches('input,textarea')&&e.dataTransfer&&[...e.dataTransfer.types].includes(DT))e.preventDefault()},true);
