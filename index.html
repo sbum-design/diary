@@ -108,6 +108,7 @@ html[data-skin]:not([data-skin=""]) .pybtn.pri{color:var(--on-ac)}
 .pyqmo button.has::after{content:"";position:absolute;top:3px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--ac)}.pyqmo button.on.has::after{background:var(--on-ac)}
 .pyty{display:flex;gap:6px;margin:0 0 8px}.pyty button{padding:4px 12px;border-radius:99px;border:1px solid var(--rule);background:var(--fill);color:var(--ink-2);font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}.pyty button.on{background:var(--ac);border-color:var(--ac);color:var(--on-ac)}
 .pytrs{font-size:.72rem;color:var(--ink-3);font-weight:600;margin-left:4px}
+.tside .si:focus-visible{outline:2px solid var(--ac);outline-offset:-2px}
 .skins{display:flex;flex-wrap:wrap;gap:8px}.skb{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid transparent;border-radius:12px;padding:5px 6px;background:none;cursor:pointer;font-size:.74rem;color:var(--ink-2)}.skb[aria-pressed=true]{border-color:var(--ac);color:var(--ink)}.skb i{display:block;width:38px;height:28px;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:linear-gradient(90deg,var(--a) 0 32%,var(--b) 32% 78%,var(--c) 78%)}
 select option,select optgroup{background:var(--page);color:var(--ink)}
 html[data-theme=dark] select option:checked{background:var(--ac-soft);color:#fff}
@@ -4954,7 +4955,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     tpush:b=>{pushToday([b.dataset.t]);render()},
     tpushall:()=>{const o=overdueList();pushToday(o.map(t=>t.id));setSaving(`${o.length}개를 오늘로 연기했습니다`);render()},
     wnewx:()=>{S.wnewFor=null;render()},
-    lfold:()=>{S.lfold=!S.lfold;try{localStorage.setItem('diarybook-lfold',S.lfold?'1':'0')}catch(e){}render()},
+    lfold:()=>{S.lfold=!S.lfold;try{localStorage.setItem('diarybook-lfold',S.lfold?'1':'0')}catch(e){}render();const b=document.querySelector('.tside [data-act=lfold]');if(b)b.focus({preventScroll:true})},
     'list-new':()=>{S.addingList=true;if(!wideSide.matches)S.side=true;render();const el=document.getElementById('listName');if(el)el.focus()},
     'list-cancel':()=>{S.addingList=false;render()},
     'list-add-set':()=>{const id='l'+Date.now().toString(36);update('cfg',d=>{d.lists.push({id,name:'새 목록',cal:''})},true);render()},
@@ -5089,12 +5090,25 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();payQSave();return}
     const t=e.target;if(e.key==='Enter'&&t&&t.dataset&&t.dataset.pq&&!e.isComposing){e.preventDefault();const ins=[...document.querySelectorAll('[data-pq]')],i=ins.indexOf(t),nx=ins[i+(e.shiftKey?-1:1)];if(nx){nx.focus();nx.select()}else document.querySelector('#payQForm .pri').focus()}
   },true);
+  /* Ctrl+↑/↓ : 왼쪽 메뉴 이동 (목록은 포커스만 → Space로 펼치기) */
+  document.addEventListener('keydown',e=>{
+    if(!e.ctrlKey||e.altKey||e.metaKey||e.shiftKey||(e.key!=='ArrowUp'&&e.key!=='ArrowDown')||e.isComposing)return;
+    const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+    if(S.payQ||S.qp)return;
+    e.preventDefault();
+    if(S.view!=='tasks'){S.view='tasks';render()}
+    const bs=[...document.querySelectorAll('.tside .si')].filter(b=>b.offsetParent!==null);if(!bs.length)return;
+    let i=bs.indexOf(document.activeElement);if(i<0)i=bs.findIndex(b=>b.classList.contains('on')&&!b.classList.contains('lfb'));if(i<0)i=bs.findIndex(b=>b.classList.contains('on'));
+    const nx=bs[((i<0?-1:i)+(e.key==='ArrowDown'?1:-1)+bs.length)%bs.length];
+    if(nx.dataset.act==='lfold'){nx.focus();return}
+    const sel=nx.dataset.act==='tab'?'.tside [data-act=tab][data-v="'+nx.dataset.v+'"]':'.tside [data-act="'+nx.dataset.act+'"][data-k="'+(nx.dataset.k||'')+'"]';
+    nx.click();requestAnimationFrame(()=>{const b=document.querySelector(sel);if(b)b.focus({preventScroll:true})});
+  });
   document.addEventListener('keydown',e=>{
     if((e.key!=='ArrowLeft'&&e.key!=='ArrowRight')||e.isComposing||e.ctrlKey||e.metaKey||e.altKey||e.shiftKey)return;
     if(S.view!=='tasks'||!isCalK(S.tl)||S.dp||S.mm||S.cm||S.tsel)return;
     const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
-    const ks=CALV.map(c=>c[0]),i=ks.indexOf(S.tl);if(i<0)return;e.preventDefault();
-    const k=ks[(i+(e.key==='ArrowRight'?1:-1)+ks.length)%ks.length];S.tl=k;S.lastCal=k;try{localStorage.setItem('diarybook-lcal',k);localStorage.setItem('diarybook-tl',k)}catch(x){}render()});
+    const btn=document.querySelector(`[data-act="${e.key==='ArrowRight'?'next':'prev'}"]`);if(!btn)return;e.preventDefault();btn.click()});
   document.addEventListener('keydown',e=>{
     if(e.key!=='Escape'||e.isComposing)return;
     if(S.cm){e.preventDefault();S.cm=null;render();return}
