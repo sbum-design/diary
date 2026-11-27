@@ -109,6 +109,18 @@ html[data-skin]:not([data-skin=""]) .pybtn.pri{color:var(--on-ac)}
 .pyty{display:flex;gap:6px;margin:0 0 8px}.pyty button{padding:4px 12px;border-radius:99px;border:1px solid var(--rule);background:var(--fill);color:var(--ink-2);font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}.pyty button.on{background:var(--ac);border-color:var(--ac);color:var(--on-ac)}
 .pytrs{font-size:.72rem;color:var(--ink-3);font-weight:600;margin-left:4px}
 .tside .si:focus-visible{outline:2px solid var(--ac);outline-offset:-2px}
+#khelp .khbg{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.35);backdrop-filter:blur(2px)}
+#khelp .khp{position:fixed;z-index:91;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 32px);overflow:auto;background:var(--page);color:var(--ink);border:1px solid var(--rule);border-radius:18px;padding:16px 20px 18px;box-shadow:0 30px 80px rgba(0,0,0,.4),0 0 0 1px color-mix(in srgb,var(--ac) 30%,transparent);font-family:var(--f-body)}
+#khelp .khh{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}#khelp .khh b{font-size:1.05rem}
+#khelp .khx{background:none;border:0;font-size:1.5rem;line-height:1;color:var(--ink-3);cursor:pointer}
+#khelp h4{margin:14px 0 6px;font-size:.72rem;letter-spacing:.08em;color:var(--ac);text-transform:uppercase}
+#khelp .khr{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:12px;padding:7px 0;border-top:1px solid var(--hair)}
+#khelp .khk{display:flex;align-items:center;flex-wrap:wrap;gap:3px}
+#khelp .khd{font-size:.88rem;display:grid}#khelp .khd small{font-size:.72rem;color:var(--ink-3)}
+#khelp .kp,#khelp .ko{font-style:normal;font-size:.72rem;color:var(--ink-3);margin:0 2px}
+kbd.kc{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:7px;font:700 .78rem/1 var(--f-body);color:var(--ink);background:linear-gradient(180deg,var(--page),var(--fill));border:1px solid var(--rule);border-bottom-width:3px;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+kbd.kc.w{min-width:46px}
+@media (max-width:560px){#khelp .khr{grid-template-columns:1fr}}
 .skins{display:flex;flex-wrap:wrap;gap:8px}.skb{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid transparent;border-radius:12px;padding:5px 6px;background:none;cursor:pointer;font-size:.74rem;color:var(--ink-2)}.skb[aria-pressed=true]{border-color:var(--ac);color:var(--ink)}.skb i{display:block;width:38px;height:28px;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:linear-gradient(90deg,var(--a) 0 32%,var(--b) 32% 78%,var(--c) 78%)}
 select option,select optgroup{background:var(--page);color:var(--ink)}
 html[data-theme=dark] select option:checked{background:var(--ac-soft);color:#fff}
@@ -2976,7 +2988,7 @@ label.tsi{cursor:pointer}
       </div><div class="sdiv"></div>
       <div class="sgrp lfgrp">${lists().map(l=>it('l:'+l.id,icon('list').replace('<svg','<svg style="color:'+listColor(l.id)+'"'),l.name,0)).join('')}</div>
       <div class="sdiv"></div>
-      <div class="sgrp lfgrp">${it('done',icon('donebox'),'완료')}</div>`}<div class="sdiv"></div><div class="sgrp"><button class="si ${S.view==='setting'?'on':''}" data-act="tab" data-v="setting" title="설정">${icon('gear')}<span>설정</span></button></div>`;
+      <div class="sgrp lfgrp">${it('done',icon('donebox'),'완료')}</div>`}<div class="sdiv"></div><div class="sgrp"><button class="si ${S.view==='setting'?'on':''}" data-act="tab" data-v="setting" title="설정">${icon('gear')}<span>설정</span></button><button class="si khb" data-act="keyhelp" title="단축키 보기 (?)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><circle cx="12" cy="16.9" r=".6" fill="currentColor"/></svg><span>단축키</span></button></div>`;
     return `${tog}<div class="sgrp">${calIt}</div><div class="sdiv"></div><div class="sgrp">
         ${it('dash',icon('dash'),'대시보드')}
         ${it('work',icon('brief'),'업무 포트폴리오',wN)}
@@ -2996,7 +3008,7 @@ label.tsi{cursor:pointer}
       <div class="sgrp lfgrp">${lists().map(l=>it('l:'+l.id,icon('list').replace('<svg','<svg style="color:'+listColor(l.id)+'"'),l.name,by('l:'+l.id))).join('')}${lform}</div>
       ${tags.length?`<div class="sh">태그</div><div class="sgrp lfgrp">${tags.map(x=>it(x.k,icon('hash'),x.n.slice(1),x.count)).join('')}</div>`:''}
       <div class="sdiv"></div>
-      <div class="sgrp lfgrp">${it('done',icon('donebox'),'완료')}</div>`}<div class="sdiv"></div><div class="sgrp"><button class="si ${S.view==='setting'?'on':''}" data-act="tab" data-v="setting" title="설정">${icon('gear')}<span>설정</span></button></div>`;
+      <div class="sgrp lfgrp">${it('done',icon('donebox'),'완료')}</div>`}<div class="sdiv"></div><div class="sgrp"><button class="si ${S.view==='setting'?'on':''}" data-act="tab" data-v="setting" title="설정">${icon('gear')}<span>설정</span></button><button class="si khb" data-act="keyhelp" title="단축키 보기 (?)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><circle cx="12" cy="16.9" r=".6" fill="currentColor"/></svg><span>단축키</span></button></div>`;
   }
   function listBody(sl,all){
     const ts=all.filter(sl.f);let body='';
@@ -4955,6 +4967,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     tpush:b=>{pushToday([b.dataset.t]);render()},
     tpushall:()=>{const o=overdueList();pushToday(o.map(t=>t.id));setSaving(`${o.length}개를 오늘로 연기했습니다`);render()},
     wnewx:()=>{S.wnewFor=null;render()},
+    keyhelp:()=>khOpen(),
     lfold:()=>{S.lfold=!S.lfold;try{localStorage.setItem('diarybook-lfold',S.lfold?'1':'0')}catch(e){}render();const b=document.querySelector('.tside [data-act=lfold]');if(b)b.focus({preventScroll:true})},
     'list-new':()=>{S.addingList=true;if(!wideSide.matches)S.side=true;render();const el=document.getElementById('listName');if(el)el.focus()},
     'list-cancel':()=>{S.addingList=false;render()},
@@ -5090,6 +5103,35 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();payQSave();return}
     const t=e.target;if(e.key==='Enter'&&t&&t.dataset&&t.dataset.pq&&!e.isComposing){e.preventDefault();const ins=[...document.querySelectorAll('[data-pq]')],i=ins.indexOf(t),nx=ins[i+(e.shiftKey?-1:1)];if(nx){nx.focus();nx.select()}else document.querySelector('#payQForm .pri').focus()}
   },true);
+
+  /* 단축키 도움말 팝업 */
+  const KH=[
+    ['전체',[
+      [['Ctrl','Space'],'할 일·일정 빠른 추가','급여 화면에서는 급여 빠른 입력'],
+      [['Ctrl','↑','/','↓'],'왼쪽 메뉴 위·아래로 이동'],
+      [['Space'],'목록에서 펼치기 / 접기','Ctrl+↑↓로 목록에 왔을 때'],
+      [['Ctrl','\\'],'왼쪽 메뉴 넓게 / 좁게'],
+      [['Ctrl','Z'],'방금 한 일 되돌리기'],
+      [['Esc'],'창 닫기 · 선택 해제'],
+      [['?'],'이 단축키 창 열기 / 닫기']]],
+    ['캘린더',[
+      [['←'],['→'],'이전 / 다음 (주 · 월 · 년)'],
+      [['Enter'],'입력줄에서 할 일 추가','@업무명 쓰면 업무 연결']]],
+    ['할 일 · 체크리스트',[
+      [['Enter'],'체크리스트 다음 항목 추가'],
+      [['Backspace'],'빈 체크리스트 항목 지우기']]],
+    ['급여',[
+      [['Ctrl','Space'],'급여 빠른 입력 열기'],
+      [['Enter'],['Shift','Enter'],'다음 칸 / 이전 칸'],
+      [['Ctrl','Enter'],'빠른 입력 저장']]]];
+  function khKeys(a){return a.map((k,i)=>k==='/'?'<i class="ko">/</i>':(i&&a[i-1]!=='/'?'<i class="kp">+</i>':'')+`<kbd class="kc ${k.length>2?'w':''}">${esc(k)}</kbd>`).join('')}
+  function khOpen(){let el=document.getElementById('khelp');if(el){el.remove();return}
+    el=document.createElement('div');el.id='khelp';
+    el.innerHTML=`<div class="khbg"></div><div class="khp" role="dialog" aria-label="단축키"><div class="khh"><b>⌨ 단축키</b><button class="khx" aria-label="닫기">×</button></div>${KH.map(([g,items])=>`<section><h4>${g}</h4>${items.map(it=>{const keys=it.filter(x=>Array.isArray(x)),txt=it.filter(x=>typeof x==='string');return `<div class="khr"><span class="khk">${keys.map(khKeys).join('<i class="ko">/</i>')}</span><span class="khd">${esc(txt[0])}${txt[1]?`<small>${esc(txt[1])}</small>`:''}</span></div>`}).join('')}</section>`).join('')}</div>`;
+    document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target.closest('.khx')||e.target.classList.contains('khbg'))el.remove()})}
+  document.addEventListener('keydown',e=>{const t=e.target;const typing=t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+    if(e.key==='Escape'&&document.getElementById('khelp')){e.preventDefault();e.stopImmediatePropagation();document.getElementById('khelp').remove();return}
+    if(!typing&&e.key==='?'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();khOpen()}},true);
   /* Ctrl+↑/↓ : 왼쪽 메뉴 이동 (목록은 포커스만 → Space로 펼치기) */
   document.addEventListener('keydown',e=>{
     if(!e.ctrlKey||e.altKey||e.metaKey||e.shiftKey||(e.key!=='ArrowUp'&&e.key!=='ArrowDown')||e.isComposing)return;
@@ -5097,7 +5139,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     if(S.payQ||S.qp)return;
     e.preventDefault();
     if(S.view!=='tasks'){S.view='tasks';render()}
-    const bs=[...document.querySelectorAll('.tside .si')].filter(b=>b.offsetParent!==null);if(!bs.length)return;
+    const bs=[...document.querySelectorAll('.tside .si')].filter(b=>b.offsetParent!==null&&!b.classList.contains('khb'));if(!bs.length)return;
     let i=bs.indexOf(document.activeElement);if(i<0)i=bs.findIndex(b=>b.classList.contains('on')&&!b.classList.contains('lfb'));if(i<0)i=bs.findIndex(b=>b.classList.contains('on'));
     const nx=bs[((i<0?-1:i)+(e.key==='ArrowDown'?1:-1)+bs.length)%bs.length];
     if(nx.dataset.act==='lfold'){nx.focus();return}
