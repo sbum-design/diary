@@ -3090,12 +3090,12 @@ label.tsi{cursor:pointer}
   const PAYG=[['','',1],['in','',1],['sav','',1],['card','신용카드',4],['fix','고정비',4],['bal','',1],['split','현대카드 분할',2],['dep','입금금액',1]];
   const PAY_EX={f_live:1};/* 잔액 계산에서 빼는 항목 (시트와 같은 방식) */
   const payRows=()=>Object.keys(S.docs).filter(k=>/^pay-\d{4}-\d\d$/.test(k)&&S.docs[k]).sort().map(k=>Object.assign({m:k.slice(4)},S.docs[k]));
-  const paySum=(r,cat)=>PAYC.filter(c=>c[2]===cat).reduce((a,c)=>a+(+r[c[0]]||0),0);
+  const paySum=(r,cat)=>PAYC.filter(c=>c[2]===cat).reduce((a,c)=>a+payV(r,c[0]),0);
   const payCalcBal=r=>(+r.sal||0)-(+r.sav||0)-paySum(r,'card')-PAYC.filter(c=>c[2]==='fix'&&!PAY_EX[c[0]]).reduce((a,c)=>a+(+r[c[0]]||0),0);
   /* 시트 수식: 칸을 비워 두면 자동 계산, 숫자를 적으면 그 값이 우선 */
   const payOff=()=>{const v=D('cfg').payScOff;return v!=null&&v!==''?+v:700000};
-  const PAYF={bal:r=>payCalcBal(r),s_sh:r=>(+r.c_hd||0)-(+r.s_sc||0),d_sc:r=>(+r.s_sc||0)+(+r.sav||0)-payOff()};
-  const PAYFT={bal:'급여 − 적금 − 카드 − 고정비(생활비 제외)',s_sh:'현대카드 − SC은행 분할',d_sc:'SC은행 분할 + 적금 − 공제액'};
+  const PAYF={bal:r=>payCalcBal(r),c_hd:r=>(+r.s_sh||0)+(+r.s_sc||0),d_sc:r=>(+r.s_sc||0)+(+r.sav||0)-payOff()};
+  const PAYFT={bal:'급여 − 적금 − 카드 − 고정비(생활비 제외)',c_hd:'신한은행 분할 + SC은행 분할',d_sc:'SC은행 분할 + 적금 − 공제액'};
   const payHas=(r,k)=>r[k]!=null&&r[k]!=='';
   const payV=(r,k)=>payHas(r,k)?+r[k]:PAYF[k]?PAYF[k](r):0;
   const payBal=r=>payV(r,'bal');
@@ -3120,7 +3120,8 @@ label.tsi{cursor:pointer}
     const dark=r.dataset.theme==='dark';return[a,`hsl(${Math.round((h+150)%360)} ${dark?95:70}% ${dark?66:55}%)`]}
   function payView(){const [PA,PB]=payPal();
     if(!D('cfg').payF2&&payRows().length)setTimeout(()=>{if(D('cfg').payF2)return;payRows().forEach(r=>payNorm(r.m));update('cfg',d=>{d.payF1=1;d.payF2=1},true);requestRender()},0);
-    if(!D('cfg').payF3&&payRows().length)setTimeout(()=>{if(D('cfg').payF3)return;payRows().forEach(r=>{const id='pay-'+r.m;if(S.docs[id])update(id,x=>{['bal','s_sh','d_sc','d_x'].forEach(k=>delete x[k])},true)});update('cfg',d=>{d.payF3=1},true);requestRender()},0);
+    if(!D('cfg').payF3&&payRows().length)setTimeout(()=>{if(D('cfg').payF3)return;payRows().forEach(r=>{const id='pay-'+r.m;if(S.docs[id])update(id,x=>{['bal','d_sc','d_x'].forEach(k=>delete x[k])},true)});update('cfg',d=>{d.payF3=1},true);requestRender()},0);
+    if(!D('cfg').payF4&&payRows().length)setTimeout(()=>{if(D('cfg').payF4)return;payRows().forEach(r=>{const id='pay-'+r.m,d=S.docs[id];if(!d)return;update(id,x=>{if(!payHas(x,'s_sh')&&payHas(x,'c_hd')){const v=(+x.c_hd)-(+x.s_sc||0);if(v>=0)x.s_sh=v}if(payHas(x,'c_hd')&&+x.c_hd===(+x.s_sh||0)+(+x.s_sc||0))delete x.c_hd},true)});update('cfg',d=>{d.payF4=1},true);requestRender()},0);
     const all=payRows(),years=[...new Set(all.map(r=>r.m.slice(0,4)))].sort(),Y=S.payY&&years.includes(S.payY)?S.payY:(years.includes(TODAY.slice(0,4))?TODAY.slice(0,4):years[years.length-1]||TODAY.slice(0,4));
     const rows=all.filter(r=>r.m.startsWith(Y)),n=rows.length||1,sheet=D('cfg').paySheet||'';
     const sumSal=rows.reduce((a,r)=>a+(+r.sal||0),0),sumSav=rows.reduce((a,r)=>a+(+r.sav||0),0),sumCard=rows.reduce((a,r)=>a+paySum(r,'card'),0),avgBal=rows.reduce((a,r)=>a+payBal(r),0)/n;
@@ -3163,7 +3164,7 @@ label.tsi{cursor:pointer}
       <div class="pyfl">${flow.map(f=>`<div><span><i style="background:${f.c}"></i>${f.l}</span>${cnt(f.v)}<em>${S.payHide?'':Math.round(f.v/ftot*100)+'%'}</em></div>`).join('')}</div>
       <div class="pymon">${rows.map(r=>`<button class="${r===sel?'on':''}" data-act="paym" data-v="${r.m}">${+r.m.slice(5)}월</button>`).join('')}</div></div>`;
     /* 도넛: 카드·고정비 세부 */
-    const parts=PAYC.filter(c=>['sav','card','fix'].includes(c[2])).map(c=>({l:c[1],v:+sel[c[0]]||0,g:c[2]})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+    const parts=PAYC.filter(c=>['sav','card','fix'].includes(c[2])).map(c=>({l:c[1],v:payV(sel,c[0]),g:c[2]})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
     const PCOL={sav:[PB],card:['#ff9f45','#ffb877','#ffd0a3','#ffe4c9'],fix:['#9aa3ae','#b8bec8','#d3d7dd','#e4e7eb']},gi={sav:0,card:0,fix:0};parts.forEach(x=>{x.c=PCOL[x.g][Math.min(gi[x.g]++,PCOL[x.g].length-1)]});
     const ptot=Math.max(1,parts.reduce((a,x)=>a+x.v,0)),R=54,C=2*Math.PI*R;let off=0;
     const donut=`<section class="pycard"><h3>${+sel.m.slice(5)}월 지출 구성</h3><div class="pydn"><div class="pydw"><svg viewBox="0 0 140 140" aria-hidden="true"><circle cx="70" cy="70" r="${R}" class="trk"/>${parts.map(x=>{const len=x.v/ptot*C,el=`<circle cx="70" cy="70" r="${R}" stroke="${x.c}" stroke-dasharray="${Math.max(0,len-2).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}"/>`;off+=len;return el}).join('')}</svg>
@@ -3186,7 +3187,7 @@ label.tsi{cursor:pointer}
   function payCount(){const els=[...document.querySelectorAll('.pyw [data-count]')].filter(e=>e.dataset.count!=='');const t0=performance.now(),D=850;
     const step=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);els.forEach(el=>{if(!el.isConnected)return;el.textContent=Math.round(+el.dataset.count*e).toLocaleString()});if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
   function payDecode(code){const b=String(code).replace(/-/g,'+').replace(/_/g,'/'),bin=atob(b+'==='.slice((b.length+3)%4));return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))))}
-  function payImport(rows,sheet){let n=0;rows.forEach(o=>{const m=o.m;if(!/^\d{4}-\d\d$/.test(m||''))return;update('pay-'+m,d=>{PAYC.map(c=>c[0]).filter(k=>!PAYF[k]).forEach(k=>{if(o[k]!=null&&o[k]!=='')d[k]=+o[k]})},true);payNorm(m);n++});
+  function payImport(rows,sheet){let n=0;rows.forEach(o=>{const m=o.m;if(!/^\d{4}-\d\d$/.test(m||''))return;update('pay-'+m,d=>{PAYC.map(c=>c[0]).filter(k=>!['bal','d_sc'].includes(k)).forEach(k=>{if(o[k]!=null&&o[k]!=='')d[k]=+o[k]})},true);payNorm(m);n++});
     if(sheet)update('cfg',d=>{d.paySheet=sheet},true);return n}
   function payParseText(t){const out=[],keys=['bal','sal','sav','c_hd','c_sh','c_lt','c_wr','f_ins','f_club','f_live','f_cp','s_sh','s_sc',null,'d_sc','d_x'];
     String(t||'').split(/\r?\n/).forEach(line=>{const cells=[];let cur='',q=false,sep=line.includes('\t')?'\t':',';for(const ch of line){if(ch==='"'){q=!q;continue}if(ch===sep&&!q){cells.push(cur);cur='';continue}cur+=ch}cells.push(cur);
