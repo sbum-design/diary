@@ -110,17 +110,18 @@ html[data-skin]:not([data-skin=""]) .pybtn.pri{color:var(--on-ac)}
 .pytrs{font-size:.72rem;color:var(--ink-3);font-weight:600;margin-left:4px}
 .tside .si:focus-visible{outline:2px solid var(--ac);outline-offset:-2px}
 #khelp .khbg{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.35);backdrop-filter:blur(2px)}
-#khelp .khp{position:fixed;z-index:91;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 32px);overflow:auto;background:var(--page);color:var(--ink);border:1px solid var(--rule);border-radius:18px;padding:16px 20px 18px;box-shadow:0 30px 80px rgba(0,0,0,.4),0 0 0 1px color-mix(in srgb,var(--ac) 30%,transparent);font-family:var(--f-body)}
+#khelp .khp{position:fixed;z-index:91;left:50%;top:50%;transform:translate(-50%,-50%);width:min(1080px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;background:var(--page);color:var(--ink);border:1px solid var(--rule);border-radius:18px;padding:16px 20px 18px;box-shadow:0 30px 80px rgba(0,0,0,.4),0 0 0 1px color-mix(in srgb,var(--ac) 30%,transparent);font-family:var(--f-body)}
 #khelp .khh{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}#khelp .khh b{font-size:1.05rem}
 #khelp .khx{background:none;border:0;font-size:1.5rem;line-height:1;color:var(--ink-3);cursor:pointer}
-#khelp h4{margin:14px 0 6px;font-size:.72rem;letter-spacing:.08em;color:var(--ac);text-transform:uppercase}
-#khelp .khr{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:12px;padding:7px 0;border-top:1px solid var(--hair)}
+#khelp .khcols{display:grid;grid-template-columns:1fr 1fr;gap:0 36px}
+#khelp h4{margin:10px 0 4px;font-size:.72rem;letter-spacing:.08em;color:var(--ac);text-transform:uppercase}
+#khelp .khr{display:grid;grid-template-columns:190px 1fr;align-items:center;gap:12px;padding:5px 0;border-top:1px solid var(--hair)}
 #khelp .khk{display:flex;align-items:center;flex-wrap:wrap;gap:3px}
 #khelp .khd{font-size:.88rem;display:grid}#khelp .khd small{font-size:.72rem;color:var(--ink-3)}
 #khelp .kp,#khelp .ko{font-style:normal;font-size:.72rem;color:var(--ink-3);margin:0 2px}
 kbd.kc{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:7px;font:700 .78rem/1 var(--f-body);color:var(--ink);background:linear-gradient(180deg,var(--page),var(--fill));border:1px solid var(--rule);border-bottom-width:3px;box-shadow:0 1px 0 rgba(0,0,0,.08)}
 kbd.kc.w{min-width:46px}
-@media (max-width:560px){#khelp .khr{grid-template-columns:1fr}}
+@media (max-width:860px){#khelp .khcols{grid-template-columns:1fr}}@media (max-width:560px){#khelp .khr{grid-template-columns:1fr}}
 .skins{display:flex;flex-wrap:wrap;gap:8px}.skb{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid transparent;border-radius:12px;padding:5px 6px;background:none;cursor:pointer;font-size:.74rem;color:var(--ink-2)}.skb[aria-pressed=true]{border-color:var(--ac);color:var(--ink)}.skb i{display:block;width:38px;height:28px;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:linear-gradient(90deg,var(--a) 0 32%,var(--b) 32% 78%,var(--c) 78%)}
 select option,select optgroup{background:var(--page);color:var(--ink)}
 html[data-theme=dark] select option:checked{background:var(--ac-soft);color:#fff}
@@ -5116,6 +5117,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
       [['?'],'이 단축키 창 열기 / 닫기']]],
     ['캘린더',[
       [['←'],['→'],'이전 / 다음 (주 · 월 · 년)'],
+      [['Ctrl','←','/','→'],'보기 바꾸기 (주 ↔ 월 ↔ 년)'],
       [['Enter'],'입력줄에서 할 일 추가','@업무명 쓰면 업무 연결']]],
     ['할 일 · 체크리스트',[
       [['Enter'],'체크리스트 다음 항목 추가'],
@@ -5127,7 +5129,8 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   function khKeys(a){return a.map((k,i)=>k==='/'?'<i class="ko">/</i>':(i&&a[i-1]!=='/'?'<i class="kp">+</i>':'')+`<kbd class="kc ${k.length>2?'w':''}">${esc(k)}</kbd>`).join('')}
   function khOpen(){let el=document.getElementById('khelp');if(el){el.remove();return}
     el=document.createElement('div');el.id='khelp';
-    el.innerHTML=`<div class="khbg"></div><div class="khp" role="dialog" aria-label="단축키"><div class="khh"><b>⌨ 단축키</b><button class="khx" aria-label="닫기">×</button></div>${KH.map(([g,items])=>`<section><h4>${g}</h4>${items.map(it=>{const keys=it.filter(x=>Array.isArray(x)),txt=it.filter(x=>typeof x==='string');return `<div class="khr"><span class="khk">${keys.map(khKeys).join('<i class="ko">/</i>')}</span><span class="khd">${esc(txt[0])}${txt[1]?`<small>${esc(txt[1])}</small>`:''}</span></div>`}).join('')}</section>`).join('')}</div>`;
+    el.innerHTML=`<div class="khbg"></div><div class="khp" role="dialog" aria-label="단축키"><div class="khh"><b>⌨ 단축키</b><button class="khx" aria-label="닫기">×</button></div><div class="khcols"><div>${KH.slice(0,1).map(sec).join('')}</div><div>${KH.slice(1).map(sec).join('')}</div></div></div>`;
+    function sec([g,items]){return `<section><h4>${g}</h4>${items.map(it=>{const keys=it.filter(x=>Array.isArray(x)),txt=it.filter(x=>typeof x==='string');return `<div class="khr"><span class="khk">${keys.map(khKeys).join('<i class="ko">/</i>')}</span><span class="khd">${esc(txt[0])}${txt[1]?`<small>${esc(txt[1])}</small>`:''}</span></div>`}).join('')}</section>`}
     document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target.closest('.khx')||e.target.classList.contains('khbg'))el.remove()})}
   document.addEventListener('keydown',e=>{const t=e.target;const typing=t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
     if(e.key==='Escape'&&document.getElementById('khelp')){e.preventDefault();e.stopImmediatePropagation();document.getElementById('khelp').remove();return}
@@ -5147,9 +5150,10 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     nx.click();requestAnimationFrame(()=>{const b=document.querySelector(sel);if(b)b.focus({preventScroll:true})});
   });
   document.addEventListener('keydown',e=>{
-    if((e.key!=='ArrowLeft'&&e.key!=='ArrowRight')||e.isComposing||e.ctrlKey||e.metaKey||e.altKey||e.shiftKey)return;
+    if((e.key!=='ArrowLeft'&&e.key!=='ArrowRight')||e.isComposing||e.metaKey||e.altKey||e.shiftKey)return;
     if(S.view!=='tasks'||!isCalK(S.tl)||S.dp||S.mm||S.cm||S.tsel)return;
     const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+    if(e.ctrlKey){const ks=CALV.map(c=>c[0]),i=ks.indexOf(S.tl);if(i<0)return;e.preventDefault();const k=ks[(i+(e.key==='ArrowRight'?1:-1)+ks.length)%ks.length];S.tl=k;S.lastCal=k;try{localStorage.setItem('diarybook-lcal',k);localStorage.setItem('diarybook-tl',k)}catch(x){}render();return}
     const btn=document.querySelector(`[data-act="${e.key==='ArrowRight'?'next':'prev'}"]`);if(!btn)return;e.preventDefault();btn.click()});
   document.addEventListener('keydown',e=>{
     if(e.key!=='Escape'||e.isComposing)return;
