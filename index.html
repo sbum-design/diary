@@ -78,6 +78,16 @@ html[data-theme=dark][data-skin=vicecity] .tside .si.on{box-shadow:0 0 18px rgba
 html[data-theme=dark][data-skin=vicecity] .tci.g[style]{box-shadow:0 0 8px color-mix(in srgb,var(--cc) 30%,transparent)}
 html[data-theme=dark][data-skin=vice] .tci.lc,html[data-theme=dark][data-skin=miami] .tci.lc,html[data-theme=dark][data-skin=sunset] .tci.lc,html[data-theme=dark][data-skin=ultra] .tci.lc,html[data-theme=dark][data-skin=toxic] .tci.lc,html[data-theme=dark][data-skin=graphite] .tci.lc,html[data-theme=dark][data-skin=vicecity] .tci.lc,html[data-theme=dark][data-skin=vice] .tci.g[style],html[data-theme=dark][data-skin=miami] .tci.g[style],html[data-theme=dark][data-skin=sunset] .tci.g[style],html[data-theme=dark][data-skin=ultra] .tci.g[style],html[data-theme=dark][data-skin=toxic] .tci.g[style],html[data-theme=dark][data-skin=graphite] .tci.g[style],html[data-theme=dark][data-skin=vicecity] .tci.g[style]{background:color-mix(in srgb,var(--cc) 20%,var(--page));color:color-mix(in srgb,var(--cc) 55%,#fff);border:1px solid color-mix(in srgb,var(--cc) 70%,transparent);border-left:4px solid var(--cc);box-shadow:0 0 10px color-mix(in srgb,var(--cc) 35%,transparent),inset 0 0 8px color-mix(in srgb,var(--cc) 15%,transparent);text-shadow:0 0 6px color-mix(in srgb,var(--cc) 60%,transparent)}
 html[data-theme=dark][data-skin=vice] .tci.done.done,html[data-theme=dark][data-skin=miami] .tci.done.done,html[data-theme=dark][data-skin=sunset] .tci.done.done,html[data-theme=dark][data-skin=ultra] .tci.done.done,html[data-theme=dark][data-skin=toxic] .tci.done.done,html[data-theme=dark][data-skin=graphite] .tci.done.done,html[data-theme=dark][data-skin=vicecity] .tci.done.done{box-shadow:none;text-shadow:none;border-color:transparent;border-left:4px solid color-mix(in srgb,var(--cc) 35%,var(--page))}
+html[data-skin]:not([data-skin=""]) .pyhero{background:radial-gradient(90% 120% at 100% 100%,color-mix(in srgb,var(--ac) 55%,transparent),transparent 60%),var(--sbg,#14161c);box-shadow:0 20px 50px color-mix(in srgb,var(--ac) 25%,transparent),inset 0 1px 0 rgba(255,255,255,.18)}
+html[data-skin]:not([data-skin=""]) .pyglow{background:radial-gradient(circle,color-mix(in srgb,var(--ac) 60%,transparent),transparent 65%)}
+html[data-skin]:not([data-skin=""]) .pymon button.on{background:var(--ac);color:var(--on-ac)}
+html[data-skin]:not([data-skin=""]) .pydelta.up{color:color-mix(in srgb,var(--ac) 60%,#fff)}
+html[data-skin]:not([data-skin=""]) .pytr .ln{stroke:var(--ac);filter:drop-shadow(0 3px 8px color-mix(in srgb,var(--ac) 50%,transparent))}
+html[data-skin]:not([data-skin=""]) .pytr .dot{stroke:var(--ac)}
+html[data-skin]:not([data-skin=""]) .pylg2 i.l{background:var(--ac)}
+html[data-skin]:not([data-skin=""]) .pyt td.fx input::placeholder{color:var(--ac)}
+html[data-skin]:not([data-skin=""]) .pyt td.fx{background:color-mix(in srgb,var(--ac) 7%,transparent)}
+html[data-skin]:not([data-skin=""]) .pybtn.pri{color:var(--on-ac)}
 .skins{display:flex;flex-wrap:wrap;gap:8px}.skb{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid transparent;border-radius:12px;padding:5px 6px;background:none;cursor:pointer;font-size:.74rem;color:var(--ink-2)}.skb[aria-pressed=true]{border-color:var(--ac);color:var(--ink)}.skb i{display:block;width:38px;height:28px;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:linear-gradient(90deg,var(--a) 0 32%,var(--b) 32% 78%,var(--c) 78%)}
 select option,select optgroup{background:var(--page);color:var(--ink)}
 html[data-theme=dark] select option:checked{background:var(--ac-soft);color:#fff}
@@ -681,6 +691,7 @@ body.mqing,body.mqing *{user-select:none!important;-webkit-user-select:none!impo
 .agday h3{margin:4px 0 0;font-size:1rem;display:flex;gap:8px;align-items:baseline}
 .agday h3 small{color:var(--ac);font-size:.8rem}
 .wkg.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.wkg.n14 .wkc{min-height:260px}.wkg.n14 .wkc:nth-child(-n+7){border-bottom:1px solid var(--rule)}.wkg.n14 .wkc:nth-child(7n){border-right:0}
 .yg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px 26px}
 .ym h4{margin:0 0 6px}
 .ym h4 button{font-weight:700;font-size:.95rem;color:var(--ink)}
@@ -2314,6 +2325,7 @@ label.tsi{cursor:pointer}
     let s=wkStart(ymd(new Date(d0.getFullYear(),yr?0:d0.getMonth(),1)));
     let e=addD(wkStart(ymd(new Date(d0.getFullYear(),yr?12:d0.getMonth()+1,0))),7);
     if(tcal&&S.tl==='review'){s=wkStart(S.cur);e=addD(s,14)}
+    if(tcal&&S.tl==='cal:w'){const w0=wkStart(S.cur),w1=addD(w0,14);if(w0<s)s=w0;if(w1>e)e=w1}
     const cals=gShown().map(c=>c.id);
     const key=`${s}|${e}|${cals.join(',')}`;
     if(!force&&key===gw.key&&Date.now()-gw.t<300000)return;
@@ -2509,7 +2521,7 @@ label.tsi{cursor:pointer}
   const newId=()=>'t-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   const nowHM=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())};
   const nowStamp=()=>ymd(new Date())+'T'+nowHM();
-  S.tl=(()=>{try{return localStorage.getItem('diarybook-tl')||'cal:m'}catch(e){return'cal:m'}})();S.tsel=null;S.showDone=false;S.addingList=false;S.col=new Set();
+  S.tl=(()=>{try{const v=localStorage.getItem('diarybook-tl')||'cal:m';return v==='cal:3'||v==='cal:d'?'cal:w':v==='cal:a'?'cal:m':v}catch(e){return'cal:m'}})();S.tsel=null;S.showDone=false;S.addingList=false;S.col=new Set();
   S.tmode=(()=>{try{return localStorage.getItem('diarybook-tmode')||'cal'}catch(e){return'cal'}})();
   function dueLabel(t){
     if(!t.due)return t.time||'';
@@ -2906,7 +2918,7 @@ label.tsi{cursor:pointer}
   S.side=false;
   S.lfold=(()=>{try{return localStorage.getItem('diarybook-lfold')!=='0'}catch(e){return true}})();
   const isCalK=k=>typeof k==='string'&&k.startsWith('cal:');
-  const CALV=[['cal:a','목록'],['cal:d','일'],['cal:3','3일'],['cal:w','주'],['cal:m','월'],['cal:y','년']];
+  const CALV=[['cal:w','주'],['cal:m','월'],['cal:y','년']];
   S.sideOff=(()=>{try{return localStorage.getItem('diarybook-sideoff')==='1'}catch(e){return false}})();
   S.mini=(()=>{try{return localStorage.getItem('diarybook-mini')!=='0'}catch(e){return true}})();
   S.lastCal=(()=>{try{const v=localStorage.getItem('diarybook-lcal');return CALV.some(c=>c[0]===v)?v:'cal:m'}catch(e){return'cal:m'}})();
@@ -2995,13 +3007,13 @@ label.tsi{cursor:pointer}
     return{title:`${y}년 ${m+1}월`,nav:true,body:`${pushBar()}${pbar}${grid}${W?'<span class="gnote">할 일을 다른 날짜 칸으로 끌어다 놓으면 날짜가 바뀝니다.</span>':''}${agenda}`};
   }
   function calWeek(n){
-    n=n||7;const s=n===7?wkStart(S.cur):S.cur,by=byDue();
+    n=n||14;const s=n===14?wkStart(S.cur):S.cur,by=byDue();
     const col=i=>{
       const id=addD(s,i),dt=parse(id),ts=by[id]||[],ev=gDay(id);
       return `<div class="wkc ${id===TODAY?'today':''}" data-drop="${id}"><button class="wkh" data-act="tdayview" data-d="${id}"><span>${WDK[dt.getDay()]}</span><b>${dt.getDate()}</b></button>
         <div class="wki">${ts.map(t=>chipFor(t,true)).join('')}${ev.map(e=>`<a class="tci g" style="--cc:${gColor(e.cal)}" data-ev="${esc(e.cal)}|${esc(e.id)}" href="${esc(e.link)}" target="_blank" rel="noopener">${e.allDay?'':`<i>${e.time}</i> `}${esc(e.title)}</a>`).join('')}${!ts.length&&!ev.length?'<span class="wke">—</span>':''}</div></div>`;
     };
-    return{title:`${md(s)} – ${md(addD(s,n-1))}`,nav:true,body:`${pushBar()}<div class="wkg ${n===3?'n3':''}">${Array.from({length:n},(_,i)=>i).map(col).join('')}</div>`};
+    return{title:`${md(s)} – ${md(addD(s,n-1))}`,nav:true,body:`${pushBar()}<div class="wkg ${n===3?'n3':n===14?'n14':''}">${Array.from({length:n},(_,i)=>i).map(col).join('')}</div>`};
   }
   function calDay(){
     const id=S.cur,dt=parse(id),ts=byDue()[id]||[],diff=Math.round((dt-parse(TODAY))/864e5);
@@ -3102,8 +3114,13 @@ label.tsi{cursor:pointer}
   try{S.payHide=!!localStorage.getItem('diarybook-payhide')}catch(e){}
   const won=n=>S.payHide?'•••••':(Math.round(+n||0)).toLocaleString();
   const wonK=n=>S.payHide?'•••':((+n||0)>=1e6?((+n)/1e4).toFixed(0)+'만':Math.round((+n||0)/1e3)+'천');
-  function payView(){
+  function payPal(){const r=document.documentElement;if(!r.dataset.skin)return['#34d399','#7c8cff'];
+    const a=(getComputedStyle(r).getPropertyValue('--ac')||'').trim();const m=/^#([0-9a-f]{6})$/i.exec(a);if(!m)return['#34d399','#7c8cff'];
+    const n=parseInt(m[1],16);let R=(n>>16&255)/255,G=(n>>8&255)/255,B=(n&255)/255;const mx=Math.max(R,G,B),mn=Math.min(R,G,B),d=mx-mn;let h=0;if(d){h=mx===R?((G-B)/d)%6:mx===G?(B-R)/d+2:(R-G)/d+4;h*=60}
+    const dark=r.dataset.theme==='dark';return[a,`hsl(${Math.round((h+150)%360)} ${dark?95:70}% ${dark?66:55}%)`]}
+  function payView(){const [PA,PB]=payPal();
     if(!D('cfg').payF2&&payRows().length)setTimeout(()=>{if(D('cfg').payF2)return;payRows().forEach(r=>payNorm(r.m));update('cfg',d=>{d.payF1=1;d.payF2=1},true);requestRender()},0);
+    if(!D('cfg').payF3&&payRows().length)setTimeout(()=>{if(D('cfg').payF3)return;payRows().forEach(r=>{const id='pay-'+r.m;if(S.docs[id])update(id,x=>{['bal','s_sh','d_sc','d_x'].forEach(k=>delete x[k])},true)});update('cfg',d=>{d.payF3=1},true);requestRender()},0);
     const all=payRows(),years=[...new Set(all.map(r=>r.m.slice(0,4)))].sort(),Y=S.payY&&years.includes(S.payY)?S.payY:(years.includes(TODAY.slice(0,4))?TODAY.slice(0,4):years[years.length-1]||TODAY.slice(0,4));
     const rows=all.filter(r=>r.m.startsWith(Y)),n=rows.length||1,sheet=D('cfg').paySheet||'';
     const sumSal=rows.reduce((a,r)=>a+(+r.sal||0),0),sumSav=rows.reduce((a,r)=>a+(+r.sav||0),0),sumCard=rows.reduce((a,r)=>a+paySum(r,'card'),0),avgBal=rows.reduce((a,r)=>a+payBal(r),0)/n;
@@ -3136,7 +3153,7 @@ label.tsi{cursor:pointer}
       <p><i class="fxm">ƒ</i> 칸은 시트처럼 <b>자동 계산</b>됩니다 — 잔액 = 급여 − 적금 − 카드 − 고정비(*생활비 제외), 신한은행 분할 = 현대카드 − SC은행, SC은행 입금 = SC은행 분할 + 적금 − 공제액. 숫자를 직접 적으면 그 값이 우선(노란 점), 지우면 다시 수식으로 돌아갑니다.</p></div>`;
     /* ---- 화려한 요약: 메인 카드 · 도넛 · 추이 ---- */
     const sel=rows.find(r=>r.m===S.payM)||rows[rows.length-1],si=rows.indexOf(sel),prev=si>0?rows[si-1]:all[all.indexOf(sel)-1];
-    const flow=[['sav','적금(주담대)','#7c8cff'],['card','신용카드','#ff9f45'],['fix','고정비','#b8bec8'],['bal','남은 돈','#34d399']].map(([k,l,c])=>({k,l,c,v:val(sel,k)}));
+    const flow=[['sav','적금(주담대)',PB],['card','신용카드','#ff9f45'],['fix','고정비','#b8bec8'],['bal','남은 돈',PA]].map(([k,l,c])=>({k,l,c,v:val(sel,k)}));
     const ftot=Math.max(1,flow.reduce((a,f)=>a+f.v,0)),dSal=prev&&+prev.sal?((+sel.sal-+prev.sal)/+prev.sal*100):null;
     const cnt=(v,cls)=>`<b class="${cls||''}" data-count="${S.payHide?'':Math.round(+v||0)}">${won(v)}</b>`;
     const hero=`<div class="pyhero"><div class="pyglow"></div>
@@ -3147,7 +3164,7 @@ label.tsi{cursor:pointer}
       <div class="pymon">${rows.map(r=>`<button class="${r===sel?'on':''}" data-act="paym" data-v="${r.m}">${+r.m.slice(5)}월</button>`).join('')}</div></div>`;
     /* 도넛: 카드·고정비 세부 */
     const parts=PAYC.filter(c=>['sav','card','fix'].includes(c[2])).map(c=>({l:c[1],v:+sel[c[0]]||0,g:c[2]})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
-    const PCOL={sav:['#7c8cff'],card:['#ff9f45','#ffb877','#ffd0a3','#ffe4c9'],fix:['#9aa3ae','#b8bec8','#d3d7dd','#e4e7eb']},gi={sav:0,card:0,fix:0};parts.forEach(x=>{x.c=PCOL[x.g][Math.min(gi[x.g]++,PCOL[x.g].length-1)]});
+    const PCOL={sav:[PB],card:['#ff9f45','#ffb877','#ffd0a3','#ffe4c9'],fix:['#9aa3ae','#b8bec8','#d3d7dd','#e4e7eb']},gi={sav:0,card:0,fix:0};parts.forEach(x=>{x.c=PCOL[x.g][Math.min(gi[x.g]++,PCOL[x.g].length-1)]});
     const ptot=Math.max(1,parts.reduce((a,x)=>a+x.v,0)),R=54,C=2*Math.PI*R;let off=0;
     const donut=`<section class="pycard"><h3>${+sel.m.slice(5)}월 지출 구성</h3><div class="pydn"><div class="pydw"><svg viewBox="0 0 140 140" aria-hidden="true"><circle cx="70" cy="70" r="${R}" class="trk"/>${parts.map(x=>{const len=x.v/ptot*C,el=`<circle cx="70" cy="70" r="${R}" stroke="${x.c}" stroke-dasharray="${Math.max(0,len-2).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}"/>`;off+=len;return el}).join('')}</svg>
       <div class="pydc"><small>총 지출</small>${cnt(ptot)}</div></div>
@@ -3156,20 +3173,20 @@ label.tsi{cursor:pointer}
     const TW=Math.max(rows.length*64,320),TH=190,pad=24,mxT=Math.max(1,...rows.map(r=>+r.sal||0)),bw=Math.min(34,TW/rows.length*0.5),xs=i=>pad+(i+.5)*((TW-pad*2)/rows.length),ys=v=>TH-8-(v/mxT)*(TH-36);
     const pts=rows.map((r,i)=>[xs(i),ys(Math.max(0,payBal(r)))]),line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(''),area=line+`L${pts[pts.length-1][0].toFixed(1)} ${TH-8}L${pts[0][0].toFixed(1)} ${TH-8}Z`;
     const trend=`<section class="pycard"><h3>월별 흐름 <span class="pylg2"><i class="b"></i>급여 <i class="l"></i>남은 돈</span></h3><div class="pyscroll"><svg class="pytr" viewBox="0 0 ${TW} ${TH+22}" style="min-width:${rows.length*40}px" aria-label="월별 급여와 남은 돈">
-      <defs><linearGradient id="pyb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c8cff"/><stop offset="1" stop-color="#7c8cff" stop-opacity=".25"/></linearGradient><linearGradient id="pyba" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b5bf0"/><stop offset="1" stop-color="#22c3a6"/></linearGradient><linearGradient id="pya" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399" stop-opacity=".35"/><stop offset="1" stop-color="#34d399" stop-opacity="0"/></linearGradient></defs>
+      <defs><linearGradient id="pyb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${PB}"/><stop offset="1" stop-color="${PB}" stop-opacity=".25"/></linearGradient><linearGradient id="pyba" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b5bf0"/><stop offset="1" stop-color="#22c3a6"/></linearGradient><linearGradient id="pya" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${PA}" stop-opacity=".35"/><stop offset="1" stop-color="${PA}" stop-opacity="0"/></linearGradient></defs>
       ${[.25,.5,.75,1].map(f=>`<line x1="${pad}" x2="${TW-pad}" y1="${ys(mxT*f).toFixed(1)}" y2="${ys(mxT*f).toFixed(1)}" class="gl"/>`).join('')}
       ${rows.map((r,i)=>`<g class="pybar ${r===sel?'on':''}" data-act="paym" data-v="${r.m}"><rect x="${(xs(i)-bw/2).toFixed(1)}" y="${ys(+r.sal||0).toFixed(1)}" width="${bw.toFixed(1)}" height="${(TH-8-ys(+r.sal||0)).toFixed(1)}" rx="6" fill="url(#${r===sel?'pyba':'pyb'})"/><rect x="${(xs(i)-((TW-pad*2)/rows.length)/2).toFixed(1)}" y="0" width="${((TW-pad*2)/rows.length).toFixed(1)}" height="${TH}" fill="transparent"/><text x="${xs(i).toFixed(1)}" y="${TH+14}" text-anchor="middle">${+r.m.slice(5)}월</text>${r===sel&&!S.payHide?`<text x="${xs(i).toFixed(1)}" y="${(ys(+r.sal||0)-6).toFixed(1)}" text-anchor="middle" class="v">${wonK(r.sal)}</text>`:''}</g>`).join('')}
       <path d="${area}" fill="url(#pya)"/><path d="${line}" class="ln"/>${pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" class="dot"/>`).join('')}</svg></div></section>`;
     const spark=(get,c)=>{const v=rows.map(get),m=Math.max(1,...v),mn=Math.min(...v);return `<svg class="pysp" viewBox="0 0 100 28" preserveAspectRatio="none"><path d="${v.map((x,i)=>(i?'L':'M')+(i/(Math.max(1,v.length-1))*100).toFixed(1)+' '+(26-(x-mn)/Math.max(1,m-mn)*22).toFixed(1)).join('')}" stroke="${c}"/></svg>`};
     const tile=(ic,l,v,sub,sp,c)=>`<div class="pyt2" style="--tc:${c}"><span class="ti">${ic}</span><span class="tl">${l}</span>${cnt(v)}<small>${sub||''}</small>${sp}</div>`;
-    const tiles=`<div class="pyks2">${tile('💼',`${Y}년 급여 합계`,sumSal,`${rows.length}개월`,spark(r=>+r.sal||0,'#7c8cff'),'#7c8cff')}${tile('📈','월평균 급여',sumSal/n,'',spark(r=>+r.sal||0,'#5b5bf0'),'#5b5bf0')}${tile('💳','월평균 카드',sumCard/n,`급여의 ${sumSal?Math.round(sumCard/sumSal*100):0}%`,spark(r=>paySum(r,'card'),'#ff9f45'),'#ff9f45')}${tile('🏦','적금(주담대) 누계',sumSav,'',spark(r=>+r.sav||0,'#22c3a6'),'#22c3a6')}${tile('🌱','월평균 남은 돈',avgBal,'',spark(r=>payBal(r),'#34d399'),'#34d399')}</div>`;
+    const tiles=`<div class="pyks2">${tile('💼',`${Y}년 급여 합계`,sumSal,`${rows.length}개월`,spark(r=>+r.sal||0,PB),PB)}${tile('📈','월평균 급여',sumSal/n,'',spark(r=>+r.sal||0,'#5b5bf0'),'#5b5bf0')}${tile('💳','월평균 카드',sumCard/n,`급여의 ${sumSal?Math.round(sumCard/sumSal*100):0}%`,spark(r=>paySum(r,'card'),'#ff9f45'),'#ff9f45')}${tile('🏦','적금(주담대) 누계',sumSav,'',spark(r=>+r.sav||0,'#22c3a6'),'#22c3a6')}${tile('🌱','월평균 남은 돈',avgBal,'',spark(r=>payBal(r),PA),PA)}</div>`;
     const key=sel.m+'|'+S.payHide+'|'+rows.length;if(S.payAnim!==key){S.payAnim=key;setTimeout(payCount,30)}
     return{title:'급여',nav:false,noAdd:true,noSeg:true,fold:false,body:`<div class="pyw">${head}${imp}<div class="pytop">${hero}<div class="pyside">${donut}</div></div>${trend}${tiles}<details class="pydet" ${S.payTbl===false?'':'open'}><summary data-act="paytbl">월별 상세 표</summary>${tbl}</details></div>`};
   }
   function payCount(){const els=[...document.querySelectorAll('.pyw [data-count]')].filter(e=>e.dataset.count!=='');const t0=performance.now(),D=850;
     const step=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);els.forEach(el=>{if(!el.isConnected)return;el.textContent=Math.round(+el.dataset.count*e).toLocaleString()});if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
   function payDecode(code){const b=String(code).replace(/-/g,'+').replace(/_/g,'/'),bin=atob(b+'==='.slice((b.length+3)%4));return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))))}
-  function payImport(rows,sheet){let n=0;rows.forEach(o=>{const m=o.m;if(!/^\d{4}-\d\d$/.test(m||''))return;update('pay-'+m,d=>{[...PAYC.map(c=>c[0]),'d_x'].forEach(k=>{if(o[k]!=null&&o[k]!=='')d[k]=+o[k]})},true);payNorm(m);n++});
+  function payImport(rows,sheet){let n=0;rows.forEach(o=>{const m=o.m;if(!/^\d{4}-\d\d$/.test(m||''))return;update('pay-'+m,d=>{PAYC.map(c=>c[0]).filter(k=>!PAYF[k]).forEach(k=>{if(o[k]!=null&&o[k]!=='')d[k]=+o[k]})},true);payNorm(m);n++});
     if(sheet)update('cfg',d=>{d.paySheet=sheet},true);return n}
   function payParseText(t){const out=[],keys=['bal','sal','sav','c_hd','c_sh','c_lt','c_wr','f_ins','f_club','f_live','f_cp','s_sh','s_sc',null,'d_sc','d_x'];
     String(t||'').split(/\r?\n/).forEach(line=>{const cells=[];let cur='',q=false,sep=line.includes('\t')?'\t':',';for(const ch of line){if(ch==='"'){q=!q;continue}if(ch===sep&&!q){cells.push(cur);cur='';continue}cur+=ch}cells.push(cur);
