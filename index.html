@@ -11,7 +11,7 @@
 <link rel="icon" href="icon.png?v=3">
 <meta name="theme-color" content="#f2f4f7">
 <meta name="color-scheme" content="light dark">
-<script>(function(){try{var t=localStorage.getItem('diarybook-theme')||'auto',d=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light';var m=document.querySelector('meta[name=theme-color]');if(m)m.content=d?'#0f1115':'#f2f4f7'}catch(e){}})()</script>
+<script>(function(){try{var t=localStorage.getItem('diarybook-theme')||'auto',d=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);var sk=localStorage.getItem(d?'diarybook-skin-dark':'diarybook-skin')||'',DD={'navy':'#0b1a33','teal':'#061a21','forest':'#0b1411','wine':'#1c0a0d','cocoa':'#1a120e','olive':'#15160b','plum':'#11112a'},SD={'cream':'#f5efdc','sage':'#e8f0e0','sky':'#e4eef9','blush':'#f9ecec','sand':'#f1e8dc','lav':'#eeedfb','peach':'#fdefe2'};document.documentElement.dataset.theme=d?'dark':'light';document.documentElement.dataset.skin=sk;var m=document.querySelector('meta[name=theme-color]');if(m)m.content=d?(DD[sk]||'#0f1115'):(SD[sk]||'#f2f4f7')}catch(e){}})()</script>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Gothic+A1:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Black+Han+Sans&family=Lilita+One&display=swap">
 <style>
@@ -34,6 +34,21 @@ html[data-theme=dark]{color-scheme:dark;
   --gutter:rgba(255,255,255,.04); --l1:#1f2a4a; --l2:#2c4185; --l3:#4865cc; --l4:#6d8dff;
   --gblue:#3d9ff0; --ggreen:#34c071; --ggsoft:#17301f; --tbg:#30343d; --note:#3a3216; --note-ink:#ecd58c}
 html[data-theme=dark] img{opacity:.94}
+html[data-theme=light][data-skin=cream]{--desk:#f5efdc;--page:#fffdf6;--fill:#f8f3e5;--hair:#eee7d3;--rule:#e1d7bd;--ac:#7c8f4e;--p1:#7c8f4e;--ac-soft:#eef2df;--l1:#e3ead0;--l2:#c5d3a0;--l3:#9fb276;--l4:#7c8f4e}
+html[data-theme=light][data-skin=sage]{--desk:#e8f0e0;--page:#fbfdf8;--fill:#f1f6ec;--hair:#e3ebda;--rule:#d2dec7;--ac:#55785d;--p1:#55785d;--ac-soft:#e3eee2;--l1:#d6e6d3;--l2:#a9c8a6;--l3:#7ea481;--l4:#55785d}
+html[data-theme=light][data-skin=sky]{--desk:#e4eef9;--page:#fafcff;--fill:#eff5fc;--hair:#e1eaf5;--rule:#cfdcec;--ac:#2f7fd6;--p1:#2f7fd6;--ac-soft:#e2eefc;--l1:#d3e5fb;--l2:#9ec8f6;--l3:#5ea6ee;--l4:#2f7fd6}
+html[data-theme=light][data-skin=blush]{--desk:#f9ecec;--page:#fffafa;--fill:#fbf2f2;--hair:#f3e4e4;--rule:#ead4d5;--ac:#d0606e;--p1:#d0606e;--ac-soft:#fbe6e8;--l1:#f9dadd;--l2:#f2b0b6;--l3:#e3848f;--l4:#d0606e}
+html[data-theme=light][data-skin=sand]{--desk:#f1e8dc;--page:#fffbf5;--fill:#f7f0e6;--hair:#ede3d5;--rule:#dfd1bf;--ac:#a8693c;--p1:#a8693c;--ac-soft:#f6e9dc;--l1:#f1dfcb;--l2:#ddb790;--l3:#c48d5c;--l4:#a8693c}
+html[data-theme=light][data-skin=lav]{--desk:#eeedfb;--page:#fcfbff;--fill:#f4f3fd;--hair:#e8e6f8;--rule:#d9d6f0;--ac:#5d5fef;--p1:#5d5fef;--ac-soft:#ebebff;--l1:#e0e0fd;--l2:#b9bbfb;--l3:#8c8ff7;--l4:#5d5fef}
+html[data-theme=light][data-skin=peach]{--desk:#fdefe2;--page:#fffaf5;--fill:#fdf4ea;--hair:#f6e7d8;--rule:#efd6c1;--ac:#e8705f;--p1:#e8705f;--ac-soft:#fde6df;--l1:#fcdcd2;--l2:#f8b3a3;--l3:#ef8d7a;--l4:#e8705f}
+html[data-theme=dark][data-skin=navy]{--desk:#0b1a33;--page:#12244a;--fill:#1a3060;--hair:#1c315a;--rule:#29437a;--ac:#6ea8ff;--p1:#6ea8ff;--ac-soft:#1b3a6e;--l1:#173566;--l2:#24508f;--l3:#3c73c4;--l4:#6ea8ff;--tbg:#29437a}
+html[data-theme=dark][data-skin=teal]{--desk:#061a21;--page:#0c2731;--fill:#123542;--hair:#133441;--rule:#1f4a5a;--ac:#5fc1c4;--p1:#5fc1c4;--ac-soft:#11414a;--l1:#0f3d47;--l2:#1b6068;--l3:#3a8f94;--l4:#5fc1c4;--tbg:#1f4a5a}
+html[data-theme=dark][data-skin=forest]{--desk:#0b1411;--page:#12211b;--fill:#1a2e26;--hair:#1b2e26;--rule:#284438;--ac:#5fc49a;--p1:#5fc49a;--ac-soft:#173a2e;--l1:#163a2d;--l2:#245c47;--l3:#3b8a6b;--l4:#5fc49a;--tbg:#284438}
+html[data-theme=dark][data-skin=wine]{--desk:#1c0a0d;--page:#2a1015;--fill:#38171d;--hair:#36161c;--rule:#4d2128;--ac:#f0707a;--p1:#f0707a;--ac-soft:#4a1b22;--l1:#4a1a21;--l2:#7a2632;--l3:#b3404d;--l4:#f0707a;--tbg:#4d2128}
+html[data-theme=dark][data-skin=cocoa]{--desk:#1a120e;--page:#261a15;--fill:#33241d;--hair:#31231c;--rule:#47342a;--ac:#d9965f;--p1:#d9965f;--ac-soft:#4a3222;--l1:#40291c;--l2:#6e4428;--l3:#a8693c;--l4:#d9965f;--tbg:#47342a}
+html[data-theme=dark][data-skin=olive]{--desk:#15160b;--page:#1f2112;--fill:#2a2d19;--hair:#2a2c19;--rule:#3d4126;--ac:#b9c46a;--p1:#b9c46a;--ac-soft:#363b1c;--l1:#33381b;--l2:#525a2b;--l3:#7c8a40;--l4:#b9c46a;--tbg:#3d4126}
+html[data-theme=dark][data-skin=plum]{--desk:#11112a;--page:#191a3a;--fill:#22244c;--hair:#22244a;--rule:#323668;--ac:#9fa2ff;--p1:#9fa2ff;--ac-soft:#2a2c66;--l1:#262a5e;--l2:#3b4196;--l3:#6064d6;--l4:#9fa2ff;--tbg:#323668}
+.skins{display:flex;flex-wrap:wrap;gap:8px}.skb{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid transparent;border-radius:12px;padding:5px 6px;background:none;cursor:pointer;font-size:.74rem;color:var(--ink-2)}.skb[aria-pressed=true]{border-color:var(--ac);color:var(--ink)}.skb i{display:block;width:38px;height:28px;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:linear-gradient(90deg,var(--a) 0 34%,var(--b) 34% 67%,var(--c) 67%)}
 select option,select optgroup{background:var(--page);color:var(--ink)}
 html[data-theme=dark] select option:checked{background:var(--ac-soft);color:#fff}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -3963,7 +3978,10 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
   /* 화면 모드 (기기별) */
   const themePref=()=>{try{return localStorage.getItem('diarybook-theme')||'auto'}catch(e){return'auto'}};
   const themeMQ=matchMedia('(prefers-color-scheme: dark)');
-  function applyTheme(){const t=themePref(),d=t==='dark'||(t==='auto'&&themeMQ.matches);document.documentElement.dataset.theme=d?'dark':'light';const m=document.querySelector('meta[name=theme-color]');if(m)m.content=d?'#0f1115':'#f2f4f7'}
+  const SKINS=[['', '기본', '#f2f4f7', '#ffffff', '#4772fa'], ['cream', '크림', '#f5efdc', '#fffdf6', '#7c8f4e'], ['sage', '세이지', '#e8f0e0', '#fbfdf8', '#55785d'], ['sky', '스카이', '#e4eef9', '#fafcff', '#2f7fd6'], ['blush', '블러시', '#f9ecec', '#fffafa', '#d0606e'], ['sand', '샌드', '#f1e8dc', '#fffbf5', '#a8693c'], ['lav', '라벤더', '#eeedfb', '#fcfbff', '#5d5fef'], ['peach', '피치', '#fdefe2', '#fffaf5', '#e8705f']];
+  const DSKINS=[['', '기본', '#0f1115', '#181a1f', '#6d8dff'], ['navy', '네이비', '#0b1a33', '#12244a', '#6ea8ff'], ['teal', '딥틸', '#061a21', '#0c2731', '#5fc1c4'], ['forest', '포레스트', '#0b1411', '#12211b', '#5fc49a'], ['wine', '와인', '#1c0a0d', '#2a1015', '#f0707a'], ['cocoa', '에스프레소', '#1a120e', '#261a15', '#d9965f'], ['olive', '올리브', '#15160b', '#1f2112', '#b9c46a'], ['plum', '미드나잇', '#11112a', '#191a3a', '#9fa2ff']];
+  const skinPref=dk=>{try{return localStorage.getItem(dk?'diarybook-skin-dark':'diarybook-skin')||''}catch(e){return''}};
+  function applyTheme(){const t=themePref(),d=t==='dark'||(t==='auto'&&themeMQ.matches),sk=skinPref(d);document.documentElement.dataset.theme=d?'dark':'light';document.documentElement.dataset.skin=sk;const L=d?DSKINS:SKINS;const m=document.querySelector('meta[name=theme-color]');if(m)m.content=(L.find(x=>x[0]===sk)||L[0])[2]}
   try{themeMQ.addEventListener('change',()=>{if(themePref()==='auto')applyTheme()})}catch(e){}
   const GPUSH={
     lvopen:()=>{flushAll();S.view='tasks';S.tl='quest';S.tsel=null;S.wsel=null;S.mmore=false;S.side=false;try{localStorage.setItem(LSV,'tasks');localStorage.setItem('diarybook-tl','quest')}catch(e){}render();window.scrollTo(0,0)},
@@ -4016,6 +4034,7 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     rvcopy:()=>{const pre=document.getElementById('rvpre');if(!pre)return;const t=pre.textContent;
       const ok=()=>flash('주간보고 초안을 복사했습니다');
       if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,()=>{selPre(pre);flash('복사가 막혀 있어 글을 선택해 두었습니다 — 길게 눌러 복사하세요')});else{selPre(pre);flash('글을 선택해 두었습니다 — 복사하세요')}},
+    skin:b=>{try{localStorage.setItem(b.dataset.dk?'diarybook-skin-dark':'diarybook-skin',b.dataset.v)}catch(e){}applyTheme();render()},
     theme:b=>{try{localStorage.setItem('diarybook-theme',b.dataset.v)}catch(e){}applyTheme();render()},
     gpushedit:()=>{S.gpushEdit=!S.gpushEdit;render()},
     gpushsave:async()=>{const v=(document.getElementById('gPushUrl').value||'').trim().replace(/\/+$/,'');
@@ -4584,6 +4603,8 @@ Aerobics|Cardio|t;Running (Treadmill)|Cardio|t;Cycling (Indoor)|Cardio|t;Ellipti
     const left=`<div class="set">
       <div class="set-row"><span class="lab">다이어리 이름</span><input type="text" id="cfgTitle" data-b="cfg|title" value="${esc(D('cfg').title||'')}" placeholder="Diary Book" maxlength="30"></div>
       <div class="set-row"><span class="lab">화면 모드</span><div class="seg">${[['light','라이트'],['dark','다크'],['auto','기기 설정 따라']].map(([k,n])=>`<button data-act="theme" data-v="${k}" aria-pressed="${themePref()===k}">${n}</button>`).join('')}</div><span class="gnote">기기마다 따로 정해집니다.</span></div>
+      <div class="set-row"><span class="lab">배경 색 · 라이트</span><div class="skins">${SKINS.map(([k,n,d,pg,a])=>`<button class="skb" data-act="skin" data-v="${k}" aria-pressed="${skinPref()===k}"><i style="--a:${d};--b:${pg};--c:${a}"></i>${n}</button>`).join('')}</div></div>
+      <div class="set-row"><span class="lab">배경 색 · 다크</span><div class="skins">${DSKINS.map(([k,n,d,pg,a])=>`<button class="skb" data-act="skin" data-dk="1" data-v="${k}" aria-pressed="${skinPref(1)===k}"><i style="--a:${d};--b:${pg};--c:${a}"></i>${n}</button>`).join('')}</div><span class="gnote">화면 모드가 라이트일 땐 위, 다크일 땐 아래 색이 쓰입니다. 기기 설정 따라로 두면 낮·밤에 자동으로 바뀝니다.</span></div>
       <div class="set-row"><span class="lab">월간 보기</span><div class="seg"><button data-act="mode" data-m="0" aria-pressed="${!c.photoMode}">TEXT</button><button data-act="mode" data-m="1" aria-pressed="${c.photoMode}">PHOTO</button></div></div>
       ${CLIENT_ID_DEFAULT?'':`<div class="set-row"><span class="lab">구글 클라이언트 ID</span><input type="text" id="cidInput" value="${esc(lsGet(LS_CID)||'')}" placeholder="0000-xxxx.apps.googleusercontent.com" autocomplete="off" spellcheck="false"><span class="gnote">Google Cloud에서 발급한 OAuth 클라이언트 ID입니다. 기기마다 한 번 입력하거나, index.html 맨 위에 넣어두면 입력할 필요가 없습니다.</span></div>`}
       <div class="set-row"><span class="lab">구글 계정</span><span>${authed()?'연결됨':'연결 안 됨'}${S.authErr?` · 로그인 실패(${esc(S.authErr)})`:''}</span><div class="li">${authed()?'<button class="btn" data-act="signout">연결 해제</button>':'<button class="btn dark" data-act="signin">구글 연결</button>'}</div></div>
